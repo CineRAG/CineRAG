@@ -116,11 +116,3 @@ Watched list:
 Chat:
 - `POST /api/chat` (requires `session_id`)
 
-## Source of Truth
-
-Project design and interfaces are defined in:
-- `docs/cinerag_3_week_project_plan.md`
-- `docs/interface_contract.md`
-- `docs/1_cinerag_project_plan.md`
-
-Implementation should follow those docs strictly for endpoint shapes, schemas, and integration boundaries.
