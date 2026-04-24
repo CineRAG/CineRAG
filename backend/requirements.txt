@@ -1,0 +1,13 @@
+fastapi==0.115.*
+uvicorn==0.34.*
+sqlalchemy==2.0.*
+python-jose[cryptography]==3.3.*
+passlib[bcrypt]==1.7.*
+bcrypt==4.0.1
+pydantic==2.*
+sentence-transformers==3.*
+chromadb==0.5.*
+rank-bm25==0.2.*
+requests==2.*
+numpy==1.*
+pytest==8.*

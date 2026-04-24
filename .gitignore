@@ -1,0 +1,31 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+.venv*/
+venv/
+env/
+
+# Local DB and runtime artifacts
+*.db
+*.sqlite3
+*.log
+
+# Python tooling cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDE/editor
+.vscode/
+.idea/
+
+# Local tool artifacts
+.codex
+
+# Project docs should stay local
+/docs/
