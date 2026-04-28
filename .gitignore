@@ -30,4 +30,5 @@ env/
 # Project docs should stay local
 /docs/
 /backend/docs/
+/Contest/
 
