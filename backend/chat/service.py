@@ -59,33 +59,74 @@ class ChatService:
             "retrieval_method": "hybrid_rrf",
         }
 
-        parsed_intent = self.preprocessor.parse(user_message, conversation_history)
-        debug["parsed_intent"] = parsed_intent
+        try:
+            # 1. Parse intent
+            parsed_intent = self.preprocessor.parse(user_message, conversation_history)
 
-        reference_movie_data = None
-        if parsed_intent.get("reference_movie"):
-            hits = self.retriever.search_by_title(parsed_intent["reference_movie"], top_k=1)
-            if hits:
-                reference_movie_data = hits[0]
+            # 2. Refinement stretch goal is OFF for Week 1 — treat as fresh query.
+            if parsed_intent.get("intent") == "refine_previous":
+                logger.info(
+                    "ChatService: refine_previous detected, falling back to fresh query"
+                )
+                parsed_intent["intent"] = "find_by_mood"
+                parsed_intent["refinement"] = None
 
-        expanded_query = self.expander.expand(parsed_intent, reference_movie_data)
-        debug["expanded_query"] = expanded_query
+            debug["parsed_intent"] = parsed_intent
 
-        candidates = self.retriever.retrieve_hybrid(expanded_query, top_k=50)
-        debug["num_candidates_before_filter"] = len(candidates)
+            # 3. Short-circuit for general questions: skip stages 2-6.
+            if parsed_intent.get("intent") == "general_question":
+                debug["retrieval_method"] = "skipped"
+                gen_result = self.generator.generate(
+                    user_message=user_message,
+                    reranked_movies=[],
+                    parsed_intent=parsed_intent,
+                    conversation_history=conversation_history,
+                )
+                return self._wrap(session_id, gen_result, debug)
 
-        filtered = _filter_watched(candidates, watched_movie_ids)
-        debug["num_candidates_after_filter"] = len(filtered)
+            # 4. Reference resolution
+            reference_movie_data = None
+            if parsed_intent.get("reference_movie"):
+                hits = self.retriever.search_by_title(
+                    parsed_intent["reference_movie"], top_k=1
+                )
+                if hits:
+                    reference_movie_data = hits[0]
 
-        reranked = _rerank(filtered, parsed_intent, top_k=5)
+            # 5. Expand
+            expanded_query = self.expander.expand(parsed_intent, reference_movie_data)
+            debug["expanded_query"] = expanded_query
 
-        gen_result = self.generator.generate(
-            user_message=user_message,
-            reranked_movies=reranked,
-            parsed_intent=parsed_intent,
-            conversation_history=conversation_history,
-        )
+            # 6. Retrieve
+            candidates = self.retriever.retrieve_hybrid(expanded_query, top_k=50)
+            debug["num_candidates_before_filter"] = len(candidates)
 
+            # 7. Filter + rerank (Person A stand-ins until Week 2)
+            filtered = _filter_watched(candidates, watched_movie_ids)
+            debug["num_candidates_after_filter"] = len(filtered)
+            reranked = _rerank(filtered, parsed_intent, top_k=5)
+
+            # 8. Generate
+            gen_result = self.generator.generate(
+                user_message=user_message,
+                reranked_movies=reranked,
+                parsed_intent=parsed_intent,
+                conversation_history=conversation_history,
+            )
+            return self._wrap(session_id, gen_result, debug)
+
+        except (ConnectionError, TimeoutError, ImportError) as exc:
+            logger.error(
+                "ChatService: pipeline failed (%s): %s", type(exc).__name__, exc
+            )
+            return {
+                "session_id": session_id,
+                "response_text": SERVICE_UNAVAILABLE_TEXT,
+                "recommendations": [],
+                "debug": debug,
+            }
+
+    def _wrap(self, session_id: str, gen_result: dict, debug: dict) -> dict:
         return {
             "session_id": session_id,
             "response_text": gen_result["response_text"],

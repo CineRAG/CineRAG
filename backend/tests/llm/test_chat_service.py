@@ -74,3 +74,143 @@ def test_full_pipeline_produces_chat_response_shape():
     assert out["debug"]["num_candidates_before_filter"] == 5
     assert out["debug"]["num_candidates_after_filter"] == 5
     retriever.search_by_title.assert_not_called()
+
+
+def test_general_question_skips_retrieval_and_returns_no_recs():
+    retriever = _make_retriever()
+    llm = _make_llm()
+    service = ChatService(retriever=retriever, llm_client=llm)
+    parsed = {
+        "intent": "general_question",
+        "reference_movie": None,
+        "attributes": {"genre": None, "mood": None, "era": None, "exclusions": None},
+        "refinement": None,
+    }
+    gen_result = {"response_text": "Here's an explanation.", "recommendations": []}
+    _stub_pipeline(service, parsed, "should not be called", gen_result)
+
+    out = service.process_chat(
+        user_message="What's neo-noir?",
+        session_id="s2",
+        user_id=42,
+        watched_movie_ids=set(),
+    )
+
+    assert out["recommendations"] == []
+    assert out["response_text"] == "Here's an explanation."
+    assert out["debug"]["retrieval_method"] == "skipped"
+    assert out["debug"]["expanded_query"] == ""
+    assert out["debug"]["num_candidates_before_filter"] == 0
+    retriever.retrieve_hybrid.assert_not_called()
+    service.expander.expand.assert_not_called()
+
+
+def test_refine_previous_falls_back_to_fresh_query():
+    retriever = _make_retriever()
+    llm = _make_llm()
+    service = ChatService(retriever=retriever, llm_client=llm)
+    parsed = {
+        "intent": "refine_previous",
+        "reference_movie": None,
+        "attributes": {"genre": None, "mood": None, "era": "1990s", "exclusions": None},
+        "refinement": "more recent",
+    }
+    gen_result = {"response_text": "ok", "recommendations": []}
+    _stub_pipeline(service, parsed, "fresh expanded", gen_result)
+
+    out = service.process_chat(
+        user_message="more recent please",
+        session_id="s3",
+        user_id=42,
+        watched_movie_ids=set(),
+    )
+
+    # Pipeline ran end-to-end, but parsed_intent in debug was rewritten
+    assert out["debug"]["parsed_intent"]["intent"] == "find_by_mood"
+    assert out["debug"]["parsed_intent"]["refinement"] is None
+
+
+def test_reference_movie_resolution_uses_search_by_title():
+    retriever = _make_retriever()
+    llm = _make_llm()
+    service = ChatService(retriever=retriever, llm_client=llm)
+    parsed = {
+        "intent": "find_similar",
+        "reference_movie": "Inception",
+        "attributes": {"genre": None, "mood": "emotional", "era": None, "exclusions": None},
+        "refinement": None,
+    }
+    gen_result = {"response_text": "ok", "recommendations": []}
+    _stub_pipeline(service, parsed, "expanded", gen_result)
+
+    service.process_chat(
+        user_message="like Inception but emotional",
+        session_id="s4",
+        user_id=42,
+        watched_movie_ids=set(),
+    )
+
+    retriever.search_by_title.assert_called_once_with("Inception", top_k=1)
+    args, kwargs = service.expander.expand.call_args
+    assert kwargs.get("reference_movie_data") is not None or (len(args) >= 2 and args[1] is not None)
+
+
+def test_watched_filter_drops_watched_movies():
+    retriever = _make_retriever()
+    llm = _make_llm()
+    service = ChatService(retriever=retriever, llm_client=llm)
+    parsed = {
+        "intent": "find_by_mood",
+        "reference_movie": None,
+        "attributes": {"genre": None, "mood": None, "era": None, "exclusions": None},
+        "refinement": None,
+    }
+    gen_result = {"response_text": "ok", "recommendations": []}
+    _stub_pipeline(service, parsed, "expanded", gen_result)
+
+    out = service.process_chat(
+        user_message="x",
+        session_id="s5",
+        user_id=42,
+        watched_movie_ids={"456789", "975900"},  # Inception + Titanic
+    )
+
+    assert out["debug"]["num_candidates_before_filter"] == 5
+    assert out["debug"]["num_candidates_after_filter"] == 3
+
+
+def test_connection_error_returns_graceful_response():
+    retriever = _make_retriever()
+    llm = _make_llm()
+    service = ChatService(retriever=retriever, llm_client=llm)
+    service.preprocessor = MagicMock()
+    service.preprocessor.parse.side_effect = ConnectionError("ollama down")
+
+    out = service.process_chat(
+        user_message="x",
+        session_id="s6",
+        user_id=42,
+        watched_movie_ids=set(),
+    )
+
+    assert out["recommendations"] == []
+    assert "unavailable" in out["response_text"].lower()
+    assert out["session_id"] == "s6"
+
+
+def test_timeout_error_returns_graceful_response():
+    retriever = _make_retriever()
+    llm = _make_llm()
+    service = ChatService(retriever=retriever, llm_client=llm)
+    service.preprocessor = MagicMock()
+    service.preprocessor.parse.side_effect = TimeoutError("slow")
+
+    out = service.process_chat(
+        user_message="x",
+        session_id="s7",
+        user_id=42,
+        watched_movie_ids=set(),
+    )
+
+    assert out["recommendations"] == []
+    assert "unavailable" in out["response_text"].lower()
