@@ -65,7 +65,7 @@ class TestExpand:
         expander = QueryExpander(client)
         expander.expand(PARSED_INTENT_NO_REF)
         sent = client.generate.call_args.args[0]
-        assert "Reference movie" not in sent
+        assert 'Reference movie: "' not in sent
 
     def test_strips_whitespace_from_output(self):
         client = _client("\n  A clean description.   \n\n")

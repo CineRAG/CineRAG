@@ -8,7 +8,7 @@ Intent: {{"intent": "find_by_mood", "attributes": {{"genre": "sci-fi", "mood": "
 Output: A cerebral science fiction film that explores big ideas about humanity, time, or consciousness. The tone is thoughtful and contemplative rather than action-driven. The story should leave room for ambiguity and emotional resonance. It avoids horror tropes and graphic violence. Visual atmosphere matters - quiet wonder rather than shock.
 
 Intent: {{"intent": "find_similar", "reference_movie": "Inception", "attributes": {{"mood": "emotional"}}}}
-Reference film: a heist-of-the-mind thriller about extracting and planting ideas inside dreams, with a grieving protagonist haunted by his late wife.
+Reference movie: a heist-of-the-mind thriller about extracting and planting ideas inside dreams, with a grieving protagonist haunted by his late wife.
 Output: A psychological thriller that blends layered reality and dream logic with deep emotional stakes. The protagonist carries unresolved grief that shapes the story's climax. The narrative bends time and perception while keeping a beating human heart at its center. Visually inventive but grounded in character. The audience should feel both wonder and ache.
 
 CURRENT INPUT
