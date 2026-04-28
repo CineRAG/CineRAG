@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-import pytest
-
 from backend.chat.service import ChatService
 from backend.tests.llm.mock_data import MOCK_RETRIEVAL_RESULTS
 
@@ -74,3 +72,5 @@ def test_full_pipeline_produces_chat_response_shape():
     assert out["debug"]["expanded_query"] == "expanded query text"
     assert out["debug"]["retrieval_method"] == "hybrid_rrf"
     assert out["debug"]["num_candidates_before_filter"] == 5
+    assert out["debug"]["num_candidates_after_filter"] == 5
+    retriever.search_by_title.assert_not_called()

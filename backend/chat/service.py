@@ -1,4 +1,4 @@
-"""Chat orchestrator — chains all 6 RAG stages.
+"""Chat orchestrator — single entry point for /api/chat.
 
 This is the single entry point Person C's `/api/chat` endpoint calls.
 See Contest/interface_contract.md §3 (process_chat pipeline).
@@ -20,17 +20,22 @@ SERVICE_UNAVAILABLE_TEXT = (
 )
 
 
+# TODO(week2): replace with backend.rag.filter.filter_watched (Person A)
 def _filter_watched(candidates: list[dict], watched_ids: set[str]) -> list[dict]:
     """Local stand-in for Person A's filter — drops watched movies from candidates."""
     return [c for c in candidates if c["movie_id"] not in watched_ids]
 
 
+# TODO(week2): replace with backend.rag.reranker.rerank (Person A)
 def _rerank(candidates: list[dict], parsed_intent: dict, top_k: int = 5) -> list[dict]:
     """Local stand-in for Person A's reranker — passes through top_k by score."""
+    del parsed_intent  # placeholder ignores intent; real reranker uses it
     return list(candidates[:top_k])
 
 
 class ChatService:
+    """Orchestrator for the /api/chat pipeline (Person B's single entry point)."""
+
     def __init__(self, retriever: Any, llm_client: OllamaClient) -> None:
         self.retriever = retriever
         self.llm_client = llm_client
