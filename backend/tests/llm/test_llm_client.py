@@ -39,6 +39,7 @@ class TestGenerate:
         assert payload["system"] == "sys"
         assert payload["stream"] is False
         assert payload["options"] == {"temperature": 0.5, "num_predict": 512}
+        assert mock_post.call_args.kwargs["timeout"] == 120
 
     def test_default_temperature_and_max_tokens(self):
         client = OllamaClient()
@@ -66,3 +67,25 @@ class TestGenerate:
         ):
             with pytest.raises(TimeoutError):
                 client.generate("p")
+
+    def test_raises_connection_error_on_http_error(self):
+        client = OllamaClient()
+        bad_resp = MagicMock()
+        bad_resp.status_code = 500
+        bad_resp.raise_for_status.side_effect = requests.HTTPError(
+            "500 Server Error", response=bad_resp
+        )
+        with patch(
+            "backend.rag.llm_client.requests.post",
+            return_value=bad_resp,
+        ):
+            with pytest.raises(ConnectionError):
+                client.generate("p")
+
+    def test_strips_trailing_slash_from_base_url(self):
+        client = OllamaClient(base_url="http://localhost:11434/")
+        fake = _make_response({"response": "ok"})
+        with patch("backend.rag.llm_client.requests.post", return_value=fake) as mock_post:
+            client.generate("p")
+        url = mock_post.call_args.args[0]
+        assert url == "http://localhost:11434/api/generate"

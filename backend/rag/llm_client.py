@@ -43,20 +43,33 @@ class OllamaClient:
             "stream": False,
             "options": {"temperature": temperature, "num_predict": max_tokens},
         }
+        url = f"{self.base_url}/api/generate"
         try:
             response = requests.post(
-                f"{self.base_url}/api/generate",
+                url,
                 json=payload,
                 timeout=REQUEST_TIMEOUT_SECONDS,
             )
             response.raise_for_status()
         except requests.Timeout as exc:
+            logger.error(
+                "Ollama timeout after %ds calling %s", REQUEST_TIMEOUT_SECONDS, url
+            )
             raise TimeoutError(
                 f"Ollama request exceeded {REQUEST_TIMEOUT_SECONDS}s"
             ) from exc
         except requests.ConnectionError as exc:
+            logger.error("Ollama connection failed at %s: %s", self.base_url, exc)
             raise ConnectionError(
                 f"Could not reach Ollama at {self.base_url}: {exc}"
+            ) from exc
+        except requests.HTTPError as exc:
+            status = exc.response.status_code if exc.response is not None else "?"
+            logger.error(
+                "Ollama returned HTTP %s for %s: %s", status, url, exc
+            )
+            raise ConnectionError(
+                f"Ollama returned HTTP {status} from {url}: {exc}"
             ) from exc
         body = response.json()
         return body["response"]
