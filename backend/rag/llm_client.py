@@ -5,7 +5,9 @@ instance to call the local Mistral model.
 """
 from __future__ import annotations
 
+import json
 import logging
+import re
 from typing import Any
 
 import requests
@@ -13,6 +15,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 REQUEST_TIMEOUT_SECONDS = 120
+JSON_PARSE_RETRY_HINT = "\n\nRespond with valid JSON only, no markdown backticks."
 
 
 class OllamaClient:
@@ -73,3 +76,32 @@ class OllamaClient:
             ) from exc
         body = response.json()
         return body["response"]
+
+    def generate_json(
+        self,
+        prompt: str,
+        system_prompt: str = "",
+        temperature: float = 0.3,
+    ) -> dict:
+        first_raw = self.generate(prompt, system_prompt, temperature)
+        try:
+            return _parse_json_strict(first_raw)
+        except ValueError:
+            logger.warning("LLM JSON parse failed on first attempt; retrying once")
+
+        retry_prompt = prompt + JSON_PARSE_RETRY_HINT
+        second_raw = self.generate(retry_prompt, system_prompt, temperature)
+        try:
+            return _parse_json_strict(second_raw)
+        except ValueError:
+            logger.error("LLM JSON parse failed twice; returning error dict")
+            return {"error": "json_parse_failed", "raw_response": second_raw}
+
+
+_FENCE_RE = re.compile(r"^\s*```(?:json)?\s*|\s*```\s*$", re.MULTILINE)
+
+
+def _parse_json_strict(text: str) -> dict:
+    """Strip markdown code fences and parse strict JSON. Raises ValueError on failure."""
+    cleaned = _FENCE_RE.sub("", text).strip()
+    return json.loads(cleaned)

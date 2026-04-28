@@ -89,3 +89,52 @@ class TestGenerate:
             client.generate("p")
         url = mock_post.call_args.args[0]
         assert url == "http://localhost:11434/api/generate"
+
+
+class TestGenerateJson:
+    def test_parses_valid_json_response(self):
+        client = OllamaClient()
+        fake = _make_response({"response": '{"intent": "find_similar"}'})
+        with patch("backend.rag.llm_client.requests.post", return_value=fake):
+            out = client.generate_json("prompt")
+        assert out == {"intent": "find_similar"}
+
+    def test_strips_markdown_code_fences(self):
+        client = OllamaClient()
+        fenced = '```json\n{"intent": "find_by_mood"}\n```'
+        fake = _make_response({"response": fenced})
+        with patch("backend.rag.llm_client.requests.post", return_value=fake):
+            out = client.generate_json("prompt")
+        assert out == {"intent": "find_by_mood"}
+
+    def test_retries_once_on_malformed_json(self):
+        client = OllamaClient()
+        bad = _make_response({"response": "not json at all"})
+        good = _make_response({"response": '{"intent": "find_similar"}'})
+        with patch(
+            "backend.rag.llm_client.requests.post",
+            side_effect=[bad, good],
+        ) as mock_post:
+            out = client.generate_json("p")
+        assert out == {"intent": "find_similar"}
+        assert mock_post.call_count == 2
+        retry_prompt = mock_post.call_args_list[1].kwargs["json"]["prompt"]
+        assert "valid JSON only" in retry_prompt
+
+    def test_returns_error_dict_after_two_failures(self):
+        client = OllamaClient()
+        bad = _make_response({"response": "garbage"})
+        with patch(
+            "backend.rag.llm_client.requests.post",
+            return_value=bad,
+        ) as mock_post:
+            out = client.generate_json("p")
+        assert out == {"error": "json_parse_failed", "raw_response": "garbage"}
+        assert mock_post.call_count == 2
+
+    def test_uses_lower_default_temperature_for_json(self):
+        client = OllamaClient()
+        fake = _make_response({"response": '{"k": 1}'})
+        with patch("backend.rag.llm_client.requests.post", return_value=fake) as mock_post:
+            client.generate_json("p")
+        assert mock_post.call_args.kwargs["json"]["options"]["temperature"] == 0.3
