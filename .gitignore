@@ -31,3 +31,8 @@ env/
 /docs/
 /backend/docs/
 
+# RAG data artifacts — large files, never commit
+data/raw/
+data/processed/
+data/chroma_db/
+*.pkl
