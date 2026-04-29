@@ -1,0 +1,85 @@
+{
+  "user_message": "I want a feel-good comedy from the 90s, no horror please",
+  "parsed_intent": {
+    "intent": "find_by_mood",
+    "reference_movie": null,
+    "attributes": {
+      "genre": "comedy",
+      "mood": "feel-good",
+      "era": "1990s",
+      "exclusions": "no horror"
+    },
+    "refinement": null
+  },
+  "expanded_query": "A humorous and uplifting comedy set in the 1990s that offers a heartwarming portrayal of friendship or romance. The tone is light-hearted and optimistic, focusing on laughter and camaraderie rather than drama. Absent any horror elements, it maintains a joyful atmosphere with a memorable soundtrack and colorful visual style. The narrative centers around relatable characters facing everyday challenges and finding unexpected solutions.",
+  "mock_retrieval_used": true,
+  "final_chat_response": {
+    "session_id": "trace_02",
+    "response_text": "Here are some feel-good comedies from the 90s that might suit your preference. Let's dive in!",
+    "recommendations": [
+      {
+        "movie_id": "234567",
+        "title": "The Notebook",
+        "year": 2004,
+        "genres": [
+          "Drama",
+          "Romance"
+        ],
+        "explanation": "The Notebook is a romantic drama set in the 1940s, which fits your request for a feel-good comedy from the 90s.",
+        "plot_preview": "A young couple from different social backgrounds fall deeply in love during one summer in the 1940s. Decades later, an elderly man reads their story from a notebook to a woman in a nursing home, hoping to rekindle her fading memories of their life together.",
+        "match_reasons": [
+          "shared theme: love",
+          "emotional core"
+        ]
+      },
+      {
+        "movie_id": "345678",
+        "title": "Eternal Sunshine of the Spotless Mind",
+        "year": 2004,
+        "genres": [
+          "Drama",
+          "Romance",
+          "Science Fiction"
+        ],
+        "explanation": "Eternal Sunshine of the Spotless Mind, while a drama-romance-sci-fi blend, has comedic elements and was released in 2004.",
+        "plot_preview": "Joel Barish discovers that his ex-girlfriend Clementine has undergone a medical procedure to erase all memories of their relationship. Devastated, he decides to undergo the same procedure, but as his memories of Clementine are being erased, he realizes he still loves her and fights to preserve them.",
+        "match_reasons": [
+          "shared decade: 90s",
+          "emotional core"
+        ]
+      },
+      {
+        "movie_id": "567890",
+        "title": "Arrival",
+        "year": 2016,
+        "genres": [
+          "Drama",
+          "Science Fiction"
+        ],
+        "explanation": "Arrival, though primarily a drama-sci-fi, has some comedic elements and was released in 2016. It might provide a unique blend of genres.",
+        "plot_preview": "When mysterious spacecraft land around the world, linguist Louise Banks is recruited by the military to communicate with the alien visitors. As she deciphers their language, she begins experiencing visions of the future that challenge her understanding of time and force her to confront a deeply pers",
+        "match_reasons": [
+          "shared decade: 90s",
+          "emotional core"
+        ]
+      }
+    ],
+    "debug": {
+      "parsed_intent": {
+        "intent": "find_by_mood",
+        "reference_movie": null,
+        "attributes": {
+          "genre": "comedy",
+          "mood": "feel-good",
+          "era": "1990s",
+          "exclusions": "no horror"
+        },
+        "refinement": null
+      },
+      "expanded_query": "A lighthearted comedy from the 1990s that evokes a sense of nostalgia and joy. The story centers around relatable characters navigating their lives with humor and heart. It avoids horror elements, instead focusing on wholesome humor and uplifting moments. The atmosphere is warm and optimistic, making it an ideal feel-good movie for any audience.",
+      "num_candidates_before_filter": 5,
+      "num_candidates_after_filter": 5,
+      "retrieval_method": "hybrid_rrf"
+    }
+  }
+}

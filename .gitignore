@@ -32,3 +32,6 @@ env/
 /backend/docs/
 /Contest/
 
+# Local-only one-off scripts (e.g. trace capture)
+/scripts_local/
+
