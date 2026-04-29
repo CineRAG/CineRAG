@@ -1,0 +1,1054 @@
+{
+  "eval_date": "2026-04-29T22:25:12",
+  "top_k": 5,
+  "num_queries": 20,
+  "results": [
+    {
+      "method": "dense",
+      "mrr_at_5": 0.1167,
+      "ndcg_at_5": 0.125,
+      "num_queries": 20,
+      "num_hits": 3,
+      "per_query": [
+        {
+          "query_id": "q01",
+          "query": "A psychological thriller about dreams and the subconscious mind",
+          "expected_ids": [
+            "23270459"
+          ],
+          "ranked_ids": [
+            "34405021",
+            "30684033",
+            "9613149",
+            "20398475",
+            "2945187"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q02",
+          "query": "Epic romance between people from different social classes aboard a ship",
+          "expected_ids": [
+            "52371"
+          ],
+          "ranked_ids": [
+            "24961327",
+            "15927958",
+            "16730206",
+            "13269529",
+            "32966863"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q03",
+          "query": "Science fiction film about time travel and a scientist trying to save the future",
+          "expected_ids": [
+            "4260551"
+          ],
+          "ranked_ids": [
+            "31748550",
+            "8922224",
+            "972940",
+            "35951335",
+            "5804666"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q04",
+          "query": "Uplifting animated story about a father searching for his missing son in the ocean",
+          "expected_ids": [
+            "239587"
+          ],
+          "ranked_ids": [
+            "3732626",
+            "19936431",
+            "25750288",
+            "9726554",
+            "12978934"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q05",
+          "query": "Dystopian sci-fi where people live in a simulated reality controlled by machines",
+          "expected_ids": [
+            "30007"
+          ],
+          "ranked_ids": [
+            "31255687",
+            "27539366",
+            "14076686",
+            "13755733",
+            "33323067"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q06",
+          "query": "A crime drama about a mob boss and his family dynasty in America",
+          "expected_ids": [
+            "2466773"
+          ],
+          "ranked_ids": [
+            "15560266",
+            "3861698",
+            "23974422",
+            "19108615",
+            "35645737"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q07",
+          "query": "Two friends on a road trip after escaping a long prison sentence",
+          "expected_ids": [
+            "30625"
+          ],
+          "ranked_ids": [
+            "1629120",
+            "4944673",
+            "25336781",
+            "16676995",
+            "19046091"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q08",
+          "query": "Romantic drama about two people who erase memories of each other",
+          "expected_ids": [
+            "537024"
+          ],
+          "ranked_ids": [
+            "22538902",
+            "17214601",
+            "24961327",
+            "9168916",
+            "14595722"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q09",
+          "query": "Horror film about a family haunted by supernatural forces in an isolated hotel",
+          "expected_ids": [
+            "1186616"
+          ],
+          "ranked_ids": [
+            "33027963",
+            "1373219",
+            "33633066",
+            "19086354",
+            "19954049"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q10",
+          "query": "Animated fantasy about a young girl who enters a magical spirit world",
+          "expected_ids": [
+            "70091"
+          ],
+          "ranked_ids": [
+            "4390109",
+            "3041353",
+            "612752",
+            "31489265",
+            "313002"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q11",
+          "query": "1990s thriller about a serial killer who leaves philosophical messages at crime scenes",
+          "expected_ids": [
+            "206818"
+          ],
+          "ranked_ids": [
+            "26953667",
+            "32726414",
+            "2295249",
+            "30913159",
+            "28177876"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q12",
+          "query": "1980s adventure about a young boy who discovers a friendly alien creature",
+          "expected_ids": [
+            "73441"
+          ],
+          "ranked_ids": [
+            "73441",
+            "34548840",
+            "8786958",
+            "2730274",
+            "6804178"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q13",
+          "query": "Dark comedy about war showing the absurdity and futility of military conflict",
+          "expected_ids": [
+            "8695"
+          ],
+          "ranked_ids": [
+            "23484100",
+            "30500829",
+            "19920525",
+            "8494294",
+            "27767451"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q14",
+          "query": "Biographical film about a mathematician who battles mental illness and wins a Nobel Prize",
+          "expected_ids": [
+            "3569822"
+          ],
+          "ranked_ids": [
+            "34890118",
+            "32833838",
+            "3569822",
+            "7583313",
+            "25811332"
+          ],
+          "mrr": 0.3333,
+          "ndcg": 0.5,
+          "hit": true
+        },
+        {
+          "query_id": "q15",
+          "query": "Epic fantasy quest where a fellowship must destroy a powerful ring",
+          "expected_ids": [
+            "173941"
+          ],
+          "ranked_ids": [
+            "173941",
+            "396607",
+            "173944",
+            "516463",
+            "22635334"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q16",
+          "query": "Heist film where criminals plan an elaborate robbery of a Las Vegas casino",
+          "expected_ids": [
+            "2251266"
+          ],
+          "ranked_ids": [
+            "27763708",
+            "25432586",
+            "3862631",
+            "24598397",
+            "11392581"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q17",
+          "query": "Emotional drama about a man with low intelligence who witnesses historic American events",
+          "expected_ids": [
+            "41528"
+          ],
+          "ranked_ids": [
+            "68119",
+            "21456296",
+            "10206152",
+            "27397002",
+            "31471442"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q18",
+          "query": "Superhero film where a billionaire builds a powered suit of armor to fight crime",
+          "expected_ids": [
+            "5676692"
+          ],
+          "ranked_ids": [
+            "11252704",
+            "11252503",
+            "5506183",
+            "13364985",
+            "5442467"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q19",
+          "query": "Space western about a mercenary crew on a spaceship taking odd jobs on the frontier",
+          "expected_ids": [
+            "504242"
+          ],
+          "ranked_ids": [
+            "22375407",
+            "5725237",
+            "5239322",
+            "2993903",
+            "14144320"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q20",
+          "query": "Comedy about a writer who discovers his life is being narrated by an unknown author",
+          "expected_ids": [
+            "4155050"
+          ],
+          "ranked_ids": [
+            "33935867",
+            "17424270",
+            "35287202",
+            "35685303",
+            "25562315"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        }
+      ]
+    },
+    {
+      "method": "sparse",
+      "mrr_at_5": 0.2125,
+      "ndcg_at_5": 0.2215,
+      "num_queries": 20,
+      "num_hits": 5,
+      "per_query": [
+        {
+          "query_id": "q01",
+          "query": "A psychological thriller about dreams and the subconscious mind",
+          "expected_ids": [
+            "23270459"
+          ],
+          "ranked_ids": [
+            "34405021",
+            "22056282",
+            "26064019",
+            "15864743",
+            "34261235"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q02",
+          "query": "Epic romance between people from different social classes aboard a ship",
+          "expected_ids": [
+            "52371"
+          ],
+          "ranked_ids": [
+            "18214566",
+            "32381897",
+            "1343327",
+            "19887961",
+            "11097321"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q03",
+          "query": "Science fiction film about time travel and a scientist trying to save the future",
+          "expected_ids": [
+            "4260551"
+          ],
+          "ranked_ids": [
+            "32602793",
+            "23927995",
+            "23720284",
+            "31176974",
+            "30316694"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q04",
+          "query": "Uplifting animated story about a father searching for his missing son in the ocean",
+          "expected_ids": [
+            "239587"
+          ],
+          "ranked_ids": [
+            "25750288",
+            "12902613",
+            "14108821",
+            "10741125",
+            "30468471"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q05",
+          "query": "Dystopian sci-fi where people live in a simulated reality controlled by machines",
+          "expected_ids": [
+            "30007"
+          ],
+          "ranked_ids": [
+            "30007",
+            "14743458",
+            "27471672",
+            "31653564",
+            "9075293"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q06",
+          "query": "A crime drama about a mob boss and his family dynasty in America",
+          "expected_ids": [
+            "2466773"
+          ],
+          "ranked_ids": [
+            "3010124",
+            "10823667",
+            "1995696",
+            "3555951",
+            "20826924"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q07",
+          "query": "Two friends on a road trip after escaping a long prison sentence",
+          "expected_ids": [
+            "30625"
+          ],
+          "ranked_ids": [
+            "21254725",
+            "24705139",
+            "36005251",
+            "13927209",
+            "6012592"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q08",
+          "query": "Romantic drama about two people who erase memories of each other",
+          "expected_ids": [
+            "537024"
+          ],
+          "ranked_ids": [
+            "537024",
+            "20622279",
+            "646454",
+            "20337153",
+            "5044905"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q09",
+          "query": "Horror film about a family haunted by supernatural forces in an isolated hotel",
+          "expected_ids": [
+            "1186616"
+          ],
+          "ranked_ids": [
+            "7468970",
+            "2074089",
+            "13716643",
+            "21984149",
+            "20291261"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q10",
+          "query": "Animated fantasy about a young girl who enters a magical spirit world",
+          "expected_ids": [
+            "70091"
+          ],
+          "ranked_ids": [
+            "18900386",
+            "22021525",
+            "18406924",
+            "28947648",
+            "8302293"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q11",
+          "query": "1990s thriller about a serial killer who leaves philosophical messages at crime scenes",
+          "expected_ids": [
+            "206818"
+          ],
+          "ranked_ids": [
+            "14722381",
+            "31153555",
+            "1222561",
+            "22877469",
+            "11493672"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q12",
+          "query": "1980s adventure about a young boy who discovers a friendly alien creature",
+          "expected_ids": [
+            "73441"
+          ],
+          "ranked_ids": [
+            "2730274",
+            "11922721",
+            "3576991",
+            "73441",
+            "20837938"
+          ],
+          "mrr": 0.25,
+          "ndcg": 0.4307,
+          "hit": true
+        },
+        {
+          "query_id": "q13",
+          "query": "Dark comedy about war showing the absurdity and futility of military conflict",
+          "expected_ids": [
+            "8695"
+          ],
+          "ranked_ids": [
+            "19316811",
+            "10124804",
+            "33910495",
+            "174437",
+            "4397117"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q14",
+          "query": "Biographical film about a mathematician who battles mental illness and wins a Nobel Prize",
+          "expected_ids": [
+            "3569822"
+          ],
+          "ranked_ids": [
+            "2819995",
+            "29552360",
+            "11923262",
+            "2146251",
+            "8056688"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q15",
+          "query": "Epic fantasy quest where a fellowship must destroy a powerful ring",
+          "expected_ids": [
+            "173941"
+          ],
+          "ranked_ids": [
+            "173941",
+            "20476331",
+            "32427039",
+            "22635334",
+            "4914926"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q16",
+          "query": "Heist film where criminals plan an elaborate robbery of a Las Vegas casino",
+          "expected_ids": [
+            "2251266"
+          ],
+          "ranked_ids": [
+            "27763708",
+            "154956",
+            "26292933",
+            "4213160",
+            "8438951"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q17",
+          "query": "Emotional drama about a man with low intelligence who witnesses historic American events",
+          "expected_ids": [
+            "41528"
+          ],
+          "ranked_ids": [
+            "10651171",
+            "35930040",
+            "1832887",
+            "489156",
+            "29650834"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q18",
+          "query": "Superhero film where a billionaire builds a powered suit of armor to fight crime",
+          "expected_ids": [
+            "5676692"
+          ],
+          "ranked_ids": [
+            "5676692",
+            "22144721",
+            "2101749",
+            "14540806",
+            "4726"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q19",
+          "query": "Space western about a mercenary crew on a spaceship taking odd jobs on the frontier",
+          "expected_ids": [
+            "504242"
+          ],
+          "ranked_ids": [
+            "2386473",
+            "2011160",
+            "3112223",
+            "8037429",
+            "15378807"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q20",
+          "query": "Comedy about a writer who discovers his life is being narrated by an unknown author",
+          "expected_ids": [
+            "4155050"
+          ],
+          "ranked_ids": [
+            "30887985",
+            "4627521",
+            "31480409",
+            "12812790",
+            "33857221"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        }
+      ]
+    },
+    {
+      "method": "hybrid",
+      "mrr_at_5": 0.21,
+      "ndcg_at_5": 0.2324,
+      "num_queries": 20,
+      "num_hits": 6,
+      "per_query": [
+        {
+          "query_id": "q01",
+          "query": "A psychological thriller about dreams and the subconscious mind",
+          "expected_ids": [
+            "23270459"
+          ],
+          "ranked_ids": [
+            "34405021",
+            "30684033",
+            "22056282",
+            "9613149",
+            "26064019"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q02",
+          "query": "Epic romance between people from different social classes aboard a ship",
+          "expected_ids": [
+            "52371"
+          ],
+          "ranked_ids": [
+            "24961327",
+            "18214566",
+            "15927958",
+            "32381897",
+            "1343327"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q03",
+          "query": "Science fiction film about time travel and a scientist trying to save the future",
+          "expected_ids": [
+            "4260551"
+          ],
+          "ranked_ids": [
+            "31748550",
+            "32602793",
+            "8922224",
+            "23927995",
+            "23720284"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q04",
+          "query": "Uplifting animated story about a father searching for his missing son in the ocean",
+          "expected_ids": [
+            "239587"
+          ],
+          "ranked_ids": [
+            "25750288",
+            "3732626",
+            "12902613",
+            "19936431",
+            "14108821"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q05",
+          "query": "Dystopian sci-fi where people live in a simulated reality controlled by machines",
+          "expected_ids": [
+            "30007"
+          ],
+          "ranked_ids": [
+            "30007",
+            "31255687",
+            "27539366",
+            "14743458",
+            "27471672"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q06",
+          "query": "A crime drama about a mob boss and his family dynasty in America",
+          "expected_ids": [
+            "2466773"
+          ],
+          "ranked_ids": [
+            "3010124",
+            "15560266",
+            "10823667",
+            "3861698",
+            "23974422"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q07",
+          "query": "Two friends on a road trip after escaping a long prison sentence",
+          "expected_ids": [
+            "30625"
+          ],
+          "ranked_ids": [
+            "1629120",
+            "21254725",
+            "24705139",
+            "4944673",
+            "36005251"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q08",
+          "query": "Romantic drama about two people who erase memories of each other",
+          "expected_ids": [
+            "537024"
+          ],
+          "ranked_ids": [
+            "22538902",
+            "537024",
+            "20622279",
+            "17214601",
+            "24961327"
+          ],
+          "mrr": 0.5,
+          "ndcg": 0.6309,
+          "hit": true
+        },
+        {
+          "query_id": "q09",
+          "query": "Horror film about a family haunted by supernatural forces in an isolated hotel",
+          "expected_ids": [
+            "1186616"
+          ],
+          "ranked_ids": [
+            "33027963",
+            "7468970",
+            "1373219",
+            "2074089",
+            "13716643"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q10",
+          "query": "Animated fantasy about a young girl who enters a magical spirit world",
+          "expected_ids": [
+            "70091"
+          ],
+          "ranked_ids": [
+            "18900386",
+            "4390109",
+            "22021525",
+            "3041353",
+            "612752"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q11",
+          "query": "1990s thriller about a serial killer who leaves philosophical messages at crime scenes",
+          "expected_ids": [
+            "206818"
+          ],
+          "ranked_ids": [
+            "14722381",
+            "26953667",
+            "31153555",
+            "32726414",
+            "2295249"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q12",
+          "query": "1980s adventure about a young boy who discovers a friendly alien creature",
+          "expected_ids": [
+            "73441"
+          ],
+          "ranked_ids": [
+            "2730274",
+            "73441",
+            "34548840",
+            "11922721",
+            "3576991"
+          ],
+          "mrr": 0.5,
+          "ndcg": 0.6309,
+          "hit": true
+        },
+        {
+          "query_id": "q13",
+          "query": "Dark comedy about war showing the absurdity and futility of military conflict",
+          "expected_ids": [
+            "8695"
+          ],
+          "ranked_ids": [
+            "23484100",
+            "19316811",
+            "30500829",
+            "10124804",
+            "19920525"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q14",
+          "query": "Biographical film about a mathematician who battles mental illness and wins a Nobel Prize",
+          "expected_ids": [
+            "3569822"
+          ],
+          "ranked_ids": [
+            "2819995",
+            "34890118",
+            "29552360",
+            "32833838",
+            "3569822"
+          ],
+          "mrr": 0.2,
+          "ndcg": 0.3869,
+          "hit": true
+        },
+        {
+          "query_id": "q15",
+          "query": "Epic fantasy quest where a fellowship must destroy a powerful ring",
+          "expected_ids": [
+            "173941"
+          ],
+          "ranked_ids": [
+            "173941",
+            "22635334",
+            "396607",
+            "20476331",
+            "32427039"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q16",
+          "query": "Heist film where criminals plan an elaborate robbery of a Las Vegas casino",
+          "expected_ids": [
+            "2251266"
+          ],
+          "ranked_ids": [
+            "27763708",
+            "154956",
+            "25432586",
+            "26292933",
+            "3862631"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q17",
+          "query": "Emotional drama about a man with low intelligence who witnesses historic American events",
+          "expected_ids": [
+            "41528"
+          ],
+          "ranked_ids": [
+            "10651171",
+            "68119",
+            "35930040",
+            "21456296",
+            "1832887"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q18",
+          "query": "Superhero film where a billionaire builds a powered suit of armor to fight crime",
+          "expected_ids": [
+            "5676692"
+          ],
+          "ranked_ids": [
+            "5676692",
+            "11252704",
+            "22144721",
+            "11252503",
+            "2101749"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q19",
+          "query": "Space western about a mercenary crew on a spaceship taking odd jobs on the frontier",
+          "expected_ids": [
+            "504242"
+          ],
+          "ranked_ids": [
+            "2386473",
+            "22375407",
+            "5725237",
+            "2011160",
+            "5239322"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q20",
+          "query": "Comedy about a writer who discovers his life is being narrated by an unknown author",
+          "expected_ids": [
+            "4155050"
+          ],
+          "ranked_ids": [
+            "33935867",
+            "30887985",
+            "4627521",
+            "17424270",
+            "35287202"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        }
+      ]
+    }
+  ]
+}

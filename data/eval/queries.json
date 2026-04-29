@@ -1,0 +1,22 @@
+[
+  {"query_id": "q01", "query": "A psychological thriller about dreams and the subconscious mind", "expected_movie_ids": ["23270459"]},
+  {"query_id": "q02", "query": "Epic romance between people from different social classes aboard a ship", "expected_movie_ids": ["52371"]},
+  {"query_id": "q03", "query": "Science fiction film about time travel and a scientist trying to save the future", "expected_movie_ids": ["4260551"]},
+  {"query_id": "q04", "query": "Uplifting animated story about a father searching for his missing son in the ocean", "expected_movie_ids": ["239587"]},
+  {"query_id": "q05", "query": "Dystopian sci-fi where people live in a simulated reality controlled by machines", "expected_movie_ids": ["30007"]},
+  {"query_id": "q06", "query": "A crime drama about a mob boss and his family dynasty in America", "expected_movie_ids": ["2466773"]},
+  {"query_id": "q07", "query": "Two friends on a road trip after escaping a long prison sentence", "expected_movie_ids": ["30625"]},
+  {"query_id": "q08", "query": "Romantic drama about two people who erase memories of each other", "expected_movie_ids": ["537024"]},
+  {"query_id": "q09", "query": "Horror film about a family haunted by supernatural forces in an isolated hotel", "expected_movie_ids": ["1186616"]},
+  {"query_id": "q10", "query": "Animated fantasy about a young girl who enters a magical spirit world", "expected_movie_ids": ["70091"]},
+  {"query_id": "q11", "query": "1990s thriller about a serial killer who leaves philosophical messages at crime scenes", "expected_movie_ids": ["206818"]},
+  {"query_id": "q12", "query": "1980s adventure about a young boy who discovers a friendly alien creature", "expected_movie_ids": ["73441"]},
+  {"query_id": "q13", "query": "Dark comedy about war showing the absurdity and futility of military conflict", "expected_movie_ids": ["8695"]},
+  {"query_id": "q14", "query": "Biographical film about a mathematician who battles mental illness and wins a Nobel Prize", "expected_movie_ids": ["3569822"]},
+  {"query_id": "q15", "query": "Epic fantasy quest where a fellowship must destroy a powerful ring", "expected_movie_ids": ["173941"]},
+  {"query_id": "q16", "query": "Heist film where criminals plan an elaborate robbery of a Las Vegas casino", "expected_movie_ids": ["2251266"]},
+  {"query_id": "q17", "query": "Emotional drama about a man with low intelligence who witnesses historic American events", "expected_movie_ids": ["41528"]},
+  {"query_id": "q18", "query": "Superhero film where a billionaire builds a powered suit of armor to fight crime", "expected_movie_ids": ["5676692"]},
+  {"query_id": "q19", "query": "Space western about a mercenary crew on a spaceship taking odd jobs on the frontier", "expected_movie_ids": ["504242"]},
+  {"query_id": "q20", "query": "Comedy about a writer who discovers his life is being narrated by an unknown author", "expected_movie_ids": ["4155050"]}
+]
