@@ -8,29 +8,18 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from backend.rag.filter import filter_watched
 from backend.rag.generator import ResponseGenerator
 from backend.rag.llm_client import OllamaClient
 from backend.rag.query_expander import QueryExpander
 from backend.rag.query_preprocessor import QueryPreprocessor
+from backend.rag.reranker import rerank
 
 logger = logging.getLogger(__name__)
 
 SERVICE_UNAVAILABLE_TEXT = (
     "The recommendation service is temporarily unavailable. Please try again."
 )
-
-
-# TODO(week2): replace with backend.rag.filter.filter_watched (Person A)
-def _filter_watched(candidates: list[dict], watched_ids: set[str]) -> list[dict]:
-    """Local stand-in for Person A's filter — drops watched movies from candidates."""
-    return [c for c in candidates if c["movie_id"] not in watched_ids]
-
-
-# TODO(week2): replace with backend.rag.reranker.rerank (Person A)
-def _rerank(candidates: list[dict], parsed_intent: dict, top_k: int = 5) -> list[dict]:
-    """Local stand-in for Person A's reranker — passes through top_k by score."""
-    del parsed_intent  # placeholder ignores intent; real reranker uses it
-    return list(candidates[:top_k])
 
 
 class ChatService:
@@ -101,10 +90,10 @@ class ChatService:
             candidates = self.retriever.retrieve_hybrid(expanded_query, top_k=50)
             debug["num_candidates_before_filter"] = len(candidates)
 
-            # 7. Filter + rerank (Person A stand-ins until Week 2)
-            filtered = _filter_watched(candidates, watched_movie_ids)
+            # 7. Filter + rerank
+            filtered = filter_watched(candidates, watched_movie_ids)
             debug["num_candidates_after_filter"] = len(filtered)
-            reranked = _rerank(filtered, parsed_intent, top_k=5)
+            reranked = rerank(filtered, parsed_intent, top_k=5)
 
             # 8. Generate
             gen_result = self.generator.generate(
