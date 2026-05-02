@@ -30,6 +30,10 @@ env/
 # Project docs should stay local
 /docs/
 /backend/docs/
+/Contest/
+
+# Local-only one-off scripts (e.g. trace capture)
+/scripts_local/
 
 # RAG data artifacts — large files, never commit
 data/raw/

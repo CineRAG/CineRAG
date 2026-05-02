@@ -1,0 +1,38 @@
+{
+  "user_message": "Movies like Inception but more emotional",
+  "parsed_intent": {
+    "intent": "find_similar",
+    "reference_movie": "Inception",
+    "attributes": {
+      "genre": null,
+      "mood": "emotional",
+      "era": null,
+      "exclusions": null
+    },
+    "refinement": null
+  },
+  "expanded_query": "A psychological journey through complex emotions and interwoven realities, this film shares the introspective tone of Inception while delving deeper into the human psyche. The narrative explores themes of love, loss, and identity, often in non-linear fashion. The visuals are rich and imaginative, creating a sense of wonderment and intrigue. Emotional resonance is key, with characters grappling with profound personal struggles that unfold throughout the story. Unlike Inception, it does not involve dream manipulation or corporate espionage, but maintains the same level of intellectual engagement and emotional depth.",
+  "mock_retrieval_used": true,
+  "final_chat_response": {
+    "session_id": "trace_01",
+    "response_text": "For movies similar to Inception but with a more emotional core, I've selected three films that delve deeper into relationships and personal struggles.",
+    "recommendations": [],
+    "debug": {
+      "parsed_intent": {
+        "intent": "find_similar",
+        "reference_movie": "Inception",
+        "attributes": {
+          "genre": null,
+          "mood": "emotional",
+          "era": null,
+          "exclusions": null
+        },
+        "refinement": null
+      },
+      "expanded_query": "A psychologically complex narrative that explores dream-shaping and reality-bending. The protagonist is a skilled thief tasked with implanting an idea in someone's subconscious while navigating multiple layers of dreams. Emotional resonance stems from the protagonist's unresolved guilt over a personal loss, intertwining deep human emotions with fantastical dreamscapes. The story maintains suspense through intense action sequences and intellectual puzzle-solving, all within the realm of science fiction.",
+      "num_candidates_before_filter": 5,
+      "num_candidates_after_filter": 5,
+      "retrieval_method": "hybrid_rrf"
+    }
+  }
+}

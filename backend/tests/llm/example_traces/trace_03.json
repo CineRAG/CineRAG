@@ -1,0 +1,38 @@
+{
+  "user_message": "What's the difference between film noir and neo-noir?",
+  "parsed_intent": {
+    "intent": "general_question",
+    "reference_movie": null,
+    "attributes": {
+      "genre": null,
+      "mood": null,
+      "era": null,
+      "exclusions": null
+    },
+    "refinement": null
+  },
+  "expanded_query": "A character-driven drama that delves into the complexities of human relationships and personal growth. The narrative unfolds in a realistic setting with subtle humor woven throughout. The story arc is compelling and emotionally resonant, with a satisfying resolution. It avoids action or horror elements, focusing instead on the power of empathy and self-discovery. The visual style is vibrant yet understated, emphasizing intimate moments over spectacle.",
+  "mock_retrieval_used": true,
+  "final_chat_response": {
+    "session_id": "trace_03",
+    "response_text": "Film Noir and Neo-Noir are both genres of crime films, but they have some distinct differences. Film Noir emerged in Hollywood during the 1940s and '50s and is characterized by its dark, moody atmosphere, moral ambiguity, cynicism, and stylized cinematography with high-contrast lighting. Neo-Noir, on the other hand, emerged as a modern reinterpretation of film noir starting in the 1970s. While it shares many similarities with its predecessor, neo-noir films often have more complex and layered narratives, explore contemporary social issues, and may feature more graphic violence and sexual content.",
+    "recommendations": [],
+    "debug": {
+      "parsed_intent": {
+        "intent": "general_question",
+        "reference_movie": null,
+        "attributes": {
+          "genre": null,
+          "mood": null,
+          "era": null,
+          "exclusions": null
+        },
+        "refinement": null
+      },
+      "expanded_query": "",
+      "num_candidates_before_filter": 0,
+      "num_candidates_after_filter": 0,
+      "retrieval_method": "skipped"
+    }
+  }
+}
