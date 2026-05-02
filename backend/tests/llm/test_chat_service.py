@@ -214,3 +214,42 @@ def test_timeout_error_returns_graceful_response():
 
     assert out["recommendations"] == []
     assert "unavailable" in out["response_text"].lower()
+
+
+def test_exclusion_attribute_drops_matching_genres_before_generation():
+    """Real reranker (Week 2 swap) honours `attributes.exclusions`.
+
+    Stand-in `_rerank` ignored parsed_intent and would have passed all 5
+    candidates to the generator. After swapping to `backend.rag.reranker.rerank`,
+    candidates whose genres match the exclusion must be removed.
+    """
+    retriever = _make_retriever()
+    llm = _make_llm()
+    service = ChatService(retriever=retriever, llm_client=llm)
+    parsed = {
+        "intent": "find_by_mood",
+        "reference_movie": None,
+        "attributes": {
+            "genre": None,
+            "mood": None,
+            "era": None,
+            "exclusions": "no romance",
+        },
+        "refinement": None,
+    }
+    gen_result = {"response_text": "ok", "recommendations": []}
+    _stub_pipeline(service, parsed, "expanded", gen_result)
+
+    service.process_chat(
+        user_message="x",
+        session_id="s8",
+        user_id=42,
+        watched_movie_ids=set(),
+    )
+
+    reranked = service.generator.generate.call_args.kwargs["reranked_movies"]
+    ids = {m["movie_id"] for m in reranked}
+    # Romance-tagged movies must be dropped; only Inception + Arrival survive.
+    assert ids == {"456789", "567890"}, (
+        f"expected only non-romance movies, got {ids}"
+    )
