@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.exc import IntegrityError
@@ -23,6 +24,7 @@ from backend.movies.schemas import (
 )
 
 router = APIRouter(tags=["movies"])
+logger = logging.getLogger(__name__)
 
 
 def _to_string_list(value: object) -> list[str]:
@@ -53,7 +55,12 @@ def _serialize_watched(item: WatchedMovieDB) -> WatchedMovieResponse:
 def _get_retriever(request: Request):
     retriever = getattr(request.app.state, "retriever", None)
     if retriever is None:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Movie retriever is not available yet")
+        startup_status = getattr(request.app.state, "startup_status", {})
+        detail = startup_status.get("retriever", {}).get("detail", "Movie retriever is not initialized")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Movie retriever is unavailable: {detail}",
+        )
     return retriever
 
 
@@ -69,7 +76,15 @@ def search_movies(
     if not hasattr(retriever, "search_by_title"):
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Movie retriever is not available yet")
 
-    raw_results = retriever.search_by_title(q, top_k=10) or []
+    try:
+        raw_results = retriever.search_by_title(q, top_k=10) or []
+    except Exception as exc:
+        logger.exception("Movie title search failed for query=%r", q)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Movie retriever failed during title search: {type(exc).__name__}",
+        ) from exc
+
     results = []
     for movie in raw_results:
         plot_summary = str(movie.get("plot_summary", ""))
@@ -94,7 +109,15 @@ def get_movie_by_id(movie_id: str, request: Request, user_id: int = Depends(get_
     if not hasattr(retriever, "retrieve_by_movie_id"):
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Movie retriever is not available yet")
 
-    movie = retriever.retrieve_by_movie_id(movie_id)
+    try:
+        movie = retriever.retrieve_by_movie_id(movie_id)
+    except Exception as exc:
+        logger.exception("Movie lookup failed for movie_id=%r", movie_id)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Movie retriever failed during movie lookup: {type(exc).__name__}",
+        ) from exc
+
     if not movie:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Movie not found")
 
