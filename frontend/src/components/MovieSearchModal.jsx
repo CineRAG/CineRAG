@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Loader2, Search, X } from 'lucide-react'
+import { toast } from 'sonner'
 import * as api from '../api/client.js'
-import { DEMO_SEARCH_CATALOG } from '../data/demoMovies.js'
 import { moviePosterSrc } from '../utils/moviePoster.js'
+import { getApiErrorMessage } from '../utils/apiError.js'
 import { RatingStars } from './RatingStars.jsx'
 
 function PosterThumb({ movie }) {
@@ -15,7 +16,7 @@ function PosterThumb({ movie }) {
       .toUpperCase()
     return (
       <div
-        className="w-[88px] h-[132px] rounded-xl border border-white/10 shrink-0 bg-gradient-to-br from-zinc-700 to-zinc-950 flex items-center justify-center text-sm font-semibold text-zinc-400"
+        className="w-[88px] h-[132px] rounded-xl border border-[var(--color-border)] shrink-0 bg-gradient-to-br from-stone-500 to-stone-800 flex items-center justify-center text-sm font-semibold text-stone-200"
         aria-hidden
       >
         {initials}
@@ -27,36 +28,14 @@ function PosterThumb({ movie }) {
       src={src}
       alt=""
       loading="lazy"
-      className="w-[88px] h-[132px] rounded-xl object-cover border border-white/10 shrink-0 bg-zinc-900"
+      className="w-[88px] h-[132px] rounded-xl object-cover border border-[var(--color-border)] shrink-0 bg-[var(--color-surface-elevated)]"
       onError={() => setFailed(true)}
     />
   )
 }
 
-function mergeByMovieId(remote, localSubset) {
-  const seen = new Set((remote || []).map((r) => r.movie_id))
-  const out = [...(remote || [])]
-  for (const item of localSubset) {
-    if (!seen.has(item.movie_id)) {
-      out.push(item)
-      seen.add(item.movie_id)
-    }
-  }
-  return out
-}
-
-function filterDemoCatalog(queryTrimmed) {
-  const q = queryTrimmed.toLowerCase()
-  if (q.length < 2) return DEMO_SEARCH_CATALOG
-  return DEMO_SEARCH_CATALOG.filter(
-    (m) =>
-      m.title.toLowerCase().includes(q) ||
-      (m.genres || []).some((g) => g.toLowerCase().includes(q))
-  )
-}
-
 /**
- * Modal: title search via GET /api/movies/search + always-available demo catalog.
+ * Modal: title search via GET /api/movies/search
  */
 export function MovieSearchModal({ isOpen, onClose, onAddMovie }) {
   const [query, setQuery] = useState('')
@@ -65,7 +44,7 @@ export function MovieSearchModal({ isOpen, onClose, onAddMovie }) {
   const [pendingRating, setPendingRating] = useState({})
 
   const trimmed = query.trim()
-  const demoMatches = useMemo(() => filterDemoCatalog(trimmed), [trimmed])
+  const rows = useMemo(() => remoteResults, [remoteResults])
 
   useEffect(() => {
     if (!isOpen) return
@@ -81,8 +60,11 @@ export function MovieSearchModal({ isOpen, onClose, onAddMovie }) {
       try {
         const data = await api.searchMovies(q)
         if (!cancelled) setRemoteResults(data.results || [])
-      } catch {
-        if (!cancelled) setRemoteResults([])
+      } catch (e) {
+        if (!cancelled) {
+          setRemoteResults([])
+          toast.error(getApiErrorMessage(e, 'Search failed.'))
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -94,14 +76,6 @@ export function MovieSearchModal({ isOpen, onClose, onAddMovie }) {
       clearTimeout(t)
     }
   }, [query, isOpen])
-
-  const displayResults = useMemo(() => {
-    if (trimmed.length < 2) {
-      return { rows: demoMatches, mode: 'demo-browse' }
-    }
-    const merged = mergeByMovieId(remoteResults, demoMatches)
-    return { rows: merged, mode: 'search' }
-  }, [trimmed, remoteResults, demoMatches])
 
   if (!isOpen) return null
 
@@ -117,12 +91,12 @@ export function MovieSearchModal({ isOpen, onClose, onAddMovie }) {
     })
   }
 
-  const { rows, mode } = displayResults
-  const empty = rows.length === 0 && !loading
+  const empty = rows.length === 0 && !loading && trimmed.length >= 2
+  const idleHint = trimmed.length < 2
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-sm bg-[var(--color-overlay)]"
       role="dialog"
       aria-modal="true"
       aria-labelledby="movie-search-title"
@@ -130,14 +104,17 @@ export function MovieSearchModal({ isOpen, onClose, onAddMovie }) {
         if (e.target === e.currentTarget) onClose?.()
       }}
     >
-      <div className="w-full max-w-2xl max-h-[85vh] flex flex-col rounded-[var(--radius-card)] bg-[var(--color-surface)] border border-white/10 shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-white/10 shrink-0">
-          <h2 id="movie-search-title" className="text-lg font-semibold">
+      <div
+        className="w-full max-w-2xl max-h-[85vh] flex flex-col rounded-[var(--radius-card)] bg-[var(--color-surface)] border border-[var(--color-border)] overflow-hidden"
+        style={{ boxShadow: 'var(--shadow-modal)' }}
+      >
+        <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-[var(--color-border-subtle)] shrink-0">
+          <h2 id="movie-search-title" className="text-lg font-semibold text-[var(--color-fg)]">
             Search movies
           </h2>
           <button
             type="button"
-            className="p-2 rounded-xl hover:bg-white/10 text-[var(--color-muted)]"
+            className="p-2 rounded-xl hover:bg-[var(--color-border-subtle)] text-[var(--color-muted)]"
             onClick={() => onClose?.()}
             aria-label="Close"
           >
@@ -145,39 +122,33 @@ export function MovieSearchModal({ isOpen, onClose, onAddMovie }) {
           </button>
         </div>
 
-        <div className="p-5 border-b border-white/10 shrink-0">
-          <label className="flex items-center gap-3 rounded-full bg-black/35 border border-white/10 px-4 py-2.5 focus-within:ring-2 focus-within:ring-amber-500/35 transition-shadow duration-200">
+        <div className="p-5 border-b border-[var(--color-border-subtle)] shrink-0">
+          <label className="flex items-center gap-3 rounded-full bg-[var(--color-input-bg)] border border-[var(--color-border)] px-4 py-2.5 focus-within:ring-2 focus-within:ring-amber-500/35 transition-shadow duration-200">
             <Search size={18} className="text-[var(--color-muted)] shrink-0" />
             <input
               autoFocus
-              placeholder="Search by title (or scroll demo list)…"
+              placeholder="Search by title (min. 2 characters)…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="flex-1 min-w-0 bg-transparent outline-none placeholder:text-[#585858]"
+              className="flex-1 min-w-0 bg-transparent outline-none text-[var(--color-fg)] placeholder:text-[var(--color-muted)]"
             />
           </label>
           <p className="mt-2 text-xs text-[var(--color-muted)]">
-            {mode === 'demo-browse' ? (
-              <>
-                <span className="text-amber-200/95 font-medium">Demo catalog</span> — try ratings and
-                Add to watched without the corpus index. Type 2+ letters to query the API and merge demo
-                matches.
-              </>
-            ) : (
-              <>
-                Corpus title search plus matching demo titles. Optionally set 1–5 stars, then add to your
-                watched list.
-              </>
-            )}
+            Results come from the backend corpus index. Optionally set 1–5 stars, then add to your watched
+            list.
           </p>
         </div>
 
         <div className="flex-1 min-h-[12rem] overflow-y-auto px-5 py-3">
           {loading && trimmed.length >= 2 ? (
             <div className="flex items-center gap-2 text-[var(--color-muted)] py-3 justify-center text-sm mb-3">
-              <Loader2 className="animate-spin shrink-0" size={18} aria-hidden /> Contacting corpus
-              search…
+              <Loader2 className="animate-spin shrink-0" size={18} aria-hidden /> Searching…
             </div>
+          ) : null}
+          {idleHint ? (
+            <p className="text-center text-[var(--color-muted)] py-8 text-sm">
+              Type at least 2 characters to search the movie catalog.
+            </p>
           ) : null}
           {!loading && empty ? (
             <p className="text-center text-[var(--color-muted)] py-8">No matching titles.</p>
@@ -186,16 +157,11 @@ export function MovieSearchModal({ isOpen, onClose, onAddMovie }) {
             {rows.map((m) => (
               <li
                 key={m.movie_id}
-                className="rounded-2xl border border-white/[0.06] bg-black/20 p-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between gap-y-3"
+                className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card-row-bg)] p-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between gap-y-3"
               >
                 <PosterThumb movie={m} />
                 <div className="min-w-0 flex-1">
-                  {String(m.movie_id).startsWith('demo_') ? (
-                    <span className="inline-block mb-1 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-950/55 text-amber-200/95 border border-amber-700/40">
-                      Demo
-                    </span>
-                  ) : null}
-                  <div className="font-medium text-white">{m.title}</div>
+                  <div className="font-medium text-[var(--color-fg)]">{m.title}</div>
                   <div className="text-sm text-[var(--color-muted)]">
                     {m.year ?? '—'}
                     {m.genres?.length ? (
@@ -206,7 +172,7 @@ export function MovieSearchModal({ isOpen, onClose, onAddMovie }) {
                     ) : null}
                   </div>
                   {m.plot_preview ? (
-                    <p className="mt-2 text-xs text-[#8a8a8a] leading-relaxed line-clamp-3">
+                    <p className="mt-2 text-xs text-[var(--color-muted)] leading-relaxed line-clamp-3">
                       {m.plot_preview}
                     </p>
                   ) : null}

@@ -1,5 +1,7 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { Toaster } from 'sonner'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
+import { ThemeProvider, useTheme } from './context/ThemeContext.jsx'
 import { LoginPage } from './pages/LoginPage.jsx'
 import { SignupPage } from './pages/SignupPage.jsx'
 import { ChatPage } from './pages/ChatPage.jsx'
@@ -23,14 +25,17 @@ function ProtectedLayout() {
   return <Outlet />
 }
 
-export default function App() {
+function AppRoutes() {
+  const { theme } = useTheme()
+
   return (
-    <AuthProvider>
+    <>
+      <Toaster position="top-right" theme={theme} richColors closeButton />
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
-          
+
           <Route element={<ProtectedLayout />}>
             <Route path="/" element={<ChatPage />} />
             <Route path="/profile" element={<ProfilePage />} />
@@ -38,6 +43,16 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
-    </AuthProvider>
+    </>
+  )
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </ThemeProvider>
   )
 }

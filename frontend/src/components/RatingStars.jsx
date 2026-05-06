@@ -21,7 +21,7 @@ export function RatingStars({
             disabled={readonly}
             onClick={() => onChange?.(star)}
             className={`rounded-sm p-0.5 transition-colors ${
-              readonly ? 'cursor-default' : 'cursor-pointer hover:bg-white/10'
+              readonly ? 'cursor-default' : 'cursor-pointer hover:bg-[var(--color-border-subtle)]'
             }`}
             aria-label={`Rate ${star} out of 5`}
           >
@@ -29,8 +29,8 @@ export function RatingStars({
               size={18}
               className={
                 filled
-                  ? 'fill-amber-400 text-amber-300'
-                  : 'fill-transparent text-zinc-600'
+                  ? 'fill-amber-400 text-amber-500'
+                  : 'fill-transparent text-[var(--color-muted)] opacity-70'
               }
               strokeWidth={filled ? 0 : 1.5}
             />
@@ -38,7 +38,7 @@ export function RatingStars({
         )
       })}
       {!readonly && unrated ? (
-        <span className="text-xs text-[#737373]">Rate</span>
+        <span className="text-xs text-[var(--color-muted)]">Rate</span>
       ) : null}
     </div>
   )
