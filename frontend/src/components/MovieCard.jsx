@@ -40,23 +40,26 @@ export function MovieCard({
   const style = useMemo(() => ({ background: posterGradient(title) }), [title]);
 
   return (
-    <article className="rounded-[var(--radius-card)] border border-white/[0.08] bg-[var(--color-surface)] overflow-hidden shadow-lg shadow-black/30 max-w-[min(100%,24rem)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-amber-950/20 hover:border-amber-900/30">
+    <article
+      className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden max-w-[min(100%,24rem)] transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-600/35"
+      style={{ boxShadow: "var(--shadow-card)" }}
+    >
       <div className="flex gap-3 p-3">
         <div
-          className="aspect-[2/3] w-[5.25rem] shrink-0 rounded-xl flex items-center justify-center text-xs font-semibold tracking-wide text-white/90 shadow-inner ring-1 ring-white/10"
+          className="aspect-[2/3] w-[5.25rem] shrink-0 rounded-xl flex items-center justify-center text-xs font-semibold tracking-wide text-white/90 shadow-inner ring-1 ring-black/20"
           style={style}
         >
           {initials(title)}
         </div>
         <div className="min-w-0 flex-1 flex flex-col gap-1.5">
           <div>
-            <h3 className="font-semibold text-white leading-snug truncate">
+            <h3 className="font-semibold text-[var(--color-fg)] leading-snug truncate">
               {title}
             </h3>
             <p className="text-xs text-[var(--color-muted)]">
               {year != null ? year : "—"}{" "}
               {genres?.length ? (
-                <span className="text-white/70">
+                <span className="text-[var(--color-fg-secondary)]">
                   {"· "}
                   {genres.slice(0, 3).join(" · ")}
                 </span>
@@ -68,7 +71,7 @@ export function MovieCard({
               {matchReasons.map((r) => (
                 <li
                   key={r}
-                  className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[var(--color-muted)]"
+                  className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-[var(--color-chip-bg)] border border-[var(--color-chip-border)] text-[var(--color-muted)]"
                 >
                   {r}
                 </li>
@@ -95,7 +98,7 @@ export function MovieCard({
               <button
                 type="button"
                 onClick={() => onRemove?.(movieId)}
-                className="inline-flex items-center gap-1 text-xs text-red-400 hover:text-red-300 ml-auto rounded-lg px-2 py-1 hover:bg-white/5"
+                className="inline-flex items-center gap-1 text-xs text-red-600 dark:text-red-400 hover:text-red-500 dark:hover:text-red-300 ml-auto rounded-lg px-2 py-1 hover:bg-[var(--color-border-subtle)]"
               >
                 <Trash2 size={14} aria-hidden /> Remove
               </button>
@@ -104,10 +107,10 @@ export function MovieCard({
         </div>
       </div>
       {showWhy ? (
-        <div className="border-t border-white/10">
+        <div className="border-t border-[var(--color-border-subtle)]">
           <button
             type="button"
-            className="w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium text-[var(--color-muted)] hover:bg-white/[0.04]"
+            className="w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium text-[var(--color-muted)] hover:bg-[var(--color-border-subtle)]"
             onClick={() => setWhyOpen((v) => !v)}
             aria-expanded={whyOpen}
           >
@@ -118,7 +121,7 @@ export function MovieCard({
             />
           </button>
           {whyOpen ? (
-            <div className="px-3 pb-3 space-y-2 text-sm text-white/85 leading-relaxed">
+            <div className="px-3 pb-3 space-y-2 text-sm text-[var(--color-fg-secondary)] leading-relaxed">
               <p>{explanation}</p>
               {plotPreview ? (
                 <blockquote className="border-l-2 border-amber-600/70 pl-3 text-[var(--color-muted)] text-xs italic leading-relaxed">

@@ -1,22 +1,8 @@
-import {
-  mockSignup,
-  mockLogin,
-  mockGetMe,
-  mockSearchMovies,
-  mockGetMovie,
-  mockGetWatched,
-  mockAddWatched,
-  mockRemoveWatched,
-  mockUpdateRating,
-  mockChat,
-} from "./mockBackend.js";
+import { toast } from "sonner";
 
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL ??
   (import.meta.env.DEV ? "" : "http://localhost:8000");
-
-/** Set VITE_USE_MOCK=false in .env when the FastAPI backend is running. */
-export const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
 
 function isPublicAuthEndpoint(endpoint, method = "GET") {
   const m = method.toUpperCase();
@@ -50,9 +36,6 @@ async function parseJsonSafe(res) {
 }
 
 async function apiFetch(endpoint, options = {}) {
-  if (USE_MOCK) {
-    return mockDispatch(endpoint, options);
-  }
   const token = localStorage.getItem("token");
   const method = (options.method || "GET").toUpperCase();
 
@@ -62,10 +45,19 @@ async function apiFetch(endpoint, options = {}) {
     ...options.headers,
   };
 
-  const res = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
+  let res;
+  try {
+    res = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
+  } catch (e) {
+    const err = new Error(e?.message || "Network error");
+    err.status = 0;
+    err.body = null;
+    throw err;
+  }
 
   if (res.status === 401 && !isPublicAuthEndpoint(endpoint, method)) {
     localStorage.removeItem("token");
+    toast.error("Session expired. Please sign in again.");
     window.location.href = "/login";
     const err = new Error("Unauthorized");
     err.status = 401;
@@ -83,44 +75,6 @@ async function apiFetch(endpoint, options = {}) {
     throw err;
   }
   return data;
-}
-
-async function mockDispatch(endpoint, options = {}) {
-  const method = options.method || "GET";
-  if (endpoint.startsWith("/api/auth/signup") && method === "POST") {
-    const body = JSON.parse(options.body || "{}");
-    return mockSignup(body.email, body.password, body.display_name);
-  }
-  if (endpoint.startsWith("/api/auth/login") && method === "POST") {
-    const body = JSON.parse(options.body || "{}");
-    return mockLogin(body.email, body.password);
-  }
-  if (endpoint === "/api/users/me") return mockGetMe();
-  if (endpoint.startsWith("/api/movies/search")) {
-    const q = new URLSearchParams(endpoint.split("?")[1] || "").get("q") || "";
-    return mockSearchMovies(q);
-  }
-  const movieDetailMatch = endpoint.match(/^\/api\/movies\/([^/]+)$/);
-  if (movieDetailMatch && method === "GET") {
-    return mockGetMovie(movieDetailMatch[1]);
-  }
-  if (endpoint === "/api/watched" && method === "GET") return mockGetWatched();
-  if (endpoint === "/api/watched" && method === "POST") {
-    return mockAddWatched(JSON.parse(options.body || "{}"));
-  }
-  const delMatch = endpoint.match(/^\/api\/watched\/([^/]+)$/);
-  if (delMatch && method === "DELETE") return mockRemoveWatched(delMatch[1]);
-  if (delMatch && method === "PUT") {
-    return mockUpdateRating(
-      delMatch[1],
-      JSON.parse(options.body || "{}").rating,
-    );
-  }
-  if (endpoint === "/api/chat" && method === "POST") {
-    const body = JSON.parse(options.body || "{}");
-    return mockChat(body.message, body.session_id);
-  }
-  throw new Error(`Mock not implemented: ${method} ${endpoint}`);
 }
 
 export const signup = (email, password, displayName) =>

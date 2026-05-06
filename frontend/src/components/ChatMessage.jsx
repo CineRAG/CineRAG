@@ -10,13 +10,22 @@ export function ChatMessage({ role, content, recommendations, onMarkWatched }) {
       <div
         className={`max-w-[min(100%,48rem)] transition-all duration-200 ${
           isUser
-            ? "rounded-3xl rounded-br-md bg-zinc-800/90 text-zinc-50 px-4 py-3 shadow-md border border-zinc-600/30 hover:border-amber-700/25"
+            ? "rounded-3xl rounded-br-md px-4 py-3 border shadow-md hover:border-amber-600/30"
             : "w-full flex flex-col gap-4 items-stretch text-left"
         }`}
+        style={
+          isUser
+            ? {
+                background: "var(--color-user-bubble-bg)",
+                borderColor: "var(--color-user-bubble-border)",
+                boxShadow: "var(--shadow-card)",
+              }
+            : undefined
+        }
       >
         {content ? (
           <div
-            className={`${isUser ? "text-[15px] leading-relaxed" : "text-[15px] leading-relaxed text-zinc-100 whitespace-pre-wrap"}`}
+            className={`${isUser ? "text-[15px] leading-relaxed text-[var(--color-fg)]" : "text-[15px] leading-relaxed text-[var(--color-assistant-text)] whitespace-pre-wrap"}`}
           >
             {content}
           </div>

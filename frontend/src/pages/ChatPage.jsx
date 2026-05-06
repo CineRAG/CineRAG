@@ -1,9 +1,11 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { Loader2, Send } from 'lucide-react'
+import { toast } from 'sonner'
 import * as api from '../api/client.js'
-import { mockChat } from '../api/mockBackend.js'
 import { ChatMessage } from '../components/ChatMessage.jsx'
 import { Navbar } from '../components/Navbar.jsx'
+import { useTheme } from '../context/ThemeContext.jsx'
+import { getApiErrorMessage, isNetworkError } from '../utils/apiError.js'
 
 const EXAMPLE_PROMPTS = [
   'Neo-noir thrillers with unreliable narrators and twist endings',
@@ -16,12 +18,12 @@ function newSessionId() {
 }
 
 export function ChatPage() {
+  const { isLight } = useTheme()
   const inputRef = useRef(null)
   const [sessionId, setSessionId] = useState(() => newSessionId())
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
-  const [error, setError] = useState('')
   const [showDebug, setShowDebug] = useState(false)
   const [lastDebug, setLastDebug] = useState(null)
 
@@ -40,8 +42,9 @@ export function ChatPage() {
         fromMessage.genres,
         null
       )
+      toast.success('Added to your watched list.')
     } catch (e) {
-      setError(e.body?.detail || e.message || 'Could not add to watched list.')
+      toast.error(getApiErrorMessage(e, 'Could not add to watched list.'))
     }
   }, [messages])
 
@@ -49,7 +52,6 @@ export function ChatPage() {
     async (text) => {
       const trimmed = text.trim()
       if (!trimmed || sending) return
-      setError('')
       setSending(true)
       const userEntry = {
         id: crypto.randomUUID(),
@@ -74,21 +76,11 @@ export function ChatPage() {
       }
 
       try {
-        if (api.USE_MOCK) {
-          const res = await mockChat(trimmed, sessionId)
-          appendAssistant(res)
-        } else {
-          try {
-            const res = await api.sendMessage(trimmed, sessionId)
-            appendAssistant(res)
-          } catch {
-            const res = await mockChat(trimmed, sessionId)
-            appendAssistant(res)
-            setError('API unavailable — showing offline mock reply.')
-          }
-        }
+        const res = await api.sendMessage(trimmed, sessionId)
+        appendAssistant(res)
       } catch (e) {
-        setError(e.body?.detail || e.message || 'Something went wrong.')
+        const msg = getApiErrorMessage(e, 'Something went wrong.')
+        toast.error(isNetworkError(e) ? 'Cannot reach the API. Is the backend running on port 8000?' : msg)
         setMessages((m) => m.filter((x) => x.id !== userEntry.id))
       } finally {
         setSending(false)
@@ -104,12 +96,13 @@ export function ChatPage() {
 
   const heroStyle = useMemo(
     () => ({
-      backgroundImage:
-        'linear-gradient(145deg, rgba(9,9,11,.88), rgba(120,53,15,.42)), url(https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1600&q=80)',
+      backgroundImage: isLight
+        ? 'linear-gradient(145deg, rgba(255,252,248,.72), rgba(254,129,090,.12)), url(https://images.unsplash.com/photo-1631702825172-a9a848c473ad?auto=format&fit=crop&w=1600&q=80)'
+        : 'linear-gradient(145deg, rgba(9,9,11,.88), rgba(120,53,15,.42)), url(https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1600&q=80)',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
     }),
-    []
+    [isLight]
   )
 
   function newChat() {
@@ -117,7 +110,6 @@ export function ChatPage() {
     setMessages([])
     setLastDebug(null)
     setShowDebug(false)
-    setError('')
     setInput('')
   }
 
@@ -134,7 +126,7 @@ export function ChatPage() {
         >
           {messages.length === 0 ? (
             <div>
-              <h1 className="text-lg font-semibold text-white tracking-tight transition-colors duration-300">
+              <h1 className="text-lg font-semibold text-[var(--color-fg)] tracking-tight transition-colors duration-300">
                 Recommendations board
               </h1>
               <p className="text-sm text-[var(--color-muted)]">
@@ -145,7 +137,7 @@ export function ChatPage() {
           <button
             type="button"
             onClick={newChat}
-            className="rounded-full border border-amber-500/35 bg-zinc-900/40 px-4 py-2 text-sm font-medium text-stone-100 hover:bg-amber-950/35 hover:border-amber-500/50 shadow-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            className="rounded-full border border-[var(--color-border)] bg-[var(--color-chip-bg)] px-4 py-2 text-sm font-medium text-[var(--color-fg)] hover:border-amber-600/40 hover:bg-[var(--color-surface-elevated)] shadow-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
             New chat
           </button>
@@ -153,17 +145,27 @@ export function ChatPage() {
 
         {messages.length === 0 ? (
           <section
-            className="relative rounded-[1.75rem] overflow-hidden mb-10 min-h-[220px] border border-white/[0.08] shadow-lg shadow-black/40 ring-1 ring-amber-900/25 transition-transform duration-500 hover:scale-[1.003]"
+            className={`relative  rounded-[1.75rem] overflow-hidden mb-10 min-h-[220px] border border-[var(--color-border)] transition-transform duration-500 hover:scale-[1.003] ${
+              isLight ? 'shadow-lg shadow-stone-900/10 ring-1 ring-amber-200/50' : 'shadow-lg shadow-black/40 ring-1 ring-amber-900/25'
+            }`}
             style={heroStyle}
           >
             <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
-              <p className="text-xs uppercase tracking-[0.2em] text-amber-200/85 mb-1 animate-fade-in-up">
+              <p
+                className={`text-xs uppercase tracking-[0.2em] mb-1 animate-fade-in-up ${
+                  isLight ? 'text-amber-900/75' : 'text-amber-200/85'
+                }`}
+              >
                 Featured
               </p>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 drop-shadow-lg">
+              <h2
+                className={`text-2xl sm:text-3xl font-bold mb-3 drop-shadow-sm ${
+                  isLight ? 'text-stone-900' : 'text-white drop-shadow-lg'
+                }`}
+              >
                 Stories worth the late night
               </h2>
-              <p className="text-sm text-white/90 max-w-lg">
+              <p className={`text-sm max-w-lg ${isLight ? 'text-stone-800' : 'text-white/90'}`}>
                 Ask naturally — retrieval blends lexical and semantic signals before the model explains choices
                 with citations.
               </p>
@@ -185,7 +187,7 @@ export function ChatPage() {
                     setInput(prompt)
                     inputRef.current?.focus()
                   }}
-                  className="interactive-chip text-left rounded-2xl border border-white/[0.08] bg-zinc-900/50 px-4 py-3 text-sm text-zinc-200 hover:border-amber-500/30 hover:bg-amber-950/20 h-full"
+                  className="interactive-chip text-left rounded-2xl border border-[var(--color-chip-border)] bg-[var(--color-chip-bg)] px-4 py-3 text-sm text-[var(--color-fg-secondary)] hover:border-amber-600/35 h-full"
                 >
                   {prompt}
                 </button>
@@ -212,29 +214,17 @@ export function ChatPage() {
           ) : null}
         </div>
 
-        {error ? (
-          <div
-            className={
-              error.includes('offline mock')
-                ? 'mb-4 rounded-xl bg-amber-950/35 border border-amber-700/35 px-3 py-2 text-sm text-amber-100/95 animate-fade-in'
-                : 'mb-4 rounded-xl bg-red-500/15 border border-red-500/30 px-3 py-2 text-sm text-red-200 animate-fade-in'
-            }
-          >
-            {error}
-          </div>
-        ) : null}
-
         {lastDebug ? (
-          <div className="mt-4 border-t border-white/10 pt-4">
+          <div className="mt-4 border-t border-[var(--color-border-subtle)] pt-4">
             <button
               type="button"
               onClick={() => setShowDebug((v) => !v)}
-              className="text-xs font-medium text-[var(--color-muted)] hover:text-amber-200/90 transition-colors duration-200"
+              className="text-xs font-medium text-[var(--color-muted)] hover:text-[var(--color-accent)] transition-colors duration-200"
             >
               {showDebug ? 'Hide' : 'Show'} pipeline debug
             </button>
             {showDebug ? (
-              <pre className="mt-2 text-[11px] leading-relaxed text-zinc-400 overflow-x-auto rounded-xl bg-zinc-950/90 p-3 border border-white/[0.07] max-h-64 overflow-y-auto animate-fade-in-up">
+              <pre className="mt-2 text-[11px] leading-relaxed text-[var(--color-debug-fg)] overflow-x-auto rounded-xl bg-[var(--color-debug-bg)] p-3 border border-[var(--color-border)] max-h-64 overflow-y-auto animate-fade-in-up">
                 {JSON.stringify(lastDebug, null, 2)}
               </pre>
             ) : null}
@@ -242,7 +232,7 @@ export function ChatPage() {
         ) : null}
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 border-t border-white/[0.08] bg-[var(--color-bg)]/95 backdrop-blur-md z-40">
+      <div className="fixed bottom-0 left-0 right-0 border-t border-[var(--color-border-subtle)] bg-[var(--color-bg)]/95 backdrop-blur-md z-40">
         <form
           onSubmit={onSubmit}
           className="max-w-[1100px] mx-auto px-4 py-3 flex flex-row items-center gap-3"
@@ -261,7 +251,7 @@ export function ChatPage() {
                 }
               }}
               placeholder="Describe a mood, a reference film, or a constraint…"
-              className="w-full resize-y rounded-2xl bg-[var(--color-surface)] border border-white/[0.08] px-4 py-3.5 text-sm leading-snug text-zinc-100 placeholder:text-zinc-500 outline-none transition-all duration-200 focus:ring-2 focus:ring-amber-500/35 focus:border-amber-600/35 min-h-[52px] max-h-40"
+              className="w-full resize-y rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] px-4 py-3.5 text-sm leading-snug text-[var(--color-fg)] placeholder:text-[var(--color-muted)] outline-none transition-all duration-200 focus:ring-2 focus:ring-amber-500/35 focus:border-amber-600/35 min-h-[52px] max-h-40"
             />
           </label>
           <button
