@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 from typing import Any
 
@@ -26,10 +27,11 @@ class OllamaClient:
 
     def __init__(
         self,
-        base_url: str = "http://localhost:11434",
+        base_url: str = "",
         model: str = "mistral",
     ) -> None:
-        self.base_url = base_url.rstrip("/")
+        resolved = base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+        self.base_url = resolved.rstrip("/")
         self.model = model
 
     def generate(
