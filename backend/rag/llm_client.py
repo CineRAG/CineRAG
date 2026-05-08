@@ -15,7 +15,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-REQUEST_TIMEOUT_SECONDS = 300
+REQUEST_TIMEOUT_SECONDS = 600
 JSON_PARSE_RETRY_HINT = "\n\nRespond with valid JSON only, no markdown backticks."
 
 
