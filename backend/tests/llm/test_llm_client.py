@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 import requests
 
-from backend.rag.llm_client import OllamaClient
+from backend.rag.llm_client import REQUEST_TIMEOUT_SECONDS, OllamaClient
 
 
 def _make_response(json_body: dict, status: int = 200) -> MagicMock:
@@ -39,7 +39,7 @@ class TestGenerate:
         assert payload["system"] == "sys"
         assert payload["stream"] is False
         assert payload["options"] == {"temperature": 0.5, "num_predict": 512}
-        assert mock_post.call_args.kwargs["timeout"] == 120
+        assert mock_post.call_args.kwargs["timeout"] == REQUEST_TIMEOUT_SECONDS
 
     def test_default_temperature_and_max_tokens(self):
         client = OllamaClient()

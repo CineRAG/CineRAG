@@ -5,7 +5,11 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from backend.rag.generator import ResponseGenerator
+from backend.rag.generator import (
+    DETERMINISTIC_FALLBACK_TEXT,
+    FALLBACK_TOP_K,
+    ResponseGenerator,
+)
 from backend.tests.llm.mock_data import MOCK_RETRIEVAL_RESULTS
 
 
@@ -29,6 +33,24 @@ def _client_json(payload):
     c.generate_json.return_value = payload
     c.generate.return_value = "ok"
     return c
+
+
+def _client_json_sequence(*payloads):
+    c = MagicMock()
+    c.generate_json.side_effect = list(payloads)
+    c.generate.return_value = "ok"
+    return c
+
+
+def _all_invalid_payload():
+    return {
+        "response_text": "Here are three picks.",
+        "picks": [
+            {"movie_id": "111111", "explanation": "fake1", "match_reasons": []},
+            {"movie_id": "222222", "explanation": "fake2", "match_reasons": []},
+            {"movie_id": "333333", "explanation": "fake3", "match_reasons": []},
+        ],
+    }
 
 
 def _good_picks_payload():
@@ -104,17 +126,6 @@ class TestGenerate:
         assert "noir" in out["response_text"].lower()
         client.generate_json.assert_not_called()
 
-    def test_llm_error_dict_returns_fallback(self):
-        client = _client_json({"error": "json_parse_failed", "raw_response": "junk"})
-        gen = ResponseGenerator(client)
-        out = gen.generate(
-            user_message="x",
-            reranked_movies=MOCK_RETRIEVAL_RESULTS,
-            parsed_intent=PARSED_INTENT_RECOMMEND,
-        )
-        assert out["recommendations"] == []
-        assert "rephrasing" in out["response_text"].lower() or "trouble" in out["response_text"].lower()
-
     def test_skips_picks_referencing_unknown_movie_ids(self):
         bad_payload = {
             "response_text": "Mixed picks.",
@@ -132,3 +143,122 @@ class TestGenerate:
         )
         assert len(out["recommendations"]) == 1
         assert out["recommendations"][0]["movie_id"] == "456789"
+        # At least one valid pick → no retry needed.
+        assert client.generate_json.call_count == 1
+
+
+class TestRetryAndFallback:
+    """Spec §2-§3: retry on all-invalid picks, then deterministic top-K fallback."""
+
+    def test_retries_when_first_attempt_returns_only_invalid_ids(self):
+        valid_payload = _good_picks_payload()
+        client = _client_json_sequence(_all_invalid_payload(), valid_payload)
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert client.generate_json.call_count == 2
+        assert len(out["recommendations"]) == 2
+        assert {r["movie_id"] for r in out["recommendations"]} == {"345678", "567890"}
+        assert out["response_text"] == valid_payload["response_text"]
+
+    def test_retries_when_first_attempt_returns_json_parse_error(self):
+        error_payload = {"error": "json_parse_failed", "raw_response": "junk"}
+        valid_payload = _good_picks_payload()
+        client = _client_json_sequence(error_payload, valid_payload)
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert client.generate_json.call_count == 2
+        assert len(out["recommendations"]) == 2
+
+    def test_retry_prompt_contains_allowed_movie_ids(self):
+        client = _client_json_sequence(_all_invalid_payload(), _good_picks_payload())
+        gen = ResponseGenerator(client)
+        gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        retry_prompt = client.generate_json.call_args_list[1].args[0]
+        assert "RETRY NOTICE" in retry_prompt
+        for movie in MOCK_RETRIEVAL_RESULTS:
+            assert f"- {movie['movie_id']}" in retry_prompt
+
+    def test_deterministic_fallback_fires_when_both_attempts_invalid(self):
+        client = _client_json_sequence(_all_invalid_payload(), _all_invalid_payload())
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert client.generate_json.call_count == 2
+        assert len(out["recommendations"]) == FALLBACK_TOP_K
+        # Top-K from MOCK_RETRIEVAL_RESULTS, in order.
+        assert [r["movie_id"] for r in out["recommendations"]] == [
+            "975900",
+            "234567",
+            "345678",
+        ]
+        # Response text must not claim a numeric count it can't back up.
+        assert out["response_text"] == DETERMINISTIC_FALLBACK_TEXT
+
+    def test_fallback_uses_plot_summary_for_explanation(self):
+        client = _client_json_sequence(_all_invalid_payload(), _all_invalid_payload())
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        first = out["recommendations"][0]
+        titanic_plot = MOCK_RETRIEVAL_RESULTS[0]["plot_summary"]
+        # Explanation should start with the plot text, not an LLM-generated string
+        # like "fake1" from the invalid payload.
+        assert first["explanation"].startswith(titanic_plot[:50])
+        assert "fake" not in first["explanation"]
+
+    def test_fallback_match_reasons_reflect_parsed_intent_attributes(self):
+        client = _client_json_sequence(_all_invalid_payload(), _all_invalid_payload())
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        reasons = out["recommendations"][0]["match_reasons"]
+        # PARSED_INTENT_RECOMMEND has genre=drama, mood=thoughtful, era=None, exclusions=None.
+        assert any("drama" in r.lower() for r in reasons)
+        assert any("thoughtful" in r.lower() for r in reasons)
+
+    def test_fallback_recommendations_never_empty_when_candidates_exist(self):
+        """Spec invariant: fallback must never return [] when reranked_movies is non-empty."""
+        client = _client_json_sequence(_all_invalid_payload(), _all_invalid_payload())
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS[:1],  # only Titanic
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert len(out["recommendations"]) == 1
+        assert out["recommendations"][0]["movie_id"] == "975900"
+
+    def test_response_text_is_consistent_when_recommendations_empty(self):
+        """When recommendations is [], response_text must not promise picks."""
+        gen = ResponseGenerator(_client_json({}))
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=[],
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert out["recommendations"] == []
+        text = out["response_text"].lower()
+        # Should not contain numeric promises like "three movies", "two films", etc.
+        assert "three movies" not in text
+        assert "two movies" not in text
