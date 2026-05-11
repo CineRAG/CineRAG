@@ -1,24 +1,6 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { BookmarkPlus, ChevronDown, Trash2 } from "lucide-react";
 import { RatingStars } from "./RatingStars.jsx";
-
-function posterGradient(title) {
-  let h = 0;
-  for (let i = 0; i < title.length; i++)
-    h = (h + title.charCodeAt(i) * (i + 1)) % 360;
-  return `linear-gradient(145deg, hsl(${h} 42% 22%), hsl(${(h + 52) % 360} 38% 12%))`;
-}
-
-function initials(title) {
-  const parts = title.trim().split(/\s+/).slice(0, 2);
-  return (
-    parts
-      .map((p) => p[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 3) || "?"
-  );
-}
 
 export function MovieCard({
   movieId,
@@ -37,21 +19,13 @@ export function MovieCard({
   const [whyOpen, setWhyOpen] = useState(false);
   const showWhy = mode === "chat" && explanation;
 
-  const style = useMemo(() => ({ background: posterGradient(title) }), [title]);
-
   return (
     <article
       className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden max-w-[min(100%,24rem)] transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-600/35"
       style={{ boxShadow: "var(--shadow-card)" }}
     >
-      <div className="flex gap-3 p-3">
-        <div
-          className="aspect-[2/3] w-[5.25rem] shrink-0 rounded-xl flex items-center justify-center text-xs font-semibold tracking-wide text-white/90 shadow-inner ring-1 ring-black/20"
-          style={style}
-        >
-          {initials(title)}
-        </div>
-        <div className="min-w-0 flex-1 flex flex-col gap-1.5">
+      <div className="p-3">
+        <div className="min-w-0 flex flex-col gap-1.5">
           <div>
             <h3 className="font-semibold text-[var(--color-fg)] leading-snug truncate">
               {title}

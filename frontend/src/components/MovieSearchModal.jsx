@@ -2,37 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Loader2, Search, X } from 'lucide-react'
 import { toast } from 'sonner'
 import * as api from '../api/client.js'
-import { moviePosterSrc } from '../utils/moviePoster.js'
 import { getApiErrorMessage } from '../utils/apiError.js'
 import { RatingStars } from './RatingStars.jsx'
-
-function PosterThumb({ movie }) {
-  const [failed, setFailed] = useState(false)
-  const src = moviePosterSrc(movie)
-  if (failed) {
-    const initials = (movie.title || '?')
-      .replace(/^(?:A |An |The )/i, '')
-      .slice(0, 2)
-      .toUpperCase()
-    return (
-      <div
-        className="w-[88px] h-[132px] rounded-xl border border-[var(--color-border)] shrink-0 bg-gradient-to-br from-stone-500 to-stone-800 flex items-center justify-center text-sm font-semibold text-stone-200"
-        aria-hidden
-      >
-        {initials}
-      </div>
-    )
-  }
-  return (
-    <img
-      src={src}
-      alt=""
-      loading="lazy"
-      className="w-[88px] h-[132px] rounded-xl object-cover border border-[var(--color-border)] shrink-0 bg-[var(--color-surface-elevated)]"
-      onError={() => setFailed(true)}
-    />
-  )
-}
 
 /**
  * Modal: title search via GET /api/movies/search
@@ -159,7 +130,6 @@ export function MovieSearchModal({ isOpen, onClose, onAddMovie }) {
                 key={m.movie_id}
                 className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card-row-bg)] p-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between gap-y-3"
               >
-                <PosterThumb movie={m} />
                 <div className="min-w-0 flex-1">
                   <div className="font-medium text-[var(--color-fg)]">{m.title}</div>
                   <div className="text-sm text-[var(--color-muted)]">
