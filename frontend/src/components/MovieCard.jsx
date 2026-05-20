@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { BookmarkPlus, ChevronDown, Trash2 } from "lucide-react";
+import { BookmarkPlus, Trash2 } from "lucide-react";
 import { RatingStars } from "./RatingStars.jsx";
 
 export function MovieCard({
@@ -7,7 +6,6 @@ export function MovieCard({
   title,
   year,
   genres,
-  explanation = null,
   plotPreview = null,
   matchReasons = null,
   userRating = null,
@@ -16,15 +14,19 @@ export function MovieCard({
   onRemove,
   onRatingChange,
 }) {
-  const [whyOpen, setWhyOpen] = useState(false);
-  const showWhy = mode === "chat" && explanation;
+  const layoutClass =
+    mode === "chat"
+      ? "rec-card flex-[1_1_17rem] min-w-[15rem] max-w-[19rem]"
+      : "max-w-[min(100%,24rem)] w-full bg-[var(--color-surface)]";
+
+  const showPlot = mode === "chat" && plotPreview;
 
   return (
     <article
-      className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden max-w-[min(100%,24rem)] transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-600/35"
+      className={`rounded-[var(--radius-card)] border overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-600/30 ${layoutClass}`}
       style={{ boxShadow: "var(--shadow-card)" }}
     >
-      <div className="p-3">
+      <div className="p-3 flex flex-col gap-2 h-full">
         <div className="min-w-0 flex flex-col gap-1.5">
           <div>
             <h3 className="font-semibold text-[var(--color-fg)] leading-snug truncate">
@@ -51,6 +53,11 @@ export function MovieCard({
                 </li>
               ))}
             </ul>
+          ) : null}
+          {showPlot ? (
+            <blockquote className="border-l-2 border-amber-600/50 pl-2.5 text-xs text-[var(--color-muted)] leading-relaxed line-clamp-5 italic">
+              {plotPreview}
+            </blockquote>
           ) : null}
           {mode === "chat" ? (
             <button
@@ -80,33 +87,6 @@ export function MovieCard({
           ) : null}
         </div>
       </div>
-      {showWhy ? (
-        <div className="border-t border-[var(--color-border-subtle)]">
-          <button
-            type="button"
-            className="w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium text-[var(--color-muted)] hover:bg-[var(--color-border-subtle)]"
-            onClick={() => setWhyOpen((v) => !v)}
-            aria-expanded={whyOpen}
-          >
-            Why this movie?
-            <ChevronDown
-              size={16}
-              className={`transition-transform shrink-0 ${whyOpen ? "rotate-180" : ""}`}
-            />
-          </button>
-          {whyOpen ? (
-            <div className="px-3 pb-3 space-y-2 text-sm text-[var(--color-fg-secondary)] leading-relaxed">
-              <p>{explanation}</p>
-              {plotPreview ? (
-                <blockquote className="border-l-2 border-amber-600/70 pl-3 text-[var(--color-muted)] text-xs italic leading-relaxed">
-                  {plotPreview}
-                  {plotPreview.length >= 298 ? "…" : ""}
-                </blockquote>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
     </article>
   );
 }

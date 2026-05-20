@@ -1,4 +1,4 @@
-"""SQLAlchemy models for watched movies and conversation history."""
+"""SQLAlchemy models for watched movies (legacy conversations table kept for migration)."""
 
 from __future__ import annotations
 

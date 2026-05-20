@@ -118,3 +118,21 @@ export const sendMessage = (message, sessionId) =>
     method: "POST",
     body: JSON.stringify({ message, session_id: sessionId }),
   });
+
+export const getChats = () => apiFetch("/api/chats");
+
+export const createChat = () =>
+  apiFetch("/api/chats", { method: "POST" });
+
+export const getChat = (chatId) =>
+  apiFetch(`/api/chats/${encodeURIComponent(chatId)}`);
+
+export const deleteChat = (chatId) =>
+  apiFetch(`/api/chats/${encodeURIComponent(chatId)}`, { method: "DELETE" });
+
+/** @deprecated Use getChats */
+export const getChatSessions = () => apiFetch("/api/chat/sessions");
+
+/** @deprecated Use getChat */
+export const getChatSessionHistory = (sessionId) =>
+  apiFetch(`/api/chat/sessions/${encodeURIComponent(sessionId)}`);

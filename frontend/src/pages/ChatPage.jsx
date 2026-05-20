@@ -1,8 +1,10 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
-import { Loader2, Send } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Loader2, Send, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import * as api from '../api/client.js'
+import { ChatHistorySidebar } from '../components/ChatHistorySidebar.jsx'
 import { ChatMessage } from '../components/ChatMessage.jsx'
+import { PipelineDebugModal } from '../components/PipelineDebugModal.jsx'
 import { Navbar } from '../components/Navbar.jsx'
 import { useTheme } from '../context/ThemeContext.jsx'
 import { getApiErrorMessage, isNetworkError } from '../utils/apiError.js'
@@ -17,6 +19,16 @@ function newSessionId() {
   return crypto.randomUUID()
 }
 
+function mapHistoryToMessages(rows) {
+  return (rows || []).map((row) => ({
+    id: String(row.id),
+    role: row.role,
+    content: row.content,
+    recommendations: row.role === 'assistant' ? row.recommendations || [] : null,
+    debug: row.role === 'assistant' ? row.debug ?? null : null,
+  }))
+}
+
 export function ChatPage() {
   const { isLight } = useTheme()
   const inputRef = useRef(null)
@@ -24,10 +36,56 @@ export function ChatPage() {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
-  const [showDebug, setShowDebug] = useState(false)
-  const [lastDebug, setLastDebug] = useState(null)
+  const [debugModalOpen, setDebugModalOpen] = useState(false)
+  const [selectedDebug, setSelectedDebug] = useState(null)
+  const [sidebarOpen, setSidebarOpen] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(min-width: 1024px)').matches : false
+  )
+  const [sessions, setSessions] = useState([])
+  const [sessionsLoading, setSessionsLoading] = useState(true)
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [deletingChatId, setDeletingChatId] = useState(null)
 
   const canSend = input.trim().length > 0 && !sending
+
+  const refreshSessions = useCallback(async () => {
+    try {
+      const res = await api.getChats()
+      setSessions(res.chats || [])
+    } catch (e) {
+      if (!isNetworkError(e)) {
+        toast.error(getApiErrorMessage(e, 'Could not load chat history.'))
+      }
+    } finally {
+      setSessionsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    refreshSessions()
+  }, [refreshSessions])
+
+  const loadSession = useCallback(
+    async (id) => {
+      if (id === sessionId && messages.length > 0) return
+      setHistoryLoading(true)
+      setDebugModalOpen(false)
+      setSelectedDebug(null)
+      try {
+        const res = await api.getChat(id)
+        setSessionId(res.id)
+        setMessages(mapHistoryToMessages(res.messages))
+        if (typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches) {
+          setSidebarOpen(false)
+        }
+      } catch (e) {
+        toast.error(getApiErrorMessage(e, 'Could not load this chat.'))
+      } finally {
+        setHistoryLoading(false)
+      }
+    },
+    [sessionId, messages.length]
+  )
 
   const handleMarkWatched = useCallback(async (movieId) => {
     const fromMessage = messages
@@ -63,7 +121,6 @@ export function ChatPage() {
       setInput('')
 
       const appendAssistant = (res) => {
-        setLastDebug(res.debug ?? null)
         setMessages((m) => [
           ...m,
           {
@@ -71,6 +128,7 @@ export function ChatPage() {
             role: 'assistant',
             content: res.response_text,
             recommendations: res.recommendations || [],
+            debug: res.debug ?? null,
           },
         ])
       }
@@ -78,6 +136,7 @@ export function ChatPage() {
       try {
         const res = await api.sendMessage(trimmed, sessionId)
         appendAssistant(res)
+        refreshSessions()
       } catch (e) {
         const msg = getApiErrorMessage(e, 'Something went wrong.')
         toast.error(isNetworkError(e) ? 'Cannot reach the API. Is the backend running on port 8000?' : msg)
@@ -86,7 +145,7 @@ export function ChatPage() {
         setSending(false)
       }
     },
-    [sending, sessionId]
+    [sending, sessionId, refreshSessions]
   )
 
   const onSubmit = (e) => {
@@ -105,132 +164,210 @@ export function ChatPage() {
     [isLight]
   )
 
-  function newChat() {
-    setSessionId(newSessionId())
-    setMessages([])
-    setLastDebug(null)
-    setShowDebug(false)
-    setInput('')
-  }
+  const handleDeleteChat = useCallback(
+    async (chatId) => {
+      setDeletingChatId(chatId)
+      try {
+        await api.deleteChat(chatId)
+        setSessions((list) => list.filter((s) => (s.id ?? s.session_id) !== chatId))
+        if (chatId === sessionId) {
+          const res = await api.createChat()
+          setSessionId(res.id)
+          setMessages([])
+          setSelectedDebug(null)
+          setDebugModalOpen(false)
+          setInput('')
+        }
+        refreshSessions()
+        toast.success('Chat deleted.')
+      } catch (e) {
+        toast.error(getApiErrorMessage(e, 'Could not delete chat.'))
+      } finally {
+        setDeletingChatId(null)
+      }
+    },
+    [sessionId, refreshSessions]
+  )
+
+  const newChat = useCallback(async () => {
+    try {
+      const res = await api.createChat()
+      setSessionId(res.id)
+      setMessages([])
+      setSelectedDebug(null)
+      setDebugModalOpen(false)
+      setInput('')
+      refreshSessions()
+      if (typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches) {
+        setSidebarOpen(false)
+      }
+    } catch (e) {
+      toast.error(getApiErrorMessage(e, 'Could not start a new chat.'))
+    }
+  }, [refreshSessions])
+
+  const isEmpty = messages.length === 0 && !historyLoading
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--color-bg)]">
       <Navbar />
-      <main className="flex-1 flex flex-col max-w-[1100px] w-full mx-auto px-4 pb-32 pt-6 animate-fade-in">
-        <div
-          className={
-            messages.length === 0
-              ? 'flex flex-wrap items-center justify-between gap-3 mb-6'
-              : 'flex justify-end mb-4'
-          }
-        >
-          {messages.length === 0 ? (
-            <div>
-              <h1 className="text-lg font-semibold text-[var(--color-fg)] tracking-tight transition-colors duration-300">
-                Recommendations board
-              </h1>
-              <p className="text-sm text-[var(--color-muted)]">
-                Conversational retrieval — each reply may include grounded movie cards below the text.
-              </p>
-            </div>
-          ) : null}
-          <button
-            type="button"
-            onClick={newChat}
-            className="rounded-full border border-[var(--color-border)] bg-[var(--color-chip-bg)] px-4 py-2 text-sm font-medium text-[var(--color-fg)] hover:border-amber-600/40 hover:bg-[var(--color-surface-elevated)] shadow-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-          >
-            New chat
-          </button>
-        </div>
+      <div className="flex flex-1 min-h-0 w-full max-w-[1400px] mx-auto">
+        <ChatHistorySidebar
+          open={sidebarOpen}
+          onToggle={() => setSidebarOpen((v) => !v)}
+          sessions={sessions}
+          activeSessionId={sessionId}
+          loading={sessionsLoading}
+          onSelectSession={loadSession}
+          onNewChat={newChat}
+        />
 
-        {messages.length === 0 ? (
-          <section
-            className={`relative  rounded-[1.75rem] overflow-hidden mb-10 min-h-[220px] border border-[var(--color-border)] transition-transform duration-500 hover:scale-[1.003] ${
-              isLight ? 'shadow-lg shadow-stone-900/10 ring-1 ring-amber-200/50' : 'shadow-lg shadow-black/40 ring-1 ring-amber-900/25'
-            }`}
-            style={heroStyle}
+        <main className="flex-1 flex flex-col min-w-0 px-4 pb-32 pt-6 animate-fade-in">
+          <div
+            className={
+              isEmpty
+                ? 'flex flex-wrap items-center justify-between gap-3 mb-6'
+                : 'flex flex-wrap items-center justify-between gap-3 mb-4'
+            }
           >
-            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
-              <p
-                className={`text-xs uppercase tracking-[0.2em] mb-1 animate-fade-in-up ${
-                  isLight ? 'text-amber-900/75' : 'text-amber-200/85'
-                }`}
+            {isEmpty ? (
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg font-semibold text-[var(--color-fg)] tracking-tight transition-colors duration-300">
+                  Recommendations board
+                </h1>
+                <p className="text-sm text-[var(--color-muted)]">
+                  Conversational retrieval — each reply may include grounded movie cards below the text.
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 min-w-0">
+                {!sidebarOpen ? (
+                  <button
+                    type="button"
+                    onClick={() => setSidebarOpen(true)}
+                    className="hidden lg:inline-flex rounded-full border border-[var(--color-border)] bg-[var(--color-chip-bg)] px-3 py-1.5 text-xs font-medium text-[var(--color-muted)] hover:text-[var(--color-fg)] hover:border-amber-600/35 transition-all duration-200"
+                  >
+                    History
+                  </button>
+                ) : null}
+              </div>
+            )}
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={newChat}
+                className="btn-toolbar rounded-full border border-[var(--color-border)] bg-[var(--color-chip-bg)] px-4 py-2 text-sm font-medium text-[var(--color-fg)] hover:border-amber-600/40 hover:bg-[var(--color-surface-elevated)] shadow-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >
-                Featured
-              </p>
-              <h2
-                className={`text-2xl sm:text-3xl font-bold mb-3 drop-shadow-sm ${
-                  isLight ? 'text-stone-900' : 'text-white drop-shadow-lg'
-                }`}
-              >
-                Stories worth the late night
-              </h2>
-              <p className={`text-sm max-w-lg ${isLight ? 'text-stone-800' : 'text-white/90'}`}>
-                Ask naturally — retrieval blends lexical and semantic signals before the model explains choices
-                with citations.
-              </p>
-            </div>
-          </section>
-        ) : null}
-
-        {messages.length === 0 ? (
-          <div className="mb-10">
-            <p className="text-xs uppercase tracking-[0.15em] text-[var(--color-muted)] mb-3">
-              Try a starter prompt
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 stagger-children">
-              {EXAMPLE_PROMPTS.map((prompt) => (
+                New chat
+              </button>
+              {!isEmpty ? (
                 <button
-                  key={prompt}
                   type="button"
-                  onClick={() => {
-                    setInput(prompt)
-                    inputRef.current?.focus()
-                  }}
-                  className="interactive-chip text-left rounded-2xl border border-[var(--color-chip-border)] bg-[var(--color-chip-bg)] px-4 py-3 text-sm text-[var(--color-fg-secondary)] hover:border-amber-600/35 h-full"
+                  onClick={() => handleDeleteChat(sessionId)}
+                  disabled={!sessionId || deletingChatId === sessionId}
+                  className="btn-toolbar rounded-full border border-[var(--color-border)] bg-[var(--color-chip-bg)] p-2 text-[var(--color-muted)] hover:text-red-600 hover:border-red-500/35 hover:bg-red-500/10 shadow-sm transition-all duration-200 disabled:opacity-40 disabled:pointer-events-none"
+                  aria-label="Delete this chat"
+                  title="Delete this chat"
                 >
-                  {prompt}
+                  <Trash2 size={18} aria-hidden />
                 </button>
-              ))}
+              ) : null}
             </div>
           </div>
-        ) : null}
 
-        <div className="flex-1 space-y-0 min-h-[40vh]">
-          {messages.map((msg) => (
-            <ChatMessage
-              key={msg.id}
-              role={msg.role}
-              content={msg.content}
-              recommendations={msg.recommendations}
-              onMarkWatched={handleMarkWatched}
-            />
-          ))}
-          {sending ? (
-            <div className="flex items-center gap-2 text-[var(--color-muted)] text-sm py-3 animate-fade-in">
-              <Loader2 className="animate-spin text-amber-500/90" size={18} aria-hidden />
-              Thinking with your library and the corpus…
+          {isEmpty ? (
+            <section
+              className={`relative rounded-[1.75rem] overflow-hidden mb-10 min-h-[220px] border border-[var(--color-border)] transition-transform duration-500 hover:scale-[1.003] ${
+                isLight ? 'shadow-lg shadow-stone-900/10 ring-1 ring-amber-200/50' : 'shadow-lg shadow-black/40 ring-1 ring-amber-900/25'
+              }`}
+              style={heroStyle}
+            >
+              <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
+                <p
+                  className={`text-xs uppercase tracking-[0.2em] mb-1 animate-fade-in-up ${
+                    isLight ? 'text-amber-900/75' : 'text-amber-200/85'
+                  }`}
+                >
+                  Featured
+                </p>
+                <h2
+                  className={`text-2xl sm:text-3xl font-bold mb-3 drop-shadow-sm ${
+                    isLight ? 'text-stone-900' : 'text-white drop-shadow-lg'
+                  }`}
+                >
+                  Stories worth the late night
+                </h2>
+                <p className={`text-sm max-w-lg ${isLight ? 'text-stone-800' : 'text-white/90'}`}>
+                  Ask naturally — retrieval blends lexical and semantic signals before the model explains choices
+                  with citations.
+                </p>
+              </div>
+            </section>
+          ) : null}
+
+          {isEmpty ? (
+            <div className="mb-10">
+              <p className="text-xs uppercase tracking-[0.15em] text-[var(--color-muted)] mb-3">
+                Try a starter prompt
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 stagger-children">
+                {EXAMPLE_PROMPTS.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    onClick={() => {
+                      setInput(prompt)
+                      inputRef.current?.focus()
+                    }}
+                    className="interactive-chip text-left rounded-2xl border border-[var(--color-chip-border)] bg-[var(--color-chip-bg)] px-4 py-3 text-sm text-[var(--color-fg-secondary)] hover:border-amber-600/35 h-full"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
             </div>
           ) : null}
-        </div>
 
-        {lastDebug ? (
-          <div className="mt-4 border-t border-[var(--color-border-subtle)] pt-4">
-            <button
-              type="button"
-              onClick={() => setShowDebug((v) => !v)}
-              className="text-xs font-medium text-[var(--color-muted)] hover:text-[var(--color-accent)] transition-colors duration-200"
-            >
-              {showDebug ? 'Hide' : 'Show'} pipeline debug
-            </button>
-            {showDebug ? (
-              <pre className="mt-2 text-[11px] leading-relaxed text-[var(--color-debug-fg)] overflow-x-auto rounded-xl bg-[var(--color-debug-bg)] p-3 border border-[var(--color-border)] max-h-64 overflow-y-auto animate-fade-in-up">
-                {JSON.stringify(lastDebug, null, 2)}
-              </pre>
+          <div className="flex-1 space-y-0 min-h-[40vh]">
+            {historyLoading ? (
+              <div className="flex items-center gap-2 text-[var(--color-muted)] text-sm py-3 animate-fade-in">
+                <Loader2 className="animate-spin text-amber-500/90" size={18} aria-hidden />
+                Loading conversation…
+              </div>
+            ) : null}
+            {messages.map((msg) => (
+              <ChatMessage
+                key={msg.id}
+                role={msg.role}
+                content={msg.content}
+                recommendations={msg.recommendations}
+                debug={msg.debug}
+                onMarkWatched={handleMarkWatched}
+                onViewDebug={(debug) => {
+                  setSelectedDebug(debug)
+                  setDebugModalOpen(true)
+                }}
+              />
+            ))}
+            {sending ? (
+              <div className="flex items-center gap-2 text-[var(--color-muted)] text-sm py-3 animate-fade-in">
+                <Loader2 className="animate-spin text-amber-500/90" size={18} aria-hidden />
+                Thinking with your library and the corpus…
+              </div>
             ) : null}
           </div>
-        ) : null}
-      </main>
+
+        </main>
+      </div>
+
+      <PipelineDebugModal
+        isOpen={debugModalOpen}
+        onClose={() => {
+          setDebugModalOpen(false)
+          setSelectedDebug(null)
+        }}
+        debug={selectedDebug}
+      />
 
       <div className="fixed bottom-0 left-0 right-0 border-t border-[var(--color-border-subtle)] bg-[var(--color-bg)]/95 backdrop-blur-md z-40">
         <form

@@ -23,7 +23,9 @@ CORS_ORIGINS = [
 # ---------------------------------------------------------------------------
 # RAG data paths
 # ---------------------------------------------------------------------------
-LFS_DATA_DIR = Path(os.getenv("LFS_DATA_DIR", "/space_mounts/pars/data"))
+
+LOCAL_DATA_DIR = ROOT_DIR / "data"
+LFS_DATA_DIR = Path(os.getenv("LFS_DATA_DIR", str(LOCAL_DATA_DIR)))
 
 RAW_DATA_DIR       = LFS_DATA_DIR / "raw"
 PROCESSED_DATA_DIR = LFS_DATA_DIR / "processed"

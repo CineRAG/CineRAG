@@ -10,6 +10,9 @@ __pycache__/
 venv/
 env/
 
+# Local secrets
+.env
+
 # Local DB and runtime artifacts
 *.db
 *.sqlite3
@@ -31,6 +34,13 @@ env/
 /docs/
 /backend/docs/
 /Contest/
+
+# Local planning / course markdown (not for repo)
+1_cinerag_project_plan*.md
+how_to_frame_project_as_rag*.md
+System_arch.md
+poster.md
+step2_status.md
 
 # Local-only one-off scripts (e.g. trace capture)
 /scripts_local/

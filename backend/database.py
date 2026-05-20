@@ -30,6 +30,11 @@ def get_db() -> Generator[Session, None, None]:
 def init_db() -> None:
     # Import models so SQLAlchemy can discover table metadata before create_all.
     from backend.auth import models as auth_models  # noqa: F401
+    from backend.chat import models as chat_models  # noqa: F401
     from backend.movies import models as movie_models  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
+
+    from backend.chat.migrate import run_migrations
+
+    run_migrations()
