@@ -1,34 +1,24 @@
-# CineRAG frontend
+# CineRAG Frontend
 
-React (Vite) + Tailwind CSS UI for the CineRAG project: JWT auth (login/signup), profile with watched titles and ratings, a movie-search modal, and a chat view wired to the FastAPI backend. Errors surface as **Sonner** toasts (top-right).
+## Backend-App Nuvolos Launch
 
-## Prerequisites
+Run this frontend from a separate terminal in the same Nuvolos Backend application as FastAPI. Frontend API calls stay on the frontend origin, including Nuvolos `/proxy/<port>` paths, and Vite proxies those requests to `http://127.0.0.1:8000`.
 
-- **Node.js** 18+ recommended (matching what your team uses).
-
-## Run in development
-
-From this directory (`frontend/`):
+Create the environment once:
 
 ```bash
-npm install
-npm run dev
+cd /files/CineRAG/frontend
+conda create -n cinerag_frontend -c conda-forge nodejs=20 -y
+conda activate cinerag_frontend
+npm ci
 ```
 
-Open the printed URL (usually `http://localhost:5173`).
-
-In dev mode, **`/api`** is proxied to **`http://127.0.0.1:8000`** (`vite.config.js`). Start the backend on port **8000** (see `../README.md`).
-
-Create a **`frontend/.env`** as needed:
-
-| Variable              | Purpose                                                                                                 |
-| --------------------- | ------------------------------------------------------------------------------------------------------- |
-| `VITE_API_BASE_URL`   | Optional. Leave unset in dev to use the Vite `/api` proxy; set for a full API URL in production builds. |
-
-## Other scripts
+Launch the frontend after the backend is already running on port `8000`:
 
 ```bash
-npm run build   # production bundle to dist/
-npm run preview # serve production build locally
-npm run lint    # ESLint
+cd /files/CineRAG/frontend
+conda activate cinerag_frontend
+unset VITE_API_BASE_URL
+npm run build
+npm run preview -- --host 0.0.0.0 --port 3000
 ```
