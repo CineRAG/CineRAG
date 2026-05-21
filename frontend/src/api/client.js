@@ -1,8 +1,12 @@
 import { toast } from "sonner";
 
-const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ??
-  (import.meta.env.DEV ? "" : "http://localhost:8000");
+function getBasePath() {
+  if (typeof window === "undefined") return "";
+  const match = window.location.pathname.match(/^\/proxy\/\d+(?=\/|$)/);
+  return match ? match[0] : "";
+}
+
+const BASE_URL = getBasePath();
 
 function isPublicAuthEndpoint(endpoint, method = "GET") {
   const m = method.toUpperCase();
@@ -40,7 +44,7 @@ async function apiFetch(endpoint, options = {}) {
   const method = (options.method || "GET").toUpperCase();
 
   const headers = {
-    "Content-Type": "application/json",
+    "Content-Type": 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
@@ -58,7 +62,7 @@ async function apiFetch(endpoint, options = {}) {
   if (res.status === 401 && !isPublicAuthEndpoint(endpoint, method)) {
     localStorage.removeItem("token");
     toast.error("Session expired. Please sign in again.");
-    window.location.href = "/login";
+    window.location.hash = "/login";
     const err = new Error("Unauthorized");
     err.status = 401;
     throw err;
