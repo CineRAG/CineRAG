@@ -6,9 +6,11 @@ import logging
 import sys
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from sqlalchemy import text
+
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -23,20 +25,46 @@ from backend.movies.router import router as movies_router
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title=APP_NAME)
+app = FastAPI(title=APP_NAME, root_path="/proxy/8000")
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,  
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def cors_preflight_handler(request: Request, call_next):
+  
+    # if request.headers.get("content-type") == "text/plain":
+    #     headers = dict(request.headers)
+    #     headers["content-type"] = "application/json"
+    #     request._headers = headers
+    # return await call_next(request)
+    if request.method == "OPTIONS":
+        return Response(
+            status_code=200,
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                "Access-Control-Allow-Credentials": "false",
+                "Access-Control-Max-Age": "600",
+            },
+        )
+    return await call_next(request)
+
+
 app.include_router(auth_router)
 app.include_router(movies_router)
 app.include_router(chat_router)
-
+# app.include_router(auth_router, prefix="/proxy/8000")
+# app.include_router(movies_router, prefix="/proxy/8000")
+# app.include_router(chat_router, prefix="/proxy/8000")
 
 @app.on_event("startup")
 def startup() -> None:
@@ -65,8 +93,8 @@ def startup() -> None:
             "status": "ok",
             "detail": "MovieRetriever initialized",
         }
-
-        app.state.llm_client = OllamaClient()
+        #app.state.llm_client = OllamaClient()
+        app.state.llm_client = OllamaClient(model="gpt-oss:120b-cloud")
         app.state.startup_status["llm_client"] = {
             "status": "ok",
             "detail": "OllamaClient initialized",

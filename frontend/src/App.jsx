@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { HashRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import { ThemeProvider, useTheme } from './context/ThemeContext.jsx'
@@ -31,7 +31,7 @@ function AppRoutes() {
   return (
     <>
       <Toaster position="top-right" theme={theme} richColors closeButton />
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
@@ -42,7 +42,7 @@ function AppRoutes() {
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </>
   )
 }

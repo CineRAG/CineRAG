@@ -65,7 +65,6 @@ export function Navbar({ onNavigateAddMovie }) {
             }}
             className="flex w-full items-center gap-2 rounded-full border border-[var(--color-border-subtle)] px-4 py-2 text-sm transition-all duration-200 bg-[var(--color-nav-search-bg)] text-[var(--color-nav-search-fg)] hover:border-amber-600/35 hover:text-[var(--color-muted)]"
           >
-            <span aria-hidden className="opacity-70">⌕</span>
             Search movies for your list…
           </button>
         </div>
@@ -92,20 +91,8 @@ export function Navbar({ onNavigateAddMovie }) {
 
         <div className="flex items-center gap-1 sm:gap-2 ml-auto">
           <ThemeToggle />
-          <button
-            type="button"
-            className="rounded-full p-2 text-[var(--color-muted)] hover:bg-[var(--color-border-subtle)] hover:text-[var(--color-fg)] transition-colors duration-200 hidden sm:inline-flex"
-            aria-label="Messages"
-          >
-            <MessageCircle size={20} />
-          </button>
-          <button
-            type="button"
-            className="rounded-full p-2 text-[var(--color-muted)] hover:bg-[var(--color-border-subtle)] hover:text-[var(--color-fg)] transition-colors duration-200 hidden sm:inline-flex"
-            aria-label="Notifications"
-          >
-            <Bell size={20} />
-          </button>
+          
+
           <div className="flex items-center gap-2 pl-1">
             <div
               className="h-9 w-9 rounded-full bg-gradient-to-br from-amber-700/80 to-stone-800 flex items-center justify-center text-[11px] font-bold text-white ring-1 ring-[var(--color-border)]"
@@ -122,7 +109,6 @@ export function Navbar({ onNavigateAddMovie }) {
               <span className="text-sm font-medium truncate max-w-[8rem] text-[var(--color-fg)]" title={display}>
                 {display}
               </span>
-              <span className="text-[11px] text-[var(--color-muted)]">Premium</span>
             </div>
           </div>
           <button
