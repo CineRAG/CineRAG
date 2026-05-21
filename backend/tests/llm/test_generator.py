@@ -127,6 +127,31 @@ class TestGenerate:
         assert "noir" in out["response_text"].lower()
         client.generate_json.assert_not_called()
 
+    def test_accepts_picks_with_integer_movie_ids(self):
+        # The LLM frequently emits movie_id as a bare JSON number (because the
+        # prompt asks for digits). Python parses that as int; by_id keys are str.
+        # Without coercion every pick gets dropped, the system falls back to
+        # deterministic, and we never see the LLM-written reasoning.
+        # Mock data movie_ids are strings ("456789"); LLM here returns 456789.
+        bad_payload = {
+            "response_text": "Pick.",
+            "picks": [
+                {"movie_id": 456789, "explanation": "dreams", "match_reasons": []},
+            ],
+        }
+        client = _client_json(bad_payload)
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        # Must resolve to Inception, not fall back.
+        assert len(out["recommendations"]) == 1
+        assert out["recommendations"][0]["movie_id"] == "456789"
+        # No retry needed — the first attempt succeeded after coercion.
+        assert client.generate_json.call_count == 1
+
     def test_skips_picks_referencing_unknown_movie_ids(self):
         bad_payload = {
             "response_text": "Mixed picks.",

@@ -23,7 +23,8 @@ CRITICAL RULES FOR movie_id:
 - You MUST pick movie_id values exactly from the CANDIDATES block below.
 - Do NOT invent movie IDs.
 - Do NOT use a movie's title as its movie_id.
-- Every pick.movie_id MUST exactly match one of the candidate movie_id values, copied character-for-character (digits only, no quotes around the digits, no extra text).
+- Every pick.movie_id MUST exactly match one of the candidate movie_id values, copied character-for-character.
+- Emit the movie_id as a JSON STRING (in double quotes), e.g. "movie_id": "23270459" — NOT as a bare number. The catalog stores IDs as strings; emitting a bare number causes a type-mismatch that drops the pick.
 - If you cannot find a perfect thematic match, still choose the closest valid candidates from the list rather than inventing IDs.
 
 For each pick, write a short explanation (1-2 sentences) of why it fits the user's request, citing concrete plot elements (and ONLY plot elements — see grounding rules above).
@@ -38,9 +39,9 @@ Return strict JSON with this shape:
   "response_text": a brief intro paragraph (2-3 sentences) addressing the user before the picks,
   "picks": [
     {{
-      "movie_id": the id of the chosen candidate (must match a CANDIDATES movie_id exactly),
-      "explanation": short reasoning grounded in the plot summary,
-      "match_reasons": [list of short phrases]
+      "movie_id": "the id of the chosen candidate as a JSON STRING (in double quotes) — must match a CANDIDATES movie_id exactly",
+      "explanation": "short reasoning grounded in the plot summary",
+      "match_reasons": ["short phrase", "another short phrase"]
     }}
   ]
 }}

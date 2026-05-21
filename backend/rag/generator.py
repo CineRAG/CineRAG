@@ -395,6 +395,11 @@ class ResponseGenerator:
         Returns [] if `result` is an LLM error dict, picks is missing/empty, or every
         pick references an unknown movie_id. Hallucinated IDs are dropped silently
         with a warning log — they must never reach the frontend.
+
+        Coerces pick["movie_id"] to str before lookup because the recommendation
+        prompt instructs the LLM to emit IDs as bare digits ("no quotes"), which
+        JSON parses as int. by_id keys are always strings (from the catalog), so
+        without coercion every valid pick would be reported as unknown.
         """
         if "error" in result:
             return []
@@ -402,6 +407,8 @@ class ResponseGenerator:
         recs: list[dict] = []
         for pick in result.get("picks", []):
             mid = pick.get("movie_id")
+            if mid is not None:
+                mid = str(mid)
             source = by_id.get(mid)
             if not source:
                 logger.warning("ResponseGenerator: pick references unknown movie_id %r", mid)
