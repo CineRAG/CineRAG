@@ -5,6 +5,7 @@ See Contest/interface_contract.md §3 for signature.
 from __future__ import annotations
 
 import logging
+import re
 
 from backend.rag._prompt_loader import load_prompt
 from backend.rag.llm_client import OllamaClient
@@ -14,6 +15,14 @@ logger = logging.getLogger(__name__)
 PLOT_PREVIEW_LEN = 300
 FALLBACK_TOP_K = 3
 FALLBACK_EXPLANATION_LEN = 220
+
+# Heuristic: 2+ capitalized words in a row, optionally joined by hyphen/apostrophe.
+# Catches person names ("Christopher Nolan"), award/studio names ("Academy Award",
+# "Warner Bros"), and similar leakage from the LLM's prior knowledge that may not
+# appear in the candidate's plot summary.
+_PROPER_NOUN_PATTERN = re.compile(
+    r"\b[A-Z][a-z]+(?:[-'][A-Z][a-z]+)?(?:\s+[A-Z][a-z]+(?:[-'][A-Z][a-z]+)?)+\b"
+)
 
 EMPTY_FALLBACK_TEXT = (
     "I couldn't find good matches for that - could you try rephrasing or adding more detail?"
@@ -66,16 +75,81 @@ def _fallback_match_reasons(movie: dict, attrs: dict) -> list[str]:
     return reasons
 
 
+def _ungrounded_proper_nouns(text: str, plot: str, title: str) -> set[str]:
+    """Return proper-noun phrases present in `text` but absent from `plot` and `title`.
+
+    Used to detect hallucinated names (directors, actors, awards, studios) leaking
+    into LLM explanations from the model's prior knowledge.
+    """
+    candidates = set(_PROPER_NOUN_PATTERN.findall(text))
+    if not candidates:
+        return set()
+    haystack = (plot + " " + title).lower()
+    return {n for n in candidates if n.lower() not in haystack}
+
+
+def _safe_plot_fallback(plot: str) -> str:
+    """Trim `plot` to FALLBACK_EXPLANATION_LEN at a sentence boundary when possible."""
+    snippet = plot[:FALLBACK_EXPLANATION_LEN].rstrip()
+    last_period = snippet.rfind(".")
+    if last_period > 40:
+        return snippet[: last_period + 1]
+    if len(plot) > FALLBACK_EXPLANATION_LEN:
+        return snippet + "..."
+    return snippet
+
+
+def _ground_explanation(raw: str, plot: str, title: str) -> str:
+    """Return `raw` if grounded; otherwise a plot-derived fallback.
+
+    Logs a warning whenever sanitization kicks in so the team can track how often
+    the LLM hallucinates names. The plot snippet is guaranteed grounded by
+    construction (it comes from the candidate's own plot summary).
+    """
+    ungrounded = _ungrounded_proper_nouns(raw, plot, title)
+    if not ungrounded:
+        return raw
+    logger.warning(
+        "ResponseGenerator: explanation for %r mentions ungrounded names %s; replacing with plot-derived fallback",
+        title, sorted(ungrounded),
+    )
+    return _safe_plot_fallback(plot)
+
+
+def _ground_match_reasons(raw: list, plot: str, title: str) -> list[str]:
+    """Drop any match_reason tag containing proper nouns not in plot or title."""
+    kept: list[str] = []
+    for r in raw:
+        if not isinstance(r, str):
+            continue
+        if _ungrounded_proper_nouns(r, plot, title):
+            logger.warning(
+                "ResponseGenerator: dropped match_reason %r for %r (ungrounded names)",
+                r, title,
+            )
+            continue
+        kept.append(r)
+    return kept
+
+
 def _build_recommendation(pick: dict, source_movie: dict) -> dict:
     plot = source_movie.get("plot_summary", "")
+    title = source_movie["title"]
+    explanation = _ground_explanation(pick.get("explanation", ""), plot, title)
+    match_reasons = _ground_match_reasons(
+        list(pick.get("match_reasons", [])), plot, title
+    )
+    if not match_reasons:
+        # Never leave a card with zero tags; "retrieved match" is a neutral safe label.
+        match_reasons = ["retrieved match"]
     return {
         "movie_id": source_movie["movie_id"],
-        "title": source_movie["title"],
+        "title": title,
         "year": source_movie.get("year"),
         "genres": list(source_movie.get("genres", [])),
-        "explanation": pick.get("explanation", ""),
+        "explanation": explanation,
         "plot_preview": plot[:PLOT_PREVIEW_LEN],
-        "match_reasons": list(pick.get("match_reasons", [])),
+        "match_reasons": match_reasons,
     }
 
 

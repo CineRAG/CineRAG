@@ -262,3 +262,124 @@ class TestRetryAndFallback:
         # Should not contain numeric promises like "three movies", "two films", etc.
         assert "three movies" not in text
         assert "two movies" not in text
+
+
+class TestGroundedReasoning:
+    """Sanitize LLM explanations and match_reasons that reference names not in the
+    candidate's plot summary or title — the leading hallucination mode for cards."""
+
+    def _payload(self, explanation, match_reasons):
+        return {
+            "response_text": "Here is a pick.",
+            "picks": [
+                {
+                    "movie_id": "456789",
+                    "explanation": explanation,
+                    "match_reasons": match_reasons,
+                }
+            ],
+        }
+
+    def test_explanation_with_director_name_is_replaced_with_plot_fallback(self):
+        # Inception's plot mentions Dom Cobb but NOT Christopher Nolan.
+        client = _client_json(
+            self._payload(
+                "Christopher Nolan crafts a layered dreamscape that fits your request.",
+                ["dream logic"],
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="dream movie",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        rec = out["recommendations"][0]
+        assert "Christopher Nolan" not in rec["explanation"]
+        # Fallback is built from the plot — must start with the plot text.
+        inception_plot = next(
+            m["plot_summary"] for m in MOCK_RETRIEVAL_RESULTS if m["movie_id"] == "456789"
+        )
+        assert rec["explanation"].startswith(inception_plot[:30])
+
+    def test_explanation_grounded_in_plot_passes_through_untouched(self):
+        # All names in this explanation ARE in Inception's plot.
+        original = "Dom Cobb steals secrets from dreams and confronts his guilt — fits your request."
+        client = _client_json(self._payload(original, ["dream logic"]))
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="dream movie",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert out["recommendations"][0]["explanation"] == original
+
+    def test_proper_nouns_appearing_in_title_are_allowed(self):
+        # "Eternal Sunshine" is in the title even though it's not in the plot summary.
+        original = "Eternal Sunshine takes a couple through a memory-erasing procedure."
+        client = _client_json(
+            {
+                "response_text": "ok",
+                "picks": [
+                    {
+                        "movie_id": "345678",
+                        "explanation": original,
+                        "match_reasons": ["memory loss"],
+                    }
+                ],
+            }
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert out["recommendations"][0]["explanation"] == original
+
+    def test_match_reasons_with_hallucinated_names_are_dropped(self):
+        client = _client_json(
+            self._payload(
+                "Dom Cobb steals secrets from dreams.",
+                ["Steven Spielberg vibes", "dream logic", "Hans Zimmer score"],
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        reasons = out["recommendations"][0]["match_reasons"]
+        assert reasons == ["dream logic"]
+
+    def test_match_reasons_all_dropped_get_replaced_with_safe_label(self):
+        client = _client_json(
+            self._payload(
+                "Dom Cobb steals secrets from dreams.",
+                ["Christopher Nolan film", "Hans Zimmer score"],
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        # All tags hallucinated → fallback to "retrieved match" so the card has at least one tag.
+        assert out["recommendations"][0]["match_reasons"] == ["retrieved match"]
+
+    def test_award_phrases_are_treated_as_ungrounded(self):
+        client = _client_json(
+            self._payload(
+                "An Academy Award winner about dreams and guilt.",
+                ["dream logic"],
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert "Academy Award" not in out["recommendations"][0]["explanation"]
