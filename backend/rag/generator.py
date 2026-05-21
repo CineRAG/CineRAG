@@ -24,12 +24,75 @@ _PROPER_NOUN_PATTERN = re.compile(
     r"\b[A-Z][a-z]+(?:[-'][A-Z][a-z]+)?(?:\s+[A-Z][a-z]+(?:[-'][A-Z][a-z]+)?)+\b"
 )
 
+# Phrases that signal external knowledge (credits, adaptation sources, awards,
+# commercial framing). These never belong in grounded card explanations — even
+# the lowercase form "directed by nolan" is a hallucination because the plot
+# never lists crew. Catching the phrase covers single-name leakage that the
+# multi-word proper-noun regex above misses ("directed by Nolan", "starring
+# DiCaprio"). Matched case-insensitively with word boundaries.
+_EXTERNAL_ATTRIBUTION_PHRASES = (
+    # Crew / cast attribution
+    "directed by",
+    "from the director of",
+    "from the directors of",
+    "starring",
+    "screenplay by",
+    "written by",
+    "produced by",
+    "music by",
+    "score by",
+    "scored by",
+    "composed by",
+    "cinematography by",
+    "shot by",
+    "edited by",
+    "from the makers of",
+    "from the studio behind",
+    # Adaptation source
+    "based on the novel by",
+    "based on the book by",
+    "based on the play by",
+    "based on the comic by",
+    "adapted from the novel",
+    "adapted from the book",
+    # Awards & critical reception
+    "academy award",
+    "oscar-winning",
+    "oscar-nominated",
+    "oscar winner",
+    "oscar nominee",
+    "won an oscar",
+    "won the oscar",
+    "golden globe",
+    "bafta",
+    "palme d'or",
+    # Commercial / franchise framing
+    "box office",
+    "blockbuster",
+    "critically acclaimed",
+    "critical acclaim",
+    "best-selling",
+    "bestselling",
+)
+_EXTERNAL_ATTRIBUTION_RE = re.compile(
+    r"\b(?:"
+    + "|".join(re.escape(p) for p in _EXTERNAL_ATTRIBUTION_PHRASES)
+    + r")\b",
+    re.IGNORECASE,
+)
+
+# 4-digit years 1900-2099 — typical release/setting range for our catalog.
+_YEAR_RE = re.compile(r"\b(?:19|20)\d{2}\b")
+
 EMPTY_FALLBACK_TEXT = (
     "I couldn't find good matches for that - could you try rephrasing or adding more detail?"
 )
 DETERMINISTIC_FALLBACK_TEXT = (
     "I found a few candidates from the movie corpus that best match your request. "
     "The explanations below are drawn from the retrieved plot summaries."
+)
+SAFE_INTRO_TEXT = (
+    "I found some films from the catalog that match your request."
 )
 
 
@@ -88,6 +151,33 @@ def _ungrounded_proper_nouns(text: str, plot: str, title: str) -> set[str]:
     return {n for n in candidates if n.lower() not in haystack}
 
 
+def _external_attribution_phrase(text: str) -> str | None:
+    """Return the first credit/award/franchise phrase found in `text`, or None.
+
+    Credit phrases ("directed by", "starring", "based on the novel by") are
+    structural signals of external knowledge regardless of whether the name that
+    follows is multi-word capitalized. Catching the phrase covers single-name
+    leaks the proper-noun regex misses.
+    """
+    m = _EXTERNAL_ATTRIBUTION_RE.search(text)
+    return m.group(0) if m else None
+
+
+def _ungrounded_years(text: str, plot: str, title: str, year: int | None) -> set[str]:
+    """Return 4-digit years in `text` that aren't in plot/title and don't match `year`.
+
+    Catches "this 1995 thriller" when the movie is actually 2010. A year is
+    considered grounded if it appears literally in the plot or title, or if it
+    equals the movie's catalog release year.
+    """
+    years = set(_YEAR_RE.findall(text))
+    if not years:
+        return set()
+    haystack = (plot + " " + title).lower()
+    source_year_str = str(year) if year is not None else None
+    return {y for y in years if y not in haystack and y != source_year_str}
+
+
 def _safe_plot_fallback(plot: str) -> str:
     """Trim `plot` to FALLBACK_EXPLANATION_LEN at a sentence boundary when possible."""
     snippet = plot[:FALLBACK_EXPLANATION_LEN].rstrip()
@@ -99,25 +189,38 @@ def _safe_plot_fallback(plot: str) -> str:
     return snippet
 
 
-def _ground_explanation(raw: str, plot: str, title: str) -> str:
+def _ground_explanation(raw: str, plot: str, title: str, year: int | None = None) -> str:
     """Return `raw` if grounded; otherwise a plot-derived fallback.
 
-    Logs a warning whenever sanitization kicks in so the team can track how often
-    the LLM hallucinates names. The plot snippet is guaranteed grounded by
+    Sanitization fires on ANY of: ungrounded proper nouns, external-attribution
+    phrases ("directed by", "Oscar-winning", ...), or 4-digit years that don't
+    match the movie's plot/title/release year. Each trigger is logged separately
+    so the team can see what the LLM is leaking. The plot snippet is grounded by
     construction (it comes from the candidate's own plot summary).
     """
-    ungrounded = _ungrounded_proper_nouns(raw, plot, title)
-    if not ungrounded:
+    ungrounded_names = _ungrounded_proper_nouns(raw, plot, title)
+    attribution = _external_attribution_phrase(raw)
+    ungrounded_years = _ungrounded_years(raw, plot, title, year)
+    if not ungrounded_names and not attribution and not ungrounded_years:
         return raw
+    reasons: list[str] = []
+    if ungrounded_names:
+        reasons.append(f"ungrounded names {sorted(ungrounded_names)}")
+    if attribution:
+        reasons.append(f"attribution phrase {attribution!r}")
+    if ungrounded_years:
+        reasons.append(f"ungrounded years {sorted(ungrounded_years)}")
     logger.warning(
-        "ResponseGenerator: explanation for %r mentions ungrounded names %s; replacing with plot-derived fallback",
-        title, sorted(ungrounded),
+        "ResponseGenerator: explanation for %r is ungrounded (%s); replacing with plot-derived fallback",
+        title, "; ".join(reasons),
     )
     return _safe_plot_fallback(plot)
 
 
-def _ground_match_reasons(raw: list, plot: str, title: str) -> list[str]:
-    """Drop any match_reason tag containing proper nouns not in plot or title."""
+def _ground_match_reasons(
+    raw: list, plot: str, title: str, year: int | None = None
+) -> list[str]:
+    """Drop any match_reason tag that fails grounding checks."""
     kept: list[str] = []
     for r in raw:
         if not isinstance(r, str):
@@ -128,16 +231,58 @@ def _ground_match_reasons(raw: list, plot: str, title: str) -> list[str]:
                 r, title,
             )
             continue
+        attribution = _external_attribution_phrase(r)
+        if attribution:
+            logger.warning(
+                "ResponseGenerator: dropped match_reason %r for %r (attribution phrase %r)",
+                r, title, attribution,
+            )
+            continue
+        if _ungrounded_years(r, plot, title, year):
+            logger.warning(
+                "ResponseGenerator: dropped match_reason %r for %r (ungrounded year)",
+                r, title,
+            )
+            continue
         kept.append(r)
     return kept
+
+
+def _ground_response_text(raw: str, candidate_titles: list[str]) -> str:
+    """Return `raw` if grounded; otherwise a neutral safe intro.
+
+    response_text spans all picks, so we can't plot-ground it. We instead block
+    external-attribution phrases and multi-word proper nouns that aren't any
+    candidate title. Candidate titles ARE allowed — the LLM may legitimately
+    write "I've selected Inception for you."
+    """
+    if not raw:
+        return raw
+    attribution = _external_attribution_phrase(raw)
+    titles_haystack = " ".join(candidate_titles).lower()
+    multi_word_names = set(_PROPER_NOUN_PATTERN.findall(raw))
+    ungrounded_names = {n for n in multi_word_names if n.lower() not in titles_haystack}
+    if not attribution and not ungrounded_names:
+        return raw
+    reasons: list[str] = []
+    if attribution:
+        reasons.append(f"attribution phrase {attribution!r}")
+    if ungrounded_names:
+        reasons.append(f"ungrounded names {sorted(ungrounded_names)}")
+    logger.warning(
+        "ResponseGenerator: response_text is ungrounded (%s); replacing with safe default",
+        "; ".join(reasons),
+    )
+    return SAFE_INTRO_TEXT
 
 
 def _build_recommendation(pick: dict, source_movie: dict) -> dict:
     plot = source_movie.get("plot_summary", "")
     title = source_movie["title"]
-    explanation = _ground_explanation(pick.get("explanation", ""), plot, title)
+    year = source_movie.get("year")
+    explanation = _ground_explanation(pick.get("explanation", ""), plot, title, year)
     match_reasons = _ground_match_reasons(
-        list(pick.get("match_reasons", [])), plot, title
+        list(pick.get("match_reasons", [])), plot, title, year
     )
     if not match_reasons:
         # Never leave a card with zero tags; "retrieved match" is a neutral safe label.
@@ -145,7 +290,7 @@ def _build_recommendation(pick: dict, source_movie: dict) -> dict:
     return {
         "movie_id": source_movie["movie_id"],
         "title": title,
-        "year": source_movie.get("year"),
+        "year": year,
         "genres": list(source_movie.get("genres", [])),
         "explanation": explanation,
         "plot_preview": plot[:PLOT_PREVIEW_LEN],
@@ -208,11 +353,16 @@ class ResponseGenerator:
             candidates_block=_render_candidates(reranked_movies),
         )
 
+        candidate_titles = [m["title"] for m in reranked_movies]
+
         first_result = self.llm_client.generate_json(base_prompt)
         first_picks_recs = self._validate_picks(first_result, reranked_movies)
         if first_picks_recs:
             return {
-                "response_text": first_result.get("response_text", "").strip(),
+                "response_text": _ground_response_text(
+                    first_result.get("response_text", "").strip(),
+                    candidate_titles,
+                ),
                 "recommendations": first_picks_recs,
             }
 
@@ -226,7 +376,10 @@ class ResponseGenerator:
         retry_recs = self._validate_picks(retry_result, reranked_movies)
         if retry_recs:
             return {
-                "response_text": retry_result.get("response_text", "").strip(),
+                "response_text": _ground_response_text(
+                    retry_result.get("response_text", "").strip(),
+                    candidate_titles,
+                ),
                 "recommendations": retry_recs,
             }
 

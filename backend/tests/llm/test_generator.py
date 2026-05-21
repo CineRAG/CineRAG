@@ -8,6 +8,7 @@ import pytest
 from backend.rag.generator import (
     DETERMINISTIC_FALLBACK_TEXT,
     FALLBACK_TOP_K,
+    SAFE_INTRO_TEXT,
     ResponseGenerator,
 )
 from backend.tests.llm.mock_data import MOCK_RETRIEVAL_RESULTS
@@ -383,3 +384,264 @@ class TestGroundedReasoning:
             parsed_intent=PARSED_INTENT_RECOMMEND,
         )
         assert "Academy Award" not in out["recommendations"][0]["explanation"]
+
+    def test_explanation_with_lowercase_directed_by_is_sanitized(self):
+        # "directed by nolan" — fully lowercase, so the multi-word proper-noun
+        # regex misses it. Credit-phrase detection picks up "directed by".
+        client = _client_json(
+            self._payload(
+                "directed by nolan, this layered dream thriller fits your request.",
+                ["dream logic"],
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        rec = out["recommendations"][0]
+        assert "directed by" not in rec["explanation"].lower()
+        assert "nolan" not in rec["explanation"].lower()
+
+    def test_explanation_with_starring_single_name_is_sanitized(self):
+        # Single-word star name escapes the multi-word regex; "starring" catches it.
+        client = _client_json(
+            self._payload(
+                "Starring DiCaprio as a dream thief — fits your request.",
+                ["dream logic"],
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        rec = out["recommendations"][0]
+        assert "Starring" not in rec["explanation"]
+        assert "DiCaprio" not in rec["explanation"]
+
+    def test_explanation_with_screenplay_by_is_sanitized(self):
+        client = _client_json(
+            self._payload(
+                "Screenplay by an Oscar nominee, exploring dreams and guilt.",
+                ["dream logic"],
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert "Screenplay by" not in out["recommendations"][0]["explanation"]
+
+    def test_explanation_with_box_office_phrase_is_sanitized(self):
+        # Commercial framing without any proper noun — only credit-phrase logic catches.
+        client = _client_json(
+            self._payload(
+                "A box office triumph about stealing secrets from dreams.",
+                ["dream logic"],
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert "box office" not in out["recommendations"][0]["explanation"].lower()
+
+    def test_explanation_with_wrong_year_is_sanitized(self):
+        # Inception is year=2010 in mock data; LLM claims 1995.
+        client = _client_json(
+            self._payload(
+                "This 1995 thriller about dream-stealers fits your request.",
+                ["dream logic"],
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert "1995" not in out["recommendations"][0]["explanation"]
+
+    def test_explanation_with_matching_source_year_passes(self):
+        # Year matches Inception's catalog year (2010) — grounded via metadata.
+        original = "Released in 2010, this dream-layered thriller fits the request."
+        client = _client_json(self._payload(original, ["dream logic"]))
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert out["recommendations"][0]["explanation"] == original
+
+    def test_explanation_with_decade_form_in_plot_passes(self):
+        # The Notebook plot says "1940s" — decade form, no 4-digit-year token is
+        # extracted from "1940s" (word boundary blocks it), so no year check fires.
+        original = "Set in the 1940s, the elderly couple reconnects via a notebook."
+        payload = {
+            "response_text": "Here is a pick.",
+            "picks": [
+                {
+                    "movie_id": "234567",
+                    "explanation": original,
+                    "match_reasons": ["timeless romance"],
+                }
+            ],
+        }
+        client = _client_json(payload)
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert out["recommendations"][0]["explanation"] == original
+
+    def test_match_reason_with_credit_phrase_is_dropped(self):
+        client = _client_json(
+            self._payload(
+                "Dom Cobb steals secrets from dreams.",
+                ["dream logic", "directed by spielberg", "memory and guilt"],
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        reasons = out["recommendations"][0]["match_reasons"]
+        assert "directed by spielberg" not in reasons
+        assert "dream logic" in reasons
+        assert "memory and guilt" in reasons
+
+    def test_match_reason_with_wrong_year_is_dropped(self):
+        client = _client_json(
+            self._payload(
+                "Dom Cobb steals secrets from dreams.",
+                ["dream logic", "set in 1995", "memory and guilt"],
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        reasons = out["recommendations"][0]["match_reasons"]
+        assert "set in 1995" not in reasons
+        assert "dream logic" in reasons
+
+
+class TestResponseTextGrounding:
+    """Sanitize the LLM-written intro paragraph (response_text). It's general
+    across all picks, so we can't plot-ground it — we block credit/award
+    attribution and multi-word proper nouns that aren't any candidate title."""
+
+    @staticmethod
+    def _payload_with_intro(intro: str) -> dict:
+        return {
+            "response_text": intro,
+            "picks": [
+                {
+                    "movie_id": "456789",
+                    "explanation": "Dom Cobb steals secrets from dreams.",
+                    "match_reasons": ["dream logic"],
+                }
+            ],
+        }
+
+    def test_response_text_with_director_attribution_is_replaced(self):
+        client = _client_json(
+            self._payload_with_intro(
+                "Three films directed by Christopher Nolan for your taste."
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert out["response_text"] == SAFE_INTRO_TEXT
+
+    def test_response_text_with_award_attribution_is_replaced(self):
+        client = _client_json(
+            self._payload_with_intro("Three Oscar-winning thrillers for your taste.")
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert "Oscar" not in out["response_text"]
+        assert out["response_text"] == SAFE_INTRO_TEXT
+
+    def test_response_text_with_proper_noun_outside_titles_is_replaced(self):
+        # "Christopher Nolan" isn't any candidate title — multi-word name flagged.
+        client = _client_json(
+            self._payload_with_intro(
+                "Here are three from Christopher Nolan's library."
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert "Christopher Nolan" not in out["response_text"]
+
+    def test_response_text_mentioning_candidate_title_passes(self):
+        # "Inception" is a candidate title — allowed.
+        original = "I've selected Inception for you based on the dream angle."
+        client = _client_json(self._payload_with_intro(original))
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert out["response_text"] == original
+
+    def test_response_text_clean_passes_through(self):
+        original = "Here are some thoughtful picks that match your request."
+        client = _client_json(self._payload_with_intro(original))
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert out["response_text"] == original
+
+    def test_response_text_grounding_runs_on_retry_path_too(self):
+        # First attempt fails (all-invalid IDs), retry returns a hallucinated intro.
+        # Sanitization must fire on the retry result as well, not only the first.
+        hallucinated_retry = {
+            "response_text": "Three Oscar-winning thrillers for your taste.",
+            "picks": [
+                {
+                    "movie_id": "456789",
+                    "explanation": "Dom Cobb steals secrets from dreams.",
+                    "match_reasons": ["dream logic"],
+                }
+            ],
+        }
+        client = _client_json_sequence(_all_invalid_payload(), hallucinated_retry)
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert out["response_text"] == SAFE_INTRO_TEXT
+        assert len(out["recommendations"]) == 1
