@@ -21,6 +21,14 @@ def filter_watched(
     Returns:
         filtered list of MovieResult dicts
     """
-    if not watched_movie_ids:
+    return filter_excluded(candidates, watched_movie_ids)
+
+
+def filter_excluded(
+    candidates: list[dict],
+    excluded_movie_ids: set[str],
+) -> list[dict]:
+    """Remove candidates whose movie_id is in excluded_movie_ids."""
+    if not excluded_movie_ids:
         return list(candidates)
-    return [c for c in candidates if c["movie_id"] not in watched_movie_ids]
+    return [c for c in candidates if c["movie_id"] not in excluded_movie_ids]

@@ -1,24 +1,28 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Bell, Flame, MessageCircle } from 'lucide-react'
+import { Flame } from 'lucide-react'
 import { useAuth } from '../context/AuthContext.jsx'
+import { CineragLogoMark } from './CineragLogoMark.jsx'
 import { ThemeToggle } from './ThemeToggle.jsx'
+import { useTheme } from '../context/ThemeContext.jsx'
 
 export function Navbar({ onNavigateAddMovie }) {
   const { user, logout } = useAuth()
+  const { isNeon } = useTheme()
   const navigate = useNavigate()
 
   const display = user?.display_name || user?.email || 'Guest'
 
   return (
     <header
-      className="sticky top-0 z-50 border-b border-[var(--color-border-subtle)] bg-[var(--color-bg)]/95 backdrop-blur-md"
+      className={`app-navbar sticky top-0 z-50 border-b border-[var(--color-border-subtle)] bg-[var(--color-bg)]/95 backdrop-blur-md ${isNeon ? 'app-navbar--neon' : ''}`}
       style={{ boxShadow: 'var(--shadow-header)' }}
     >
       <div className="mx-auto flex max-w-[1400px] items-center gap-4 px-4 py-3">
         <Link
           to="/"
-          className="font-bold tracking-[0.2em] text-sm sm:text-[15px] text-[var(--color-fg)] whitespace-nowrap hover:text-[var(--color-logo-hover)] transition-colors duration-200"
+          className={`navbar-brand font-bold tracking-[0.2em] text-sm sm:text-[15px] whitespace-nowrap transition-colors duration-200 inline-flex items-center gap-2.5 ${isNeon ? 'navbar-brand--neon' : 'text-[var(--color-fg)] hover:text-[var(--color-logo-hover)]'}`}
         >
+          <CineragLogoMark size={19} />
           CINERAG
         </Link>
 
@@ -33,11 +37,15 @@ export function Navbar({ onNavigateAddMovie }) {
                 }`}
               >
                 {isActive ? (
-                  <Flame size={14} className="text-amber-500 shrink-0" aria-hidden />
+                  <Flame
+                    size={14}
+                    className={`shrink-0 ${isNeon ? 'text-[var(--color-highlight)]' : 'text-amber-500'}`}
+                    aria-hidden
+                  />
                 ) : null}
                 Board
                 {isActive ? (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-gradient-to-r from-transparent via-amber-600 to-amber-400 opacity-90" />
+                  <span className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-full opacity-90 ${isNeon ? 'navbar-tab-glow' : 'bg-gradient-to-r from-transparent via-amber-600 to-amber-400'}`} />
                 ) : null}
               </span>
             )}
@@ -47,7 +55,9 @@ export function Navbar({ onNavigateAddMovie }) {
             className={({ isActive }) =>
               `pb-1 transition-colors duration-200 ${
                 isActive
-                  ? 'text-[var(--color-fg)] border-b-2 border-amber-500'
+                  ? isNeon
+                    ? 'text-[var(--color-fg)] border-b-2 border-[var(--color-highlight)]'
+                    : 'text-[var(--color-fg)] border-b-2 border-amber-500'
                   : 'text-[var(--color-muted)] hover:text-[var(--color-fg-secondary)] border-b-2 border-transparent'
               }`
             }
@@ -95,7 +105,11 @@ export function Navbar({ onNavigateAddMovie }) {
 
           <div className="flex items-center gap-2 pl-1">
             <div
-              className="h-9 w-9 rounded-full bg-gradient-to-br from-amber-700/80 to-stone-800 flex items-center justify-center text-[11px] font-bold text-white ring-1 ring-[var(--color-border)]"
+              className={`h-9 w-9 rounded-full flex items-center justify-center text-[11px] font-bold text-white ring-1 ring-[var(--color-border)] navbar-avatar ${
+              isNeon
+                ? ''
+                : 'bg-gradient-to-br from-amber-700/80 to-stone-800'
+            }`}
               aria-hidden
             >
               {display

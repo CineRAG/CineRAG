@@ -94,14 +94,14 @@ export function MovieSearchModal({ isOpen, onClose, onAddMovie }) {
         </div>
 
         <div className="p-5 border-b border-[var(--color-border-subtle)] shrink-0">
-          <label className="flex items-center gap-3 rounded-full bg-[var(--color-input-bg)] border border-[var(--color-border)] px-4 py-2.5 focus-within:ring-2 focus-within:ring-amber-500/35 transition-shadow duration-200">
+          <label className="flex items-center gap-3 rounded-full bg-[var(--color-input-bg)] border border-[var(--color-border)] px-4 py-2.5 transition-colors duration-200">
             <Search size={18} className="text-[var(--color-muted)] shrink-0" />
             <input
               autoFocus
               placeholder="Search by title (min. 2 characters)…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="flex-1 min-w-0 bg-transparent outline-none text-[var(--color-fg)] placeholder:text-[var(--color-muted)]"
+              className="movie-search-input flex-1 min-w-0 bg-transparent outline-none text-[var(--color-fg)] placeholder:text-[var(--color-muted)]"
             />
           </label>
           <p className="mt-2 text-xs text-[var(--color-muted)]">

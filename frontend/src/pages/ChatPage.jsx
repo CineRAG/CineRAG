@@ -6,14 +6,21 @@ import { ChatHistorySidebar } from '../components/ChatHistorySidebar.jsx'
 import { ChatMessage } from '../components/ChatMessage.jsx'
 import { PipelineDebugModal } from '../components/PipelineDebugModal.jsx'
 import { Navbar } from '../components/Navbar.jsx'
+import { NeonPageShell } from '../components/NeonPageShell.jsx'
+import { ThemedPageBackdrop } from '../components/ThemedPageBackdrop.jsx'
 import { useTheme } from '../context/ThemeContext.jsx'
 import { getApiErrorMessage, isNetworkError } from '../utils/apiError.js'
+import bannerLight from '../assets/banner.png'
+import bannerDark from '../assets/banner2.png'
 
 const EXAMPLE_PROMPTS = [
   'Neo-noir thrillers with unreliable narrators and twist endings',
   'Character-driven dramas from the 2010s with bittersweet endings',
   'Visually bold sci-fi that still feels grounded and human',
 ]
+
+const MORE_RECOMMENDATIONS_PROMPT =
+  'Show me more recommendations for the same request. Pick different movies — do not repeat any films you have already suggested in this conversation.'
 
 function newSessionId() {
   return crypto.randomUUID()
@@ -30,7 +37,7 @@ function mapHistoryToMessages(rows) {
 }
 
 export function ChatPage() {
-  const { isLight } = useTheme()
+  const { theme } = useTheme()
   const inputRef = useRef(null)
   const [sessionId, setSessionId] = useState(() => newSessionId())
   const [messages, setMessages] = useState([])
@@ -47,6 +54,14 @@ export function ChatPage() {
   const [deletingChatId, setDeletingChatId] = useState(null)
 
   const canSend = input.trim().length > 0 && !sending
+
+  const lastAssistantWithRecsId = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i -= 1) {
+      const msg = messages[i]
+      if (msg.role === 'assistant' && msg.recommendations?.length) return msg.id
+    }
+    return null
+  }, [messages])
 
   const refreshSessions = useCallback(async () => {
     try {
@@ -107,18 +122,22 @@ export function ChatPage() {
   }, [messages])
 
   const send = useCallback(
-    async (text) => {
+    async (text, { silent = false } = {}) => {
       const trimmed = text.trim()
       if (!trimmed || sending) return
       setSending(true)
-      const userEntry = {
-        id: crypto.randomUUID(),
-        role: 'user',
-        content: trimmed,
-        recommendations: null,
+      const userEntry = silent
+        ? null
+        : {
+            id: crypto.randomUUID(),
+            role: 'user',
+            content: trimmed,
+            recommendations: null,
+          }
+      if (userEntry) {
+        setMessages((m) => [...m, userEntry])
+        setInput('')
       }
-      setMessages((m) => [...m, userEntry])
-      setInput('')
 
       const appendAssistant = (res) => {
         setMessages((m) => [
@@ -134,13 +153,15 @@ export function ChatPage() {
       }
 
       try {
-        const res = await api.sendMessage(trimmed, sessionId)
+        const res = await api.sendMessage(trimmed, sessionId, { silent })
         appendAssistant(res)
         refreshSessions()
       } catch (e) {
         const msg = getApiErrorMessage(e, 'Something went wrong.')
         toast.error(isNetworkError(e) ? 'Cannot reach the API. Is the backend running on port 8000?' : msg)
-        setMessages((m) => m.filter((x) => x.id !== userEntry.id))
+        if (userEntry) {
+          setMessages((m) => m.filter((x) => x.id !== userEntry.id))
+        }
       } finally {
         setSending(false)
       }
@@ -148,21 +169,14 @@ export function ChatPage() {
     [sending, sessionId, refreshSessions]
   )
 
+  const handleMore = useCallback(() => {
+    send(MORE_RECOMMENDATIONS_PROMPT, { silent: true })
+  }, [send])
+
   const onSubmit = (e) => {
     e.preventDefault()
     send(input)
   }
-
-  const heroStyle = useMemo(
-    () => ({
-      backgroundImage: isLight
-        ? 'linear-gradient(145deg, rgba(255,252,248,.72), rgba(254,129,090,.12)), url(https://images.unsplash.com/photo-1631702825172-a9a848c473ad?auto=format&fit=crop&w=1600&q=80)'
-        : 'linear-gradient(145deg, rgba(9,9,11,.88), rgba(120,53,15,.42)), url(https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1600&q=80)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-    }),
-    [isLight]
-  )
 
   const handleDeleteChat = useCallback(
     async (chatId) => {
@@ -209,9 +223,10 @@ export function ChatPage() {
   const isEmpty = messages.length === 0 && !historyLoading
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--color-bg)]">
+    <NeonPageShell className="min-h-screen flex flex-col">
+      <ThemedPageBackdrop page="chat" />
       <Navbar />
-      <div className="flex flex-1 min-h-0 w-full max-w-[1400px] mx-auto">
+      <div className="relative z-[1] flex flex-1 min-h-0 w-full max-w-[1400px] mx-auto">
         <ChatHistorySidebar
           open={sidebarOpen}
           onToggle={() => setSidebarOpen((v) => !v)}
@@ -277,31 +292,23 @@ export function ChatPage() {
 
           {isEmpty ? (
             <section
-              className={`relative rounded-[1.75rem] overflow-hidden mb-10 min-h-[220px] border border-[var(--color-border)] transition-transform duration-500 hover:scale-[1.003] ${
-                isLight ? 'shadow-lg shadow-stone-900/10 ring-1 ring-amber-200/50' : 'shadow-lg shadow-black/40 ring-1 ring-amber-900/25'
+              className={`chat-hero-banner relative rounded-[1.75rem] overflow-hidden mb-10 min-h-[300px] border transition-transform duration-500 hover:scale-[1.005] ${
+                theme === 'light'
+                  ? 'border-[var(--color-border)] shadow-xl shadow-stone-900/15 ring-1 ring-stone-900/10'
+                  : theme === 'neon'
+                    ? 'chat-hero-banner--neon border-violet-700/50 shadow-xl shadow-[#07050F]/60 ring-1 ring-violet-400/35'
+                    : 'border-[var(--color-border)] shadow-xl shadow-black/50 ring-1 ring-white/10'
               }`}
-              style={heroStyle}
             >
-              <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
-                <p
-                  className={`text-xs uppercase tracking-[0.2em] mb-1 animate-fade-in-up ${
-                    isLight ? 'text-amber-900/75' : 'text-amber-200/85'
-                  }`}
-                >
-                  Featured
-                </p>
-                <h2
-                  className={`text-2xl sm:text-3xl font-bold mb-3 drop-shadow-sm ${
-                    isLight ? 'text-stone-900' : 'text-white drop-shadow-lg'
-                  }`}
-                >
-                  Stories worth the late night
-                </h2>
-                <p className={`text-sm max-w-lg ${isLight ? 'text-stone-800' : 'text-white/90'}`}>
-                  Ask naturally — retrieval blends lexical and semantic signals before the model explains choices
-                  with citations.
-                </p>
-              </div>
+              <img
+                src={
+                  theme === 'light'
+                    ? bannerLight
+                    : bannerDark
+                }
+                alt=""
+                className="chat-hero-banner__image absolute inset-0 h-full w-full object-cover object-center"
+              />
             </section>
           ) : null}
 
@@ -347,6 +354,9 @@ export function ChatPage() {
                   setSelectedDebug(debug)
                   setDebugModalOpen(true)
                 }}
+                showMore={msg.id === lastAssistantWithRecsId}
+                onMore={handleMore}
+                moreDisabled={sending}
               />
             ))}
             {sending ? (
@@ -401,6 +411,6 @@ export function ChatPage() {
           </button>
         </form>
       </div>
-    </div>
+    </NeonPageShell>
   )
 }

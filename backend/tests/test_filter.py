@@ -43,3 +43,18 @@ class TestFilterWatched:
         candidates = [{"movie_id": "A", "score": 0.9}, {"movie_id": "B", "score": 0.8}]
         result = filter_watched(candidates, {"B"})
         assert result[0]["score"] == 0.9
+
+
+class TestFilterExcluded:
+
+    def test_removes_excluded_ids(self):
+        from rag.filter import filter_excluded
+
+        result = filter_excluded(_movies("A", "B", "C"), {"B", "C"})
+        assert [m["movie_id"] for m in result] == ["A"]
+
+    def test_empty_excluded_returns_all(self):
+        from rag.filter import filter_excluded
+
+        candidates = _movies("A", "B")
+        assert filter_excluded(candidates, set()) == candidates

@@ -113,10 +113,10 @@ export const updateRating = (movieId, rating) =>
     body: JSON.stringify({ rating }),
   });
 
-export const sendMessage = (message, sessionId) =>
+export const sendMessage = (message, sessionId, { silent = false } = {}) =>
   apiFetch("/api/chat", {
     method: "POST",
-    body: JSON.stringify({ message, session_id: sessionId }),
+    body: JSON.stringify({ message, session_id: sessionId, silent }),
   });
 
 export const getChats = () => apiFetch("/api/chats");

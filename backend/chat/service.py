@@ -8,7 +8,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from backend.rag.filter import filter_watched
+from backend.rag.filter import filter_excluded, filter_watched
 from backend.rag.generator import ResponseGenerator
 from backend.rag.llm_client import OllamaClient
 from backend.rag.query_expander import QueryExpander
@@ -39,6 +39,7 @@ class ChatService:
         user_id: int,
         watched_movie_ids: set[str],
         conversation_history: list[dict] | None = None,
+        exclude_movie_ids: set[str] | None = None,
     ) -> dict:
         debug: dict[str, Any] = {
             "parsed_intent": None,
@@ -92,6 +93,8 @@ class ChatService:
 
             # 7. Filter + rerank
             filtered = filter_watched(candidates, watched_movie_ids)
+            if exclude_movie_ids:
+                filtered = filter_excluded(filtered, exclude_movie_ids)
             debug["num_candidates_after_filter"] = len(filtered)
             reranked = rerank(filtered, parsed_intent, top_k=5)
 

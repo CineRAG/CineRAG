@@ -26,6 +26,7 @@ from backend.chat.schemas import (
 from backend.chat.store import (
     get_chat_messages,
     get_recent_conversation_history,
+    get_recommended_movie_ids,
     list_user_chats,
     save_chat_turn,
 )
@@ -153,6 +154,9 @@ def chat(
     conversation_history = get_recent_conversation_history(
         db, user_id=user_id, chat_id=payload.session_id, limit=5
     )
+    exclude_movie_ids = get_recommended_movie_ids(
+        db, user_id=user_id, chat_id=payload.session_id
+    )
 
     chat_service = getattr(request.app.state, "chat_service", None)
     if chat_service is None or not hasattr(chat_service, "process_chat"):
@@ -165,6 +169,7 @@ def chat(
             user_id=user_id,
             watched_movie_ids=watched_ids,
             conversation_history=conversation_history,
+            exclude_movie_ids=exclude_movie_ids,
         )
     except (ConnectionError, TimeoutError, ImportError, OSError) as exc:
         logger.exception("Chat pipeline dependency failed for chat_id=%r", payload.session_id)
@@ -216,6 +221,7 @@ def chat(
                 "debug": result.get("debug", {}),
                 "recommendations": result.get("recommendations", []),
             },
+            persist_user_message=not payload.silent,
         )
         db.commit()
     except SQLAlchemyError as exc:

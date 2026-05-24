@@ -1,16 +1,26 @@
-import { Moon, Sun } from 'lucide-react'
+import { Moon, Sparkles, Sun } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext.jsx'
 
+const LABELS = {
+  dark: 'Switch to light theme',
+  light: 'Switch to neon theme',
+  neon: 'Switch to dark theme',
+}
+
 export function ThemeToggle({ className = '' }) {
-  const { theme, toggleTheme } = useTheme()
+  const { theme, cycleTheme } = useTheme()
+
+  const Icon = theme === 'dark' ? Sun : theme === 'light' ? Sparkles : Moon
+
   return (
     <button
       type="button"
-      onClick={toggleTheme}
-      className={`rounded-full p-2 text-[var(--color-muted)] border border-[var(--color-border-subtle)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-fg)] transition-colors duration-200 shadow-sm ${className}`}
-      aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+      onClick={cycleTheme}
+      className={`theme-toggle rounded-full p-2 text-[var(--color-muted)] border border-[var(--color-border-subtle)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-fg)] transition-all duration-200 shadow-sm ${className}`}
+      aria-label={LABELS[theme] ?? 'Switch theme'}
+      title={LABELS[theme] ?? 'Switch theme'}
     >
-      {theme === 'dark' ? <Sun size={18} strokeWidth={1.75} /> : <Moon size={18} strokeWidth={1.75} />}
+      <Icon size={18} strokeWidth={1.75} />
     </button>
   )
 }

@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import * as api from '../api/client.js'
 import { Navbar } from '../components/Navbar.jsx'
+import { NeonPageShell } from '../components/NeonPageShell.jsx'
+import { ThemedPageBackdrop } from '../components/ThemedPageBackdrop.jsx'
 import { MovieCard } from '../components/MovieCard.jsx'
 import { MovieSearchModal } from '../components/MovieSearchModal.jsx'
 import { getApiErrorMessage } from '../utils/apiError.js'
@@ -111,9 +113,10 @@ export function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--color-bg)]">
+    <NeonPageShell className="min-h-screen flex flex-col profile-page">
+      <ThemedPageBackdrop page="profile" />
       <Navbar />
-      <main className="flex-1 max-w-[1200px] w-full mx-auto px-4 py-10">
+      <main className="relative z-[1] flex-1 max-w-[1200px] w-full mx-auto px-4 py-10">
         <div className="flex flex-wrap items-end justify-between gap-4 mb-10">
           <div>
             <h1 className="text-2xl font-bold text-[var(--color-fg)] tracking-tight">Your profile</h1>
@@ -187,6 +190,6 @@ export function ProfilePage() {
         onClose={() => setModalOpen(false)}
         onAddMovie={handleAddFromModal}
       />
-    </div>
+    </NeonPageShell>
   )
 }
