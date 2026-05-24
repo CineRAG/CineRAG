@@ -127,6 +127,60 @@ class TestGenerate:
         assert "noir" in out["response_text"].lower()
         client.generate_json.assert_not_called()
 
+    def test_llm_explanation_that_copies_plot_is_replaced(self):
+        # Lazy LLM lifts the first sentence of Inception's plot verbatim.
+        inception_plot = next(
+            m["plot_summary"] for m in MOCK_RETRIEVAL_RESULTS if m["movie_id"] == "456789"
+        )
+        copied = inception_plot[:140]  # well above the 60-char run threshold
+        payload = {
+            "response_text": "Here is a pick.",
+            "picks": [
+                {
+                    "movie_id": "456789",
+                    "explanation": copied,
+                    "match_reasons": ["dream logic"],
+                }
+            ],
+        }
+        client = _client_json(payload)
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="dream movie",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        rec = out["recommendations"][0]
+        assert rec["explanation"] == DETERMINISTIC_FALLBACK_EXPLANATION
+        # plot_preview must still carry the real plot as evidence.
+        assert rec["plot_preview"] == inception_plot[:300]
+        assert rec["explanation"] != rec["plot_preview"]
+
+    def test_llm_explanation_that_paraphrases_passes_through(self):
+        # Genuine paraphrase that synthesizes concepts — must NOT be flagged.
+        original = (
+            "A meditation on memory, guilt, and the boundary between dreams and "
+            "reality — fits your request for layered psychological storytelling."
+        )
+        payload = {
+            "response_text": "Here is a pick.",
+            "picks": [
+                {
+                    "movie_id": "456789",
+                    "explanation": original,
+                    "match_reasons": ["dream logic"],
+                }
+            ],
+        }
+        client = _client_json(payload)
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="dream movie",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert out["recommendations"][0]["explanation"] == original
+
     def test_skips_picks_referencing_unknown_movie_ids(self):
         bad_payload = {
             "response_text": "Mixed picks.",

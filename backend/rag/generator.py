@@ -5,6 +5,7 @@ See Contest/interface_contract.md §3 for signature.
 from __future__ import annotations
 
 import logging
+import re
 
 from backend.rag._prompt_loader import load_prompt
 from backend.rag.llm_client import OllamaClient
@@ -69,14 +70,62 @@ def _fallback_match_reasons(movie: dict, attrs: dict) -> list[str]:
     return reasons
 
 
+_PUNCT_RE = re.compile(r"[^\w\s]")
+
+
+def _normalize_for_similarity(s: str) -> str:
+    """Lowercase, drop non-word/whitespace chars, collapse whitespace."""
+    return " ".join(_PUNCT_RE.sub(" ", s.lower()).split())
+
+
+def _explanation_duplicates_plot(
+    explanation: str, plot: str, min_run: int = 60
+) -> bool:
+    """True when the LLM's explanation is effectively a slice of the plot.
+
+    Catches the lazy-LLM mode where the model copies (or barely edits) a chunk
+    of the plot summary into the explanation field. The card UI also renders
+    plot_preview as a citation just below, so a copy makes the two read 95%
+    identical. Heuristic: normalize both (lowercase, strip punctuation, collapse
+    whitespace); if the normalized explanation as a whole — or any contiguous
+    `min_run`-char window of it — appears inside the normalized plot, treat as
+    duplication. `min_run = 60` is roughly one short clause; small enough to
+    catch real copies, large enough to skip incidental phrase overlap.
+    """
+    if not explanation or not plot:
+        return False
+    norm_exp = _normalize_for_similarity(explanation)
+    norm_plot = _normalize_for_similarity(plot)
+    if len(norm_exp) < min_run:
+        return norm_exp in norm_plot and len(norm_exp) >= 20
+    if norm_exp in norm_plot:
+        return True
+    # Slide a window across the explanation; any contiguous run that lives in
+    # the plot signals the LLM lifted text.
+    step = max(1, min_run // 3)
+    for i in range(0, len(norm_exp) - min_run + 1, step):
+        if norm_exp[i:i + min_run] in norm_plot:
+            return True
+    return False
+
+
 def _build_recommendation(pick: dict, source_movie: dict) -> dict:
     plot = source_movie.get("plot_summary", "")
+    raw_explanation = pick.get("explanation", "") or ""
+    if _explanation_duplicates_plot(raw_explanation, plot):
+        logger.warning(
+            "ResponseGenerator: explanation for %r duplicates plot text; replacing with safe fallback",
+            source_movie.get("title"),
+        )
+        explanation = DETERMINISTIC_FALLBACK_EXPLANATION
+    else:
+        explanation = raw_explanation
     return {
         "movie_id": source_movie["movie_id"],
         "title": source_movie["title"],
         "year": source_movie.get("year"),
         "genres": list(source_movie.get("genres", [])),
-        "explanation": pick.get("explanation", ""),
+        "explanation": explanation,
         "plot_preview": plot[:PLOT_PREVIEW_LEN],
         "match_reasons": list(pick.get("match_reasons", [])),
     }
