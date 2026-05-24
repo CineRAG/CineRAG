@@ -249,6 +249,20 @@ class TestRetryAndFallback:
         assert len(out["recommendations"]) == 1
         assert out["recommendations"][0]["movie_id"] == "975900"
 
+    def test_deterministic_fallback_plot_preview_is_empty(self):
+        # Fallback explanations are direct slices of plot; the card UI already
+        # renders explanation above plot_preview as a citation, so a non-empty
+        # plot_preview here just duplicates the explanation text.
+        client = _client_json_sequence(_all_invalid_payload(), _all_invalid_payload())
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        for rec in out["recommendations"]:
+            assert rec["plot_preview"] == ""
+
     def test_response_text_is_consistent_when_recommendations_empty(self):
         """When recommendations is [], response_text must not promise picks."""
         gen = ResponseGenerator(_client_json({}))

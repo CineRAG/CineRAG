@@ -218,7 +218,8 @@ class ResponseGenerator:
                     "year": m.get("year"),
                     "genres": list(m.get("genres", [])),
                     "explanation": explanation,
-                    "plot_preview": plot[:PLOT_PREVIEW_LEN],
+                    # Explanation is itself a plot slice — avoid duplication on the card.
+                    "plot_preview": "",
                     "match_reasons": match_reasons,
                 }
             )
