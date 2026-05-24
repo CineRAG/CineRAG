@@ -22,6 +22,9 @@ DETERMINISTIC_FALLBACK_TEXT = (
     "I found a few candidates from the movie corpus that best match your request. "
     "The explanations below are drawn from the retrieved plot summaries."
 )
+DETERMINISTIC_FALLBACK_EXPLANATION = (
+    "A top match retrieved from the catalog for your query — see the plot summary below."
+)
 
 
 def _render_history(history: list[dict] | None) -> str:
@@ -207,9 +210,6 @@ class ResponseGenerator:
         recs: list[dict] = []
         for m in top:
             plot = m.get("plot_summary", "")
-            explanation = plot[:FALLBACK_EXPLANATION_LEN].rstrip()
-            if len(plot) > FALLBACK_EXPLANATION_LEN:
-                explanation += "..."
             match_reasons = _fallback_match_reasons(m, attrs)
             recs.append(
                 {
@@ -217,9 +217,10 @@ class ResponseGenerator:
                     "title": m["title"],
                     "year": m.get("year"),
                     "genres": list(m.get("genres", [])),
-                    "explanation": explanation,
-                    # Explanation is itself a plot slice — avoid duplication on the card.
-                    "plot_preview": "",
+                    # Generic safe explanation — never echo LLM hallucinated text
+                    # nor a plot slice (would duplicate plot_preview on the card).
+                    "explanation": DETERMINISTIC_FALLBACK_EXPLANATION,
+                    "plot_preview": plot[:PLOT_PREVIEW_LEN],
                     "match_reasons": match_reasons,
                 }
             )

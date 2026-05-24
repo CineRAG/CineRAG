@@ -6,6 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from backend.rag.generator import (
+    DETERMINISTIC_FALLBACK_EXPLANATION,
     DETERMINISTIC_FALLBACK_TEXT,
     FALLBACK_TOP_K,
     ResponseGenerator,
@@ -209,7 +210,10 @@ class TestRetryAndFallback:
         # Response text must not claim a numeric count it can't back up.
         assert out["response_text"] == DETERMINISTIC_FALLBACK_TEXT
 
-    def test_fallback_uses_plot_summary_for_explanation(self):
+    def test_fallback_uses_generic_explanation_not_llm_text(self):
+        # Deterministic fallback must use a fixed safe message; it must never echo
+        # the LLM's hallucinated text (e.g., "fake1" from _all_invalid_payload)
+        # and must not be a plot slice (would duplicate plot_preview on the card).
         client = _client_json_sequence(_all_invalid_payload(), _all_invalid_payload())
         gen = ResponseGenerator(client)
         out = gen.generate(
@@ -218,10 +222,7 @@ class TestRetryAndFallback:
             parsed_intent=PARSED_INTENT_RECOMMEND,
         )
         first = out["recommendations"][0]
-        titanic_plot = MOCK_RETRIEVAL_RESULTS[0]["plot_summary"]
-        # Explanation should start with the plot text, not an LLM-generated string
-        # like "fake1" from the invalid payload.
-        assert first["explanation"].startswith(titanic_plot[:50])
+        assert first["explanation"] == DETERMINISTIC_FALLBACK_EXPLANATION
         assert "fake" not in first["explanation"]
 
     def test_fallback_match_reasons_reflect_parsed_intent_attributes(self):
@@ -249,10 +250,10 @@ class TestRetryAndFallback:
         assert len(out["recommendations"]) == 1
         assert out["recommendations"][0]["movie_id"] == "975900"
 
-    def test_deterministic_fallback_plot_preview_is_empty(self):
-        # Fallback explanations are direct slices of plot; the card UI already
-        # renders explanation above plot_preview as a citation, so a non-empty
-        # plot_preview here just duplicates the explanation text.
+    def test_deterministic_fallback_plot_preview_is_populated_and_distinct(self):
+        # plot_preview must carry the real plot slice as citation/evidence and
+        # must NOT match the explanation text (avoids the duplication bug
+        # introduced when explanation was itself a plot slice).
         client = _client_json_sequence(_all_invalid_payload(), _all_invalid_payload())
         gen = ResponseGenerator(client)
         out = gen.generate(
@@ -261,7 +262,11 @@ class TestRetryAndFallback:
             parsed_intent=PARSED_INTENT_RECOMMEND,
         )
         for rec in out["recommendations"]:
-            assert rec["plot_preview"] == ""
+            source = next(
+                m for m in MOCK_RETRIEVAL_RESULTS if m["movie_id"] == rec["movie_id"]
+            )
+            assert rec["plot_preview"] == source["plot_summary"][:300]
+            assert rec["plot_preview"] != rec["explanation"]
 
     def test_response_text_is_consistent_when_recommendations_empty(self):
         """When recommendations is [], response_text must not promise picks."""
