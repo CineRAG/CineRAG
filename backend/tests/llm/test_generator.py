@@ -275,6 +275,18 @@ class TestRetryAndFallback:
         assert len(out["recommendations"]) == 1
         assert out["recommendations"][0]["movie_id"] == "975900"
 
+    def test_deterministic_fallback_plot_preview_is_empty(self):
+        # Fallback explanations are direct slices of plot — plot_preview would duplicate.
+        client = _client_json_sequence(_all_invalid_payload(), _all_invalid_payload())
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        for rec in out["recommendations"]:
+            assert rec["plot_preview"] == ""
+
     def test_response_text_is_consistent_when_recommendations_empty(self):
         """When recommendations is [], response_text must not promise picks."""
         gen = ResponseGenerator(_client_json({}))
@@ -563,6 +575,63 @@ class TestGroundedReasoning:
         reasons = out["recommendations"][0]["match_reasons"]
         assert "set in 1995" not in reasons
         assert "dream logic" in reasons
+
+    def test_plot_preview_is_empty_when_explanation_replaced_by_plot_fallback(self):
+        # When the sanitizer replaces an ungrounded explanation with a plot snippet,
+        # the card would otherwise render the same plot text twice (explanation +
+        # plot_preview blockquote). Suppress plot_preview in that case.
+        client = _client_json(
+            self._payload(
+                "Christopher Nolan crafts a layered dreamscape that fits your request.",
+                ["dream logic"],
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        rec = out["recommendations"][0]
+        # Sanitizer fired (no Nolan in plot) → explanation is plot-derived.
+        assert "Christopher Nolan" not in rec["explanation"]
+        # plot_preview must be empty to avoid duplication on the card.
+        assert rec["plot_preview"] == ""
+
+    def test_plot_preview_is_empty_when_attribution_phrase_triggers_fallback(self):
+        client = _client_json(
+            self._payload(
+                "A box office triumph about stealing secrets from dreams.",
+                ["dream logic"],
+            )
+        )
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        rec = out["recommendations"][0]
+        assert "box office" not in rec["explanation"].lower()
+        assert rec["plot_preview"] == ""
+
+    def test_plot_preview_is_kept_when_explanation_passes_grounding(self):
+        # Grounded LLM explanation is paraphrased, NOT a plot slice — show plot_preview
+        # alongside as a citation.
+        original = "Dom Cobb steals secrets from dreams and confronts his guilt."
+        client = _client_json(self._payload(original, ["dream logic"]))
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        rec = out["recommendations"][0]
+        assert rec["explanation"] == original
+        inception_plot = next(
+            m["plot_summary"] for m in MOCK_RETRIEVAL_RESULTS if m["movie_id"] == "456789"
+        )
+        assert rec["plot_preview"] == inception_plot[:300]
 
 
 class TestResponseTextGrounding:

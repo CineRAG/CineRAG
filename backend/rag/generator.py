@@ -189,20 +189,27 @@ def _safe_plot_fallback(plot: str) -> str:
     return snippet
 
 
-def _ground_explanation(raw: str, plot: str, title: str, year: int | None = None) -> str:
-    """Return `raw` if grounded; otherwise a plot-derived fallback.
+def _ground_explanation(
+    raw: str, plot: str, title: str, year: int | None = None
+) -> tuple[str, bool]:
+    """Return `(explanation, used_plot_fallback)`.
 
     Sanitization fires on ANY of: ungrounded proper nouns, external-attribution
     phrases ("directed by", "Oscar-winning", ...), or 4-digit years that don't
     match the movie's plot/title/release year. Each trigger is logged separately
     so the team can see what the LLM is leaking. The plot snippet is grounded by
     construction (it comes from the candidate's own plot summary).
+
+    `used_plot_fallback` is True when the returned text is derived from the plot
+    rather than the LLM. The caller suppresses `plot_preview` in that case so the
+    card doesn't render the same plot text twice (once as explanation, once as
+    the citation blockquote).
     """
     ungrounded_names = _ungrounded_proper_nouns(raw, plot, title)
     attribution = _external_attribution_phrase(raw)
     ungrounded_years = _ungrounded_years(raw, plot, title, year)
     if not ungrounded_names and not attribution and not ungrounded_years:
-        return raw
+        return raw, False
     reasons: list[str] = []
     if ungrounded_names:
         reasons.append(f"ungrounded names {sorted(ungrounded_names)}")
@@ -214,7 +221,7 @@ def _ground_explanation(raw: str, plot: str, title: str, year: int | None = None
         "ResponseGenerator: explanation for %r is ungrounded (%s); replacing with plot-derived fallback",
         title, "; ".join(reasons),
     )
-    return _safe_plot_fallback(plot)
+    return _safe_plot_fallback(plot), True
 
 
 def _ground_match_reasons(
@@ -280,20 +287,25 @@ def _build_recommendation(pick: dict, source_movie: dict) -> dict:
     plot = source_movie.get("plot_summary", "")
     title = source_movie["title"]
     year = source_movie.get("year")
-    explanation = _ground_explanation(pick.get("explanation", ""), plot, title, year)
+    explanation, used_plot_fallback = _ground_explanation(
+        pick.get("explanation", ""), plot, title, year
+    )
     match_reasons = _ground_match_reasons(
         list(pick.get("match_reasons", [])), plot, title, year
     )
     if not match_reasons:
         # Never leave a card with zero tags; "retrieved match" is a neutral safe label.
         match_reasons = ["retrieved match"]
+    # Suppress plot_preview when explanation is itself plot-derived — the card
+    # otherwise renders the same plot text twice (explanation + citation blockquote).
+    plot_preview = "" if used_plot_fallback else plot[:PLOT_PREVIEW_LEN]
     return {
         "movie_id": source_movie["movie_id"],
         "title": title,
         "year": year,
         "genres": list(source_movie.get("genres", [])),
         "explanation": explanation,
-        "plot_preview": plot[:PLOT_PREVIEW_LEN],
+        "plot_preview": plot_preview,
         "match_reasons": match_reasons,
     }
 
@@ -452,7 +464,8 @@ class ResponseGenerator:
                     "year": m.get("year"),
                     "genres": list(m.get("genres", [])),
                     "explanation": explanation,
-                    "plot_preview": plot[:PLOT_PREVIEW_LEN],
+                    # Explanation is itself a plot slice — avoid duplication on the card.
+                    "plot_preview": "",
                     "match_reasons": match_reasons,
                 }
             )
