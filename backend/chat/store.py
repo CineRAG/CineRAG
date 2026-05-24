@@ -36,20 +36,22 @@ def save_chat_turn(
     user_message: str,
     assistant_message: str,
     metadata: dict | None = None,
+    persist_user_message: bool = True,
 ) -> Chat:
     chat = get_or_create_chat(db, user_id=user_id, chat_id=chat_id)
     now = datetime.utcnow()
 
-    if chat.title == "New conversation":
+    if persist_user_message and chat.title == "New conversation":
         chat.title = _truncate_title(user_message)
 
-    db.add(
-        ChatMessage(
-            chat_id=chat_id,
-            role="user",
-            content=user_message,
+    if persist_user_message:
+        db.add(
+            ChatMessage(
+                chat_id=chat_id,
+                role="user",
+                content=user_message,
+            )
         )
-    )
     db.add(
         ChatMessage(
             chat_id=chat_id,
@@ -103,6 +105,32 @@ def get_chat_messages(db: Session, *, user_id: int, chat_id: str) -> list[ChatHi
         .all()
     )
     return [_row_to_history_message(row) for row in rows]
+
+
+def get_recommended_movie_ids(
+    db: Session, *, user_id: int, chat_id: str
+) -> set[str]:
+    """Collect movie_ids already recommended in this chat session."""
+    rows = (
+        db.query(ChatMessage)
+        .join(Chat, ChatMessage.chat_id == Chat.id)
+        .filter(
+            Chat.id == chat_id,
+            Chat.user_id == user_id,
+            ChatMessage.role == "assistant",
+        )
+        .order_by(ChatMessage.created_at.asc())
+        .all()
+    )
+    seen: set[str] = set()
+    for row in rows:
+        recs, _ = parse_message_metadata(row.metadata_json)
+        for rec in recs:
+            if isinstance(rec, dict):
+                movie_id = rec.get("movie_id")
+                if movie_id:
+                    seen.add(str(movie_id))
+    return seen
 
 
 def get_recent_conversation_history(

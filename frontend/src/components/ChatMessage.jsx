@@ -1,7 +1,17 @@
-import { Workflow } from "lucide-react";
+import { Plus, Workflow } from "lucide-react";
 import { MovieCard } from "./MovieCard.jsx";
 
-export function ChatMessage({ role, content, recommendations, debug, onMarkWatched, onViewDebug }) {
+export function ChatMessage({
+  role,
+  content,
+  recommendations,
+  debug,
+  onMarkWatched,
+  onViewDebug,
+  showMore = false,
+  onMore,
+  moreDisabled = false,
+}) {
   const isUser = role === "user";
 
   return (
@@ -42,21 +52,35 @@ export function ChatMessage({ role, content, recommendations, debug, onMarkWatch
           </button>
         ) : null}
         {!isUser && recommendations?.length ? (
-          <div className="recommendations-row stagger-children">
-            {recommendations.map((rec) => (
-              <MovieCard
-                key={rec.movie_id}
-                movieId={rec.movie_id}
-                title={rec.title}
-                year={rec.year}
-                genres={rec.genres || []}
-                plotPreview={rec.plot_preview}
-                matchReasons={rec.match_reasons}
-                userRating={null}
-                mode="chat"
-                onMarkWatched={onMarkWatched}
-              />
-            ))}
+          <div className="flex flex-col gap-3">
+            <div className="recommendations-row stagger-children">
+              {recommendations.map((rec) => (
+                <MovieCard
+                  key={rec.movie_id}
+                  movieId={rec.movie_id}
+                  title={rec.title}
+                  year={rec.year}
+                  genres={rec.genres || []}
+                  explanation={rec.explanation}
+                  plotPreview={rec.plot_preview}
+                  matchReasons={rec.match_reasons}
+                  userRating={null}
+                  mode="chat"
+                  onMarkWatched={onMarkWatched}
+                />
+              ))}
+            </div>
+            {showMore ? (
+              <button
+                type="button"
+                onClick={onMore}
+                disabled={moreDisabled}
+                className="btn-toolbar self-start inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-chip-bg)] px-3 py-1.5 text-xs font-medium text-[var(--color-muted)] hover:text-[var(--color-fg)] hover:border-amber-600/35 transition-all duration-200 disabled:opacity-40 disabled:pointer-events-none"
+              >
+                <Plus size={14} className="text-amber-600/90 shrink-0" aria-hidden />
+                More
+              </button>
+            ) : null}
           </div>
         ) : null}
       </div>
