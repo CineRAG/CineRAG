@@ -6,10 +6,10 @@ from unittest.mock import MagicMock
 import pytest
 
 from backend.rag.generator import (
-    DETERMINISTIC_FALLBACK_EXPLANATION,
     DETERMINISTIC_FALLBACK_TEXT,
     FALLBACK_TOP_K,
     ResponseGenerator,
+    _safe_per_movie_explanation,
 )
 from backend.tests.llm.mock_data import MOCK_RETRIEVAL_RESULTS
 
@@ -151,8 +151,10 @@ class TestGenerate:
             parsed_intent=PARSED_INTENT_RECOMMEND,
         )
         rec = out["recommendations"][0]
-        assert rec["explanation"] == DETERMINISTIC_FALLBACK_EXPLANATION
-        # plot_preview must still carry the real plot as evidence.
+        # Replacement must not be the copied plot text, must not be a slice of
+        # the plot at all, and must not equal the plot_preview rendered below.
+        assert rec["explanation"] != copied
+        assert rec["explanation"] not in inception_plot
         assert rec["plot_preview"] == inception_plot[:300]
         assert rec["explanation"] != rec["plot_preview"]
 
@@ -201,6 +203,53 @@ class TestGenerate:
         # At least one valid pick → no retry needed.
         assert client.generate_json.call_count == 1
 
+    def test_accepts_integer_movie_ids_from_llm(self):
+        """The prompt's wording (digits only, no quotes) makes the LLM emit
+        JSON numbers, so picks arrive as int. Validation must coerce to string
+        before looking them up against the string-keyed candidate dict —
+        otherwise EVERY pick is dropped and the deterministic fallback fires
+        100% of the time, which is what was happening in production."""
+        payload = {
+            "response_text": "Three picks.",
+            "picks": [
+                {"movie_id": 975900, "explanation": "real 1", "match_reasons": []},
+                {"movie_id": 234567, "explanation": "real 2", "match_reasons": []},
+                {"movie_id": 345678, "explanation": "real 3", "match_reasons": []},
+            ],
+        }
+        client = _client_json(payload)
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert client.generate_json.call_count == 1, (
+            "Should not retry — int IDs must resolve on first attempt"
+        )
+        assert [r["movie_id"] for r in out["recommendations"]] == [
+            "975900", "234567", "345678",
+        ], "Integer picks must be coerced to canonical string IDs"
+        # And the LLM's real explanations must survive (no fallback rewrite).
+        assert out["recommendations"][0]["explanation"] == "real 1"
+
+    def test_accepts_mixed_int_and_str_movie_ids(self):
+        payload = {
+            "response_text": "Mixed types.",
+            "picks": [
+                {"movie_id": "975900", "explanation": "str pick", "match_reasons": []},
+                {"movie_id": 234567, "explanation": "int pick", "match_reasons": []},
+            ],
+        }
+        client = _client_json(payload)
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert [r["movie_id"] for r in out["recommendations"]] == ["975900", "234567"]
+
 
 class TestRetryAndFallback:
     """Spec §2-§3: retry on all-invalid picks, then deterministic top-K fallback."""
@@ -242,8 +291,11 @@ class TestRetryAndFallback:
         )
         retry_prompt = client.generate_json.call_args_list[1].args[0]
         assert "RETRY NOTICE" in retry_prompt
+        # IDs are rendered quoted so the LLM emits them as JSON strings, not
+        # bare numbers. The validation layer is type-tolerant, but lining up
+        # prompt and validation reduces fallback firing in the first place.
         for movie in MOCK_RETRIEVAL_RESULTS:
-            assert f"- {movie['movie_id']}" in retry_prompt
+            assert f'"{movie["movie_id"]}"' in retry_prompt
 
     def test_deterministic_fallback_fires_when_both_attempts_invalid(self):
         client = _client_json_sequence(_all_invalid_payload(), _all_invalid_payload())
@@ -264,10 +316,10 @@ class TestRetryAndFallback:
         # Response text must not claim a numeric count it can't back up.
         assert out["response_text"] == DETERMINISTIC_FALLBACK_TEXT
 
-    def test_fallback_uses_generic_explanation_not_llm_text(self):
-        # Deterministic fallback must use a fixed safe message; it must never echo
-        # the LLM's hallucinated text (e.g., "fake1" from _all_invalid_payload)
-        # and must not be a plot slice (would duplicate plot_preview on the card).
+    def test_fallback_never_echoes_llm_text_or_plot_slice(self):
+        # Deterministic fallback must never echo the LLM's hallucinated text
+        # (e.g., "fake1" attached to invalid IDs) and must not contain plot text
+        # (would duplicate plot_preview on the card).
         client = _client_json_sequence(_all_invalid_payload(), _all_invalid_payload())
         gen = ResponseGenerator(client)
         out = gen.generate(
@@ -275,9 +327,47 @@ class TestRetryAndFallback:
             reranked_movies=MOCK_RETRIEVAL_RESULTS,
             parsed_intent=PARSED_INTENT_RECOMMEND,
         )
-        first = out["recommendations"][0]
-        assert first["explanation"] == DETERMINISTIC_FALLBACK_EXPLANATION
-        assert "fake" not in first["explanation"]
+        for rec in out["recommendations"]:
+            assert "fake" not in rec["explanation"]
+            source = next(
+                m for m in MOCK_RETRIEVAL_RESULTS if m["movie_id"] == rec["movie_id"]
+            )
+            assert rec["explanation"] not in source["plot_summary"]
+
+    def test_fallback_explanations_are_distinct_across_cards(self):
+        """Bug fix: previously every fallback card got the same static string,
+        making the three recommendation cards read like xeroxes. The per-movie
+        explanation must vary across cards so the UI does not look broken."""
+        client = _client_json_sequence(_all_invalid_payload(), _all_invalid_payload())
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        explanations = [r["explanation"] for r in out["recommendations"]]
+        assert len(explanations) == FALLBACK_TOP_K
+        assert len(set(explanations)) == FALLBACK_TOP_K, (
+            f"Expected {FALLBACK_TOP_K} distinct explanations, got {explanations}"
+        )
+
+    def test_fallback_explanation_mentions_movie_metadata(self):
+        """The per-movie fallback should weave in the movie's year and primary
+        genre so the user sees concrete grounding, not a generic placeholder."""
+        client = _client_json_sequence(_all_invalid_payload(), _all_invalid_payload())
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        for rec in out["recommendations"]:
+            source = next(
+                m for m in MOCK_RETRIEVAL_RESULTS if m["movie_id"] == rec["movie_id"]
+            )
+            assert str(source["year"]) in rec["explanation"]
+            primary_genre = source["genres"][0].lower()
+            assert primary_genre in rec["explanation"].lower()
 
     def test_fallback_match_reasons_reflect_parsed_intent_attributes(self):
         client = _client_json_sequence(_all_invalid_payload(), _all_invalid_payload())
@@ -335,3 +425,47 @@ class TestRetryAndFallback:
         # Should not contain numeric promises like "three movies", "two films", etc.
         assert "three movies" not in text
         assert "two movies" not in text
+
+
+class TestSafePerMovieExplanation:
+    """Unit tests for the per-movie deterministic explanation builder."""
+
+    def test_includes_year_and_primary_genre(self):
+        movie = {
+            "movie_id": "1",
+            "title": "Foo",
+            "year": 2011,
+            "genres": ["Drama", "Romance"],
+            "plot_summary": "p",
+        }
+        out = _safe_per_movie_explanation(movie, {}, index=0)
+        assert "2011" in out
+        assert "drama" in out.lower()
+
+    def test_weaves_in_mood_attribute_when_present(self):
+        movie = {"movie_id": "1", "title": "Foo", "year": 2011, "genres": ["Drama"]}
+        out = _safe_per_movie_explanation(movie, {"mood": "bittersweet"}, index=0)
+        assert "bittersweet" in out.lower()
+
+    def test_index_varies_intro_phrasing(self):
+        movie = {"movie_id": "1", "title": "Foo", "year": 2011, "genres": ["Drama"]}
+        outs = [_safe_per_movie_explanation(movie, {}, index=i) for i in range(3)]
+        assert len(set(outs)) == 3
+
+    def test_no_metadata_still_returns_distinct_safe_string(self):
+        movie = {"movie_id": "1", "title": "Foo"}
+        out = _safe_per_movie_explanation(movie, {}, index=0)
+        assert out.strip() != ""
+        assert "plot summary" in out.lower()
+
+    def test_never_includes_plot_text(self):
+        movie = {
+            "movie_id": "1",
+            "title": "Foo",
+            "year": 2011,
+            "genres": ["Drama"],
+            "plot_summary": "A young couple from different social backgrounds fall in love.",
+        }
+        out = _safe_per_movie_explanation(movie, {"mood": "tense"}, index=0)
+        assert "young couple" not in out.lower()
+        assert "social backgrounds" not in out.lower()
