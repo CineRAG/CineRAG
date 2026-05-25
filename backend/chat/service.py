@@ -57,8 +57,9 @@ class ChatService:
         self.expander = QueryExpander(llm_client)
 
         from sentence_transformers import CrossEncoder
-        self.generator = ResponseGenerator(llm_client)
         self.cross_encoder = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+        self.generator = ResponseGenerator(llm_client)
+        
 
     def process_chat(
         self,
@@ -104,12 +105,14 @@ class ChatService:
 
             # 4. Reference resolution
             reference_movie_data = None
+            title_hits: list[dict] = []
             if parsed_intent.get("reference_movie"):
                 hits = self.retriever.search_by_title(
-                    parsed_intent["reference_movie"], top_k=1
+                    parsed_intent["reference_movie"], top_k=10
                 )
                 if hits:
                     reference_movie_data = hits[0]
+                    title_hits = hits
 
             # 5. Expand
             expanded_query = self.expander.expand(parsed_intent, reference_movie_data)
@@ -118,7 +121,10 @@ class ChatService:
             # 6. Retrieve
             raw_hits = self.retriever.retrieve_hybrid(user_message, top_k=50)
             exp_hits = self.retriever.retrieve_hybrid(expanded_query, top_k=50)
-            candidates = _rrf_fuse([raw_hits, exp_hits], top_k=50)
+            lists_to_fuse = [raw_hits, exp_hits]
+            if title_hits:
+                lists_to_fuse.append(title_hits)
+            candidates = _rrf_fuse(lists_to_fuse, top_k=50)
 
 
 

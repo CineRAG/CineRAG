@@ -18,7 +18,7 @@ VALID_INTENTS = {"find_similar", "find_by_mood", "refine_previous", "general_que
 SAFE_DEFAULT_PARSED_INTENT: dict[str, Any] = {
     "intent": "find_by_mood",
     "reference_movie": None,
-    "attributes": {"genre": None, "mood": None, "era": None, "exclusions": None},
+    "attributes": {"genre": None, "mood": None, "era": None, "exclusions": None,  "min_year": None, "max_year": None},
     "refinement": None,
 }
 
@@ -82,5 +82,10 @@ class QueryPreprocessor:
                 "Preprocessor coercing invalid intent %r to find_by_mood", result["intent"]
             )
             result["intent"] = "find_by_mood"
+          # Fill optional year fields if LLM omitted them
+        attrs = result.get("attributes", {})
+        attrs.setdefault("min_year", None)
+        attrs.setdefault("max_year", None)
+        result["attributes"] = attrs
 
         return result

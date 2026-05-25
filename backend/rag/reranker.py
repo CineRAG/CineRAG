@@ -3,10 +3,11 @@ backend/rag/reranker.py
 Stage 5: Attribute-based score boosting from parsed intent.
 
 Boosting rules (additive, applied to top-20 candidates):
-  - genre match  : +0.20
-  - era match    : +0.15
-  - exclusion    : candidate removed entirely
-  - mood         : no boost (handled upstream by semantic retrieval)
+- genre match  : +0.20
+- era match    : +0.15
+- exclusion    : candidate removed entirely
+- year bounds  : candidate removed entirely (hard filter)
+- mood         : no boost (handled upstream by semantic retrieval)
 
 Final score = original_score * (1 + total_boost)
 """
@@ -47,6 +48,13 @@ def _genres_lower(movie: dict) -> list[str]:
     return [g.lower() for g in movie.get("genres", [])]
 
 
+def _to_int(v) -> int | None:
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return None
+
+
 # ------------------------------------------------------------------
 # Public API
 # ------------------------------------------------------------------
@@ -56,28 +64,6 @@ def rerank(
     parsed_intent: dict,
     top_k: int = 5,
 ) -> list[dict]:
-    """
-    Rerank candidates based on attribute boosting from parsed_intent.
-
-    Boosting rules:
-      - If parsed_intent["attributes"]["genre"] is set, boost movies
-        matching that genre by +0.20.
-      - If parsed_intent["attributes"]["era"] is set (e.g. "1990s"),
-        boost movies from that decade by +0.15.
-      - If parsed_intent["attributes"]["exclusions"] is set (e.g. "no horror"),
-        remove movies with that genre entirely.
-      - If parsed_intent["attributes"]["mood"] is set, no boost applied
-        (mood is handled by semantic retrieval upstream).
-
-    Args:
-        candidates:    list of MovieResult dicts (already filtered).
-                       Only the first 20 are considered for efficiency.
-        parsed_intent: ParsedIntent dict from Stage 1 (Person B).
-        top_k:         number of results to return.
-
-    Returns:
-        top_k MovieResult dicts sorted by adjusted score descending.
-    """
     pool       = candidates[:20]
     attributes = parsed_intent.get("attributes") or {}
 
@@ -85,12 +71,14 @@ def rerank(
     era_str: str | None      = (attributes.get("era") or "").strip() or None
     exclusions: str | None   = (attributes.get("exclusions") or "").strip().lower() or None
 
-    # Normalise exclusion string — strip leading "no ", "not ", "without " …
     excl_genre: str | None = None
     if exclusions:
         excl_genre = re.sub(r"^(no|not|without|excludes?)\s+", "", exclusions).strip() or None
 
     era_range = _parse_era_range(era_str) if era_str else None
+
+    min_year = _to_int(attributes.get("min_year"))
+    max_year = _to_int(attributes.get("max_year"))
 
     reranked: list[dict] = []
     for movie in pool:
@@ -99,6 +87,12 @@ def rerank(
 
         # Exclusion filter
         if excl_genre and any(excl_genre in g for g in genres):
+            continue
+
+        # Hard year filter
+        if min_year is not None and (year is None or year < min_year):
+            continue
+        if max_year is not None and (year is None or year > max_year):
             continue
 
         # Boost calculation
@@ -116,19 +110,17 @@ def rerank(
     reranked.sort(key=lambda m: m["score"], reverse=True)
     return reranked[:top_k]
 
+
 def crossencoder_rerank(
-      query: str,
-      candidates: list[dict],
-      cross_encoder,
-      top_k: int = 20,
-  ) -> list[dict]:
-      if not candidates:
-          return candidates
-      pairs = [(query, m.get("plot_summary", "")) for m in candidates]
-      scores = cross_encoder.predict(pairs)
-      for m, score in zip(candidates, scores):
-          m = m.copy()
-          m["score"] = float(score)
-      candidates = [dict(m, score=float(s)) for m, s in zip(candidates, scores)]
-      candidates.sort(key=lambda m: m["score"], reverse=True)
-      return candidates[:top_k]
+    query: str,
+    candidates: list[dict],
+    cross_encoder,
+    top_k: int = 20,
+) -> list[dict]:
+    if not candidates:
+        return candidates
+    pairs = [(query, m.get("plot_summary", "")) for m in candidates]
+    scores = cross_encoder.predict(pairs)
+    candidates = [dict(m, score=float(s)) for m, s in zip(candidates, scores)]
+    candidates.sort(key=lambda m: m["score"], reverse=True)
+    return candidates[:top_k]

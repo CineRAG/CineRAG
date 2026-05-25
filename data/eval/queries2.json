@@ -1,0 +1,716 @@
+[
+  {
+    "query_id": "q001",
+    "query": "I’m trying to find a classic Indian black‑white drama set in Varanasi where a young boy’s father dies, leaving his mother to raise him alone while he navigates school, new friendships, and growing up.",
+    "expected_movie_ids": [
+      "1267738"
+    ],
+    "title": "Aparajito",
+    "year": 1956,
+    "genres": [
+      "Bengali Cinema",
+      "Art film",
+      "World cinema",
+      "Family Drama",
+      "Drama",
+      "Coming of age",
+      "Bollywood"
+    ]
+  },
+  {
+    "query_id": "q002",
+    "query": "I'm trying to find a black‑and‑white Russian movie about a remote Ural village where farmers band together to seek violent, off‑screen revenge after their collective farm is sold, featuring old Soviet music.",
+    "expected_movie_ids": [
+      "2485411"
+    ],
+    "title": "Outskirts",
+    "year": 1998,
+    "genres": [
+      "Action/Adventure",
+      "Drama",
+      "Political drama",
+      "World cinema"
+    ]
+  },
+  {
+    "query_id": "q003",
+    "query": "I'm searching for an indie drama set after 9/11 that follows two buddies who lose their Statue of Liberty concession job, get involved in drug dealing and insurance fraud, and one of them decides to enlist in the army to pay for college.",
+    "expected_movie_ids": [
+      "25730129"
+    ],
+    "title": "Liberty Kid",
+    "year": 2007,
+    "genres": [
+      "Drama",
+      "Indie"
+    ]
+  },
+  {
+    "query_id": "q004",
+    "query": "Which 1970s horror‑comedy B‑movie has teens skinny‑dipping at an abandoned military site and getting attacked by something in the water, while an insurance investigator searches for the missing kids?",
+    "expected_movie_ids": [
+      "3153784"
+    ],
+    "title": "Piranha",
+    "year": 1978,
+    "genres": [
+      "Parody",
+      "Natural horror films",
+      "Horror",
+      "Indie",
+      "Stop motion",
+      "Cult",
+      "Comedy",
+      "B-movie"
+    ]
+  },
+  {
+    "query_id": "q005",
+    "query": "Looking for a movie about a man raised in a circus who becomes a businessman, hits a mid‑life crisis at fifty, disappears at sea, and then encounters an old employee who forces him to confront the things he’s neglected in his life.",
+    "expected_movie_ids": [
+      "24643555"
+    ],
+    "title": "Itinéraire d'un enfant gâté",
+    "year": 1988,
+    "genres": [
+      "Adventure",
+      "Comedy-drama",
+      "Drama",
+      "Comedy",
+      "Romantic drama",
+      "Romance Film"
+    ]
+  },
+  {
+    "query_id": "q006",
+    "query": "I'm looking for a Hindi family comedy where a frustrated husband suddenly gains the ability to hear women's thoughts after attending a village festival, and tries to deal with his wife, mother, and boss with the help of a psychologist.",
+    "expected_movie_ids": [
+      "14602109"
+    ],
+    "title": "Aga Bai Arrecha",
+    "year": 2004,
+    "genres": [
+      "Bollywood",
+      "Musical",
+      "Family Film",
+      "Comedy",
+      "World cinema"
+    ]
+  },
+  {
+    "query_id": "q007",
+    "query": "I'm trying to find a classic noir where a crime magazine editor hides behind a huge clock in a New York publishing building after being set up for a murder, and the story unfolds in flashbacks.",
+    "expected_movie_ids": [
+      "2098715"
+    ],
+    "title": "The Big Clock",
+    "year": 1948,
+    "genres": [
+      "Thriller",
+      "Crime Fiction",
+      "Psychological thriller",
+      "Black-and-white",
+      "Mystery",
+      "Drama",
+      "Film noir"
+    ]
+  },
+  {
+    "query_id": "q008",
+    "query": "I’m looking for a gritty thriller about a teenage drug addict who gets caught after a botched pharmacy robbery, is sentenced to life, and then a secret government agency fakes her death and trains her as an assassin. It has a dark, conspiratorial vibe with intense spy action.",
+    "expected_movie_ids": [
+      "264943"
+    ],
+    "title": "Nikita",
+    "year": 1990,
+    "genres": [
+      "Thriller",
+      "Conspiracy fiction",
+      "World cinema",
+      "Heist",
+      "Action/Adventure",
+      "Crime Thriller",
+      "Action",
+      "Spy"
+    ]
+  },
+  {
+    "query_id": "q009",
+    "query": "What’s the title of that 2008 horror/thriller where a couple in a Colorado town get caught in a sudden zombie outbreak, with military roadblocks, a desperate father trying to get medical aid for his sick child, and soldiers trying to contain the chaos?",
+    "expected_movie_ids": [
+      "3759313"
+    ],
+    "title": "Day of the Dead",
+    "year": 2008,
+    "genres": [
+      "Thriller",
+      "Horror",
+      "Doomsday film",
+      "Cult",
+      "Splatter film",
+      "Zombie Film"
+    ]
+  },
+  {
+    "query_id": "q010",
+    "query": "Looking for a World War II movie about an Irish sailor who survives a U‑boat attack, is cared for by a pacifist doctor, and then becomes obsessed with revenge by hunting the submarine down with a fighter plane.",
+    "expected_movie_ids": [
+      "882438"
+    ],
+    "title": "Murphy's War",
+    "year": 1971,
+    "genres": [
+      "Action",
+      "Drama",
+      "War film"
+    ]
+  },
+  {
+    "query_id": "q011",
+    "query": "Looking for a 1980s Chinese action‑thriller where a hard‑working man juggling two jobs to afford a motorcycle gets betrayed by his drug‑dealer friend, who also wants his girlfriend and involves a corrupt police officer in the plot.",
+    "expected_movie_ids": [
+      "5706283"
+    ],
+    "title": "Legacy of Rage",
+    "year": 1986,
+    "genres": [
+      "Thriller",
+      "Action",
+      "Martial Arts Film",
+      "Chinese Movies",
+      "World cinema"
+    ]
+  },
+  {
+    "query_id": "q012",
+    "query": "I'm looking for a movie about an Alaskan oil‑field worker who survives a plane crash in a blizzard and is hunted by wolves while grappling with guilt and thoughts of suicide.",
+    "expected_movie_ids": [
+      "32099336"
+    ],
+    "title": "The Grey",
+    "year": 2012,
+    "genres": [
+      "Action",
+      "Drama"
+    ]
+  },
+  {
+    "query_id": "q013",
+    "query": "Which classic animated movie features Yogi Bear being sent to a zoo after his endless pic‑a‑nic food schemes, with Cindy Bear trying to win his heart?",
+    "expected_movie_ids": [
+      "2513047"
+    ],
+    "title": "Hey There, It's Yogi Bear!",
+    "year": 1964,
+    "genres": [
+      "Adventure",
+      "Animation",
+      "Children's",
+      "Comedy",
+      "Romance Film",
+      "Family Film"
+    ]
+  },
+  {
+    "query_id": "q014",
+    "query": "Looking for a rom‑com where a woman stages her own kidnapping by locking herself in her car’s trunk, only to have a car thief actually steal the vehicle with her inside.",
+    "expected_movie_ids": [
+      "3422774"
+    ],
+    "title": "Excess Baggage",
+    "year": 1997,
+    "genres": [
+      "Romantic comedy",
+      "Romance Film",
+      "Comedy"
+    ]
+  },
+  {
+    "query_id": "q015",
+    "query": "I'm looking for a drama/thriller set in a small Australian town about a teenage boy who comes back from boarding school and forms a close, possibly romantic bond with a local girl who uses a leg brace, with a mysterious, emotional undercurrent.",
+    "expected_movie_ids": [
+      "12287985"
+    ],
+    "title": "Till Human Voices Wake Us",
+    "year": 2002,
+    "genres": [
+      "Thriller",
+      "World cinema",
+      "Mystery",
+      "Drama",
+      "Romantic drama",
+      "Romance Film"
+    ]
+  },
+  {
+    "query_id": "q016",
+    "query": "Looking for an old sci‑fi horror where a rich man's brain is kept alive after his death, turning into a telepathic monster that possesses a medical assistant, and a woman has to battle it.",
+    "expected_movie_ids": [
+      "5844491"
+    ],
+    "title": "The Lady and the Monster",
+    "year": 1944,
+    "genres": [
+      "Science Fiction",
+      "Horror",
+      "Sci-Fi Horror"
+    ]
+  },
+  {
+    "query_id": "q017",
+    "query": "I’m trying to find that 80s sci‑fi horror where a farmer gets taken by a strange light, a half‑alien kid grows up on a farm and starts killing the family members, ending with a weird pregnancy and birth.",
+    "expected_movie_ids": [
+      "2831557"
+    ],
+    "title": "Xtro",
+    "year": 1983,
+    "genres": [
+      "Sci-Fi Horror",
+      "Alien Film",
+      "Science Fiction",
+      "Horror",
+      "Creature Film"
+    ]
+  },
+  {
+    "query_id": "q018",
+    "query": "A thriller about a psychiatrist who, after a stormy car crash, gets possessed by a ghostly girl and wakes up as a patient in the mental hospital where she works, trying to prove she’s not actually crazy.",
+    "expected_movie_ids": [
+      "793025"
+    ],
+    "title": "Gothika",
+    "year": 2003,
+    "genres": [
+      "Thriller",
+      "Horror",
+      "Supernatural",
+      "Psychological thriller",
+      "Mystery",
+      "Crime Thriller"
+    ]
+  },
+  {
+    "query_id": "q019",
+    "query": "What is the name of that early black‑and‑white horror film where a young scientist and his hunchback assistant stitch together a human body in a creepy tower lab and end up creating a monster?",
+    "expected_movie_ids": [
+      "73488"
+    ],
+    "title": "Frankenstein",
+    "year": 1931,
+    "genres": [
+      "Science Fiction",
+      "Horror",
+      "Black-and-white",
+      "Monster"
+    ]
+  },
+  {
+    "query_id": "q020",
+    "query": "I’m looking for a mid‑90s sci‑fi parody where Martians invade Earth, the president gives a televised address, and the chaos spreads from a Vegas hotel to a Kansas family with a bumbling first‑contact meeting.",
+    "expected_movie_ids": [
+      "3565461"
+    ],
+    "title": "Mars Attacks!",
+    "year": 1996,
+    "genres": [
+      "Thriller",
+      "Parody",
+      "Science Fiction",
+      "Ensemble Film",
+      "Alien Film",
+      "Fantasy",
+      "Comedy",
+      "Action"
+    ]
+  },
+  {
+    "query_id": "q021",
+    "query": "I'm looking for a Japanese sci‑fi thriller set in a near‑future Chinese megacity where three orphaned pickpockets get tangled with a vampire gang leader after an economic collapse.",
+    "expected_movie_ids": [
+      "1607540"
+    ],
+    "title": "Moon Child",
+    "year": 2003,
+    "genres": [
+      "Thriller",
+      "Science Fiction",
+      "Horror",
+      "World cinema",
+      "Action/Adventure",
+      "Japanese Movies",
+      "Action"
+    ]
+  },
+  {
+    "query_id": "q022",
+    "query": "Looking for an old black‑and‑white animated short where a musical cartoon character hosts a Halloween party with pumpkins and animal friends, only to have a huge gorilla crash the celebration.",
+    "expected_movie_ids": [
+      "7487699"
+    ],
+    "title": "Betty Boop's Hallowe'en Party",
+    "year": 1933,
+    "genres": [
+      "Short Film",
+      "Family Film",
+      "Horror",
+      "Musical",
+      "Animation"
+    ]
+  },
+  {
+    "query_id": "q023",
+    "query": "I'm looking for an animated musical about a princess and a fortune‑teller who try to use a mysterious dimensional portal to flee a kingdom under attack by a robotic army.",
+    "expected_movie_ids": [
+      "7460481"
+    ],
+    "title": "Felix the Cat: The Movie",
+    "year": 1988,
+    "genres": [
+      "Science Fiction",
+      "Family Film",
+      "Fantasy",
+      "Musical",
+      "Animation"
+    ]
+  },
+  {
+    "query_id": "q024",
+    "query": "I'm trying to find an animated short where an elderly widower keeps adding new levels to his house as floodwaters rise, and when he drops his pipe in the submerged lower floors, his search triggers memories of his past.",
+    "expected_movie_ids": [
+      "21663542"
+    ],
+    "title": "La Maison en Petits Cubes",
+    "year": 2008,
+    "genres": [
+      "Japanese Movies",
+      "Animation",
+      "Short Film",
+      "Anime",
+      "Drama",
+      "Family Film"
+    ]
+  },
+  {
+    "query_id": "q025",
+    "query": "I'm trying to find a movie about a prison uprising where a reluctant inmate ends up defending a guard against a group of violent prisoners during a chaotic riot.",
+    "expected_movie_ids": [
+      "18970935"
+    ],
+    "title": "Riot",
+    "year": 1969,
+    "genres": [
+      "Action/Adventure",
+      "Crime Fiction",
+      "Action",
+      "Drama",
+      "Film adaptation"
+    ]
+  },
+  {
+    "query_id": "q026",
+    "query": "I’m looking for a made‑for‑TV thriller where a Des Plaines police lieutenant investigates a missing teenager, suspects a well‑known local businessman of being a serial killer, and battles community denial and flimsy evidence to catch him.",
+    "expected_movie_ids": [
+      "20836034"
+    ],
+    "title": "To Catch a Killer",
+    "year": 1992,
+    "genres": [
+      "Thriller",
+      "Mystery",
+      "Drama",
+      "Crime Thriller",
+      "Television movie"
+    ]
+  },
+  {
+    "query_id": "q027",
+    "query": "A thriller about a widowed psychiatrist who receives a strange call from her own father about a mysterious wheelchair‑bound patient, with supernatural twists and a tense airport backdrop.",
+    "expected_movie_ids": [
+      "18716405"
+    ],
+    "title": "Shelter",
+    "year": 2009,
+    "genres": [
+      "Thriller",
+      "Mystery",
+      "Horror",
+      "Crime Thriller",
+      "Supernatural"
+    ]
+  },
+  {
+    "query_id": "q028",
+    "query": "Looking for a classic western about a cowboy who drives a herd of cattle to the Klondike gold rush and clashes with a self‑appointed judge who confiscates his herd, leading to a chase across the Canadian border.",
+    "expected_movie_ids": [
+      "2165760"
+    ],
+    "title": "The Far Country",
+    "year": 1955,
+    "genres": [
+      "Action/Adventure",
+      "Western"
+    ]
+  },
+  {
+    "query_id": "q029",
+    "query": "I'm trying to find a 1980s horror‑action movie set in the Louisiana swamps where a scientist is transformed into a plant‑based monster after a lab accident, and his sister is killed by a crazed doctor obsessed with immortality.",
+    "expected_movie_ids": [
+      "5929445"
+    ],
+    "title": "Swamp Thing",
+    "year": 1982,
+    "genres": [
+      "Monster movie",
+      "Action/Adventure",
+      "Science Fiction",
+      "Horror",
+      "Superhero movie",
+      "Superhero",
+      "Cult"
+    ]
+  },
+  {
+    "query_id": "q030",
+    "query": "I'm trying to find a family fantasy adventure set in wartime Scotland where a young boy discovers a mysterious creature in Loch Ness and forms a bond with it. It has a magical, heartfelt vibe and includes an old storyteller who shares the legend in a bar.",
+    "expected_movie_ids": [
+      "36956792"
+    ],
+    "title": "The Water Horse: Legend of the Deep",
+    "year": 2007,
+    "genres": [
+      "Family Film",
+      "Children's",
+      "Fantasy",
+      "Adventure"
+    ]
+  },
+  {
+    "query_id": "q031",
+    "query": "I'm looking for an old black‑and‑white adventure thriller where a female pilot crashes in the jungles of French Indochina and is rescued by a mysterious detective posing as an archaeologist.",
+    "expected_movie_ids": [
+      "20904748"
+    ],
+    "title": "Mr. Moto Takes a Chance",
+    "year": 1938,
+    "genres": [
+      "Thriller",
+      "Mystery",
+      "Drama",
+      "Adventure",
+      "Black-and-white"
+    ]
+  },
+  {
+    "query_id": "q032",
+    "query": "I'm trying to find a 1980s Indian thriller where a senior police officer is sent to a rich family's house to investigate a daughter‑in‑law's death that appears to be a suicide but turns into a murder mystery.",
+    "expected_movie_ids": [
+      "23227434"
+    ],
+    "title": "Oru CBI Diary Kurippu",
+    "year": 1988,
+    "genres": [
+      "Thriller",
+      "Mystery",
+      "Action",
+      "Bollywood"
+    ]
+  },
+  {
+    "query_id": "q033",
+    "query": "What is the French indie horror thriller about two college friends who drive to a remote house for the weekend and are relentlessly stalked by a mysterious killer, opening with a disturbing scene of a woman in a hospital gown?",
+    "expected_movie_ids": [
+      "1157922"
+    ],
+    "title": "Haute Tension",
+    "year": 2003,
+    "genres": [
+      "Thriller",
+      "Horror",
+      "Indie",
+      "World cinema",
+      "Road-Horror",
+      "Mystery",
+      "Drama",
+      "Slasher"
+    ]
+  },
+  {
+    "query_id": "q034",
+    "query": "I’m looking for a historical drama about a German monk in the 1500s who breaks with the Catholic Church over its teachings and sparks the Reformation.",
+    "expected_movie_ids": [
+      "10185281"
+    ],
+    "title": "Martin Luther",
+    "year": 1953,
+    "genres": [
+      "Christian film",
+      "Biographical film",
+      "Biography",
+      "Drama"
+    ]
+  },
+  {
+    "query_id": "q035",
+    "query": "I’m looking for an epic biographical drama about a Chinese emperor who grows up in the Forbidden City, loses his throne, and ends up as a political prisoner after the Communist takeover.",
+    "expected_movie_ids": [
+      "129246"
+    ],
+    "title": "The Last Emperor",
+    "year": 1987,
+    "genres": [
+      "Biography",
+      "History",
+      "Epic",
+      "Chinese Movies",
+      "Period piece",
+      "Drama",
+      "Biographical film",
+      "Political drama"
+    ]
+  },
+  {
+    "query_id": "q036",
+    "query": "I'm looking for a movie about a Black high‑school football coach hired in the early 1970s at a newly integrated school, where he has to overcome racial tensions and forge a bond with a white assistant while trying to lead the team to a championship.",
+    "expected_movie_ids": [
+      "397574"
+    ],
+    "title": "Remember the Titans",
+    "year": 2000,
+    "genres": [
+      "Sports",
+      "Americana",
+      "Biography",
+      "Drama",
+      "Inspirational Drama"
+    ]
+  },
+  {
+    "query_id": "q037",
+    "query": "Looking for a silent black‑and‑white fantasy drama where a fairy appears as a poor widow and sends a brother and sister on a magical quest to find the bluebird of happiness, using a special hat that reveals hidden worlds.",
+    "expected_movie_ids": [
+      "4597981"
+    ],
+    "title": "The Blue Bird",
+    "year": 1918,
+    "genres": [
+      "Drama",
+      "Silent film",
+      "Fantasy",
+      "Indie",
+      "Black-and-white"
+    ]
+  },
+  {
+    "query_id": "q038",
+    "query": "What’s the name of that 1980s fantasy comedy where a wealthy 81‑year‑old man swaps bodies with his 18‑year‑old grandson and has to go back to high school, sports and teenage romance?",
+    "expected_movie_ids": [
+      "15336744"
+    ],
+    "title": "18 Again!",
+    "year": 1988,
+    "genres": [
+      "Fantasy",
+      "Comedy",
+      "Slapstick"
+    ]
+  },
+  {
+    "query_id": "q039",
+    "query": "I'm looking for an animated fantasy about a solitary white five‑tailed fox who ends up at a mountain school for misfit kids, taught by an eccentric teacher, while a stranded alien tries to fix its ship and go home.",
+    "expected_movie_ids": [
+      "10175018"
+    ],
+    "title": "Yobi, the Five Tailed Fox",
+    "year": 2007,
+    "genres": [
+      "Fantasy",
+      "Animation"
+    ]
+  },
+  {
+    "query_id": "q040",
+    "query": "A classic wartime drama about a gentle German pastor who stands up to the Nazis in a small village, gets arrested for preaching against Hitler and is sent to Dachau.A classic wartime drama about a gentle German pastor who stands up to the Nazis in a small village, gets arrested for preaching against Hitler and is sent to Dachau.",
+    "expected_movie_ids": [
+      "13840353"
+    ],
+    "title": "Pastor Hall",
+    "year": 1940,
+    "genres": [
+      "Drama",
+      "War film"
+    ]
+  },
+  {
+    "query_id": "q041",
+    "query": "I'm trying to find a World War II action movie where a major recruits a dozen hardened prisoners for a suicide raid on a secret Nazi chemical plant to stop a nerve‑gas attack on Washington, D.C.",
+    "expected_movie_ids": [
+      "25649956"
+    ],
+    "title": "The Dirty Dozen: The Deadly Mission",
+    "year": 1987,
+    "genres": [
+      "Action",
+      "War film"
+    ]
+  },
+  {
+    "query_id": "q042",
+    "query": "Looking for a Korean period drama set during King Sejong's reign where Joseon is threatened by Ming China over a secret weapons program and forced to send young women as tribute.",
+    "expected_movie_ids": [
+      "20413984"
+    ],
+    "title": "The Divine Weapon",
+    "year": 2008,
+    "genres": [
+      "Period piece",
+      "Historical fiction",
+      "Drama",
+      "World cinema",
+      "War film"
+    ]
+  },
+  {
+    "query_id": "q043",
+    "query": "Which classic western has a charismatic outlaw who hides with a Mormon wagon train to evade the marshals, befriends a little girl, and ultimately defends the travelers from an Indian attack?",
+    "expected_movie_ids": [
+      "9140037"
+    ],
+    "title": "Bad Bascomb",
+    "year": 1946,
+    "genres": [
+      "Western",
+      "Action"
+    ]
+  },
+  {
+    "query_id": "q044",
+    "query": "Looking for an ’80s horror‑western where a small‑town teen is bitten by a mysterious drifter, becomes a vampire, and is forced to join a roaming gang of night‑time blood‑suckers while trying to survive the deadly sunrise.",
+    "expected_movie_ids": [
+      "1637470"
+    ],
+    "title": "Near Dark",
+    "year": 1987,
+    "genres": [
+      "Cult",
+      "Western",
+      "Horror",
+      "Teen"
+    ]
+  },
+  {
+    "query_id": "q045",
+    "query": "Looking for a comedic Western where two longtime cowboy buddies reunite in a Texas town, one now a country music star and the other a Hollywood actor, and both end up competing for the same woman they both loved back in the day.",
+    "expected_movie_ids": [
+      "11036915"
+    ],
+    "title": "Mi amigo",
+    "year": 2002,
+    "genres": [
+      "Action/Adventure",
+      "Western",
+      "Buddy film",
+      "Comedy",
+      "Comedy Western"
+    ]
+  }
+]
