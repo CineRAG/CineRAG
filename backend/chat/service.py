@@ -13,9 +13,34 @@ from backend.rag.generator import ResponseGenerator
 from backend.rag.llm_client import OllamaClient
 from backend.rag.query_expander import QueryExpander
 from backend.rag.query_preprocessor import QueryPreprocessor
-from backend.rag.reranker import rerank
+from backend.rag.reranker import rerank, crossencoder_rerank
 
 logger = logging.getLogger(__name__)
+
+def _rrf_fuse(ranked_lists: list[list[dict]], top_k: int, rrf_k: int = 60) -> list[dict]:
+    rank_maps: list[dict[str, int]] = []
+    meta_lookup: dict[str, dict] = {}
+    for lst in ranked_lists:
+        rank_maps.append({r["movie_id"]: i + 1 for i, r in enumerate(lst)})
+        for r in lst:
+            meta_lookup[r["movie_id"]] = r
+
+    all_ids = set().union(*rank_maps)
+    scores: dict[str, float] = {}
+    for mid in all_ids:
+        scores[mid] = sum(
+            1.0 / (rrf_k + rm[mid]) for rm in rank_maps if mid in rm
+        )
+
+    sorted_ids = sorted(scores, key=lambda x: scores[x], reverse=True)[:top_k]
+    result = []
+    for mid in sorted_ids:
+        entry = meta_lookup[mid].copy()
+        entry["score"] = round(scores[mid], 6)
+        result.append(entry)
+    return result
+
+
 
 SERVICE_UNAVAILABLE_TEXT = (
     "The recommendation service is temporarily unavailable. Please try again."
@@ -30,7 +55,10 @@ class ChatService:
         self.llm_client = llm_client
         self.preprocessor = QueryPreprocessor(llm_client)
         self.expander = QueryExpander(llm_client)
+
+        from sentence_transformers import CrossEncoder
         self.generator = ResponseGenerator(llm_client)
+        self.cross_encoder = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
 
     def process_chat(
         self,
@@ -88,7 +116,12 @@ class ChatService:
             debug["expanded_query"] = expanded_query
 
             # 6. Retrieve
-            candidates = self.retriever.retrieve_hybrid(expanded_query, top_k=50)
+            raw_hits = self.retriever.retrieve_hybrid(user_message, top_k=50)
+            exp_hits = self.retriever.retrieve_hybrid(expanded_query, top_k=50)
+            candidates = _rrf_fuse([raw_hits, exp_hits], top_k=50)
+
+
+
             debug["num_candidates_before_filter"] = len(candidates)
 
             # 7. Filter + rerank
@@ -96,6 +129,8 @@ class ChatService:
             if exclude_movie_ids:
                 filtered = filter_excluded(filtered, exclude_movie_ids)
             debug["num_candidates_after_filter"] = len(filtered)
+
+            filtered = crossencoder_rerank(user_message, filtered, self.cross_encoder, top_k=20)
             reranked = rerank(filtered, parsed_intent, top_k=5)
 
             # 8. Generate

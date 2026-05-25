@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from config import CHROMA_DB_PATH, BM25_INDEX_PATH
 
-EMBEDDING_MODEL   = "all-MiniLM-L6-v2"
+EMBEDDING_MODEL   = "BAAI/bge-base-en-v1.5"  # 768-dim, normalized embeddings
 CHROMA_COLLECTION = "movies"
 
 
@@ -91,7 +91,8 @@ class MovieRetriever:
         Returns list of MovieResult dicts sorted by cosine similarity descending.
         Score is cosine similarity normalized to 0-1.
         """
-        query_embedding = self._model.encode(query_text).tolist()
+        query_embedding = self._model.encode("Represent this sentence for searching relevant passages: " + query_text,normalize_embeddings=True,).tolist()
+
 
         results = self._collection.query(
             query_embeddings=[query_embedding],

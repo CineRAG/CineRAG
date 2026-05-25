@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
 from config import MOVIES_JSON_PATH, CHROMA_DB_PATH, BM25_INDEX_PATH
 
-EMBEDDING_MODEL   = "all-MiniLM-L6-v2"
+EMBEDDING_MODEL   = "BAAI/bge-base-en-v1.5"  # 768-dim, normalized embeddings
 CHROMA_COLLECTION = "movies"
 BATCH_SIZE        = 512
 
@@ -69,7 +69,7 @@ def build_chroma(movies: list[dict]):
             for m in batch
         ]
 
-        embeddings = model.encode(texts, show_progress_bar=False, batch_size=64).tolist()
+        embeddings = model.encode(texts, normalize_embeddings=True, show_progress_bar=False, batch_size=64).tolist()
         collection.upsert(ids=ids, embeddings=embeddings, metadatas=metadatas, documents=texts)
 
     print(f"\n    Done — {collection.count():,} documents indexed")
