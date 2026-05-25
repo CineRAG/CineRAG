@@ -23,8 +23,13 @@ DETERMINISTIC_FALLBACK_TEXT = (
     "I found a few candidates from the movie corpus that best match your request. "
     "The explanations below are drawn from the retrieved plot summaries."
 )
-DETERMINISTIC_FALLBACK_EXPLANATION = (
-    "A top match retrieved from the catalog for your query — see the plot summary below."
+
+# Index-based intros so the N fallback cards never read as carbon copies of
+# each other even when their metadata happens to overlap (same genre/year).
+_FALLBACK_INTROS = (
+    "A top match",
+    "Another close fit",
+    "Also surfaced",
 )
 
 
@@ -48,6 +53,44 @@ def _render_candidates(movies: list[dict]) -> str:
             f"genres: {genres}\n    plot: {m.get('plot_summary', '')}"
         )
     return "\n\n".join(lines)
+
+
+def _safe_per_movie_explanation(
+    movie: dict, attrs: dict | None, index: int
+) -> str:
+    """Deterministic per-movie explanation that never quotes the plot.
+
+    Used whenever the LLM cannot be trusted to write the explanation: both
+    fallback paths (LLM picked invalid IDs, LLM copied plot text into the
+    explanation). Builds the sentence from structured metadata only — year,
+    primary genre, and any matched attributes from parsed_intent — so the
+    output is visibly distinct from the plot_preview citation rendered below
+    the card. The index-based intro guarantees the 3 fallback cards never
+    look like duplicates even if their genre/year overlap.
+    """
+    intro = _FALLBACK_INTROS[index % len(_FALLBACK_INTROS)]
+    genres = movie.get("genres") or []
+    year = movie.get("year")
+    descriptor_bits: list[str] = []
+    if year:
+        descriptor_bits.append(str(year))
+    if genres:
+        descriptor_bits.append(genres[0].lower())
+    descriptor = " ".join(descriptor_bits) or "candidate"
+
+    qualifier = "your query"
+    if attrs:
+        mood = (attrs.get("mood") or "").strip().lower()
+        era = (attrs.get("era") or "").strip().lower()
+        if mood:
+            qualifier = f"your {mood} query"
+        elif era:
+            qualifier = f"your {era}-era query"
+
+    return (
+        f"{intro} from the catalog — a {descriptor} aligned with {qualifier}. "
+        "See the plot summary below."
+    )
 
 
 def _fallback_match_reasons(movie: dict, attrs: dict) -> list[str]:
@@ -109,7 +152,12 @@ def _explanation_duplicates_plot(
     return False
 
 
-def _build_recommendation(pick: dict, source_movie: dict) -> dict:
+def _build_recommendation(
+    pick: dict,
+    source_movie: dict,
+    index: int,
+    attrs: dict | None,
+) -> dict:
     plot = source_movie.get("plot_summary", "")
     raw_explanation = pick.get("explanation", "") or ""
     if _explanation_duplicates_plot(raw_explanation, plot):
@@ -117,7 +165,7 @@ def _build_recommendation(pick: dict, source_movie: dict) -> dict:
             "ResponseGenerator: explanation for %r duplicates plot text; replacing with safe fallback",
             source_movie.get("title"),
         )
-        explanation = DETERMINISTIC_FALLBACK_EXPLANATION
+        explanation = _safe_per_movie_explanation(source_movie, attrs, index)
     else:
         explanation = raw_explanation
     return {
@@ -186,8 +234,10 @@ class ResponseGenerator:
             candidates_block=_render_candidates(reranked_movies),
         )
 
+        attrs = (parsed_intent.get("attributes") or {}) if parsed_intent else {}
+
         first_result = self.llm_client.generate_json(base_prompt)
-        first_picks_recs = self._validate_picks(first_result, reranked_movies)
+        first_picks_recs = self._validate_picks(first_result, reranked_movies, attrs)
         if first_picks_recs:
             return {
                 "response_text": first_result.get("response_text", "").strip(),
@@ -201,7 +251,7 @@ class ResponseGenerator:
         )
         retry_prompt = self._build_retry_prompt(base_prompt, reranked_movies)
         retry_result = self.llm_client.generate_json(retry_prompt)
-        retry_recs = self._validate_picks(retry_result, reranked_movies)
+        retry_recs = self._validate_picks(retry_result, reranked_movies, attrs)
         if retry_recs:
             return {
                 "response_text": retry_result.get("response_text", "").strip(),
@@ -214,7 +264,12 @@ class ResponseGenerator:
         )
         return self._deterministic_fallback(reranked_movies, parsed_intent)
 
-    def _validate_picks(self, result: dict, reranked_movies: list[dict]) -> list[dict]:
+    def _validate_picks(
+        self,
+        result: dict,
+        reranked_movies: list[dict],
+        attrs: dict | None = None,
+    ) -> list[dict]:
         """Return Recommendation dicts for picks whose movie_id is in reranked_movies.
 
         Returns [] if `result` is an LLM error dict, picks is missing/empty, or every
@@ -231,7 +286,7 @@ class ResponseGenerator:
             if not source:
                 logger.warning("ResponseGenerator: pick references unknown movie_id %r", mid)
                 continue
-            recs.append(_build_recommendation(pick, source))
+            recs.append(_build_recommendation(pick, source, len(recs), attrs))
         return recs
 
     def _build_retry_prompt(self, base_prompt: str, reranked_movies: list[dict]) -> str:
@@ -257,7 +312,7 @@ class ResponseGenerator:
         top = reranked_movies[:FALLBACK_TOP_K]
         attrs = (parsed_intent.get("attributes") or {}) if parsed_intent else {}
         recs: list[dict] = []
-        for m in top:
+        for index, m in enumerate(top):
             plot = m.get("plot_summary", "")
             match_reasons = _fallback_match_reasons(m, attrs)
             recs.append(
@@ -266,9 +321,7 @@ class ResponseGenerator:
                     "title": m["title"],
                     "year": m.get("year"),
                     "genres": list(m.get("genres", [])),
-                    # Generic safe explanation — never echo LLM hallucinated text
-                    # nor a plot slice (would duplicate plot_preview on the card).
-                    "explanation": DETERMINISTIC_FALLBACK_EXPLANATION,
+                    "explanation": _safe_per_movie_explanation(m, attrs, index),
                     "plot_preview": plot[:PLOT_PREVIEW_LEN],
                     "match_reasons": match_reasons,
                 }
