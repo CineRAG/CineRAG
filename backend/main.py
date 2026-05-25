@@ -66,7 +66,8 @@ def startup() -> None:
             "detail": "MovieRetriever initialized",
         }
 
-        app.state.llm_client = OllamaClient()
+        #app.state.llm_client = OllamaClient()
+        app.state.llm_client = OllamaClient(model="gpt-oss:120b-cloud")
         app.state.startup_status["llm_client"] = {
             "status": "ok",
             "detail": "OllamaClient initialized",

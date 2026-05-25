@@ -25,11 +25,11 @@ CORS_ORIGINS = [
 # ---------------------------------------------------------------------------
 
 LOCAL_DATA_DIR = ROOT_DIR / "data"
-LFS_DATA_DIR = Path(os.getenv("LFS_DATA_DIR", str(LOCAL_DATA_DIR)))
+LFS_DATA_DIR   = Path("/space_mounts/pars/data")
 
 RAW_DATA_DIR       = LFS_DATA_DIR / "raw"
 PROCESSED_DATA_DIR = LFS_DATA_DIR / "processed"
-CHROMA_DB_PATH     = os.getenv("CHROMA_DB_PATH", str(LFS_DATA_DIR / "chroma_db"))
+CHROMA_DB_PATH     = os.getenv("CHROMA_DB_PATH", str(LOCAL_DATA_DIR / "chroma_db"))
 BM25_INDEX_PATH    = os.getenv("BM25_INDEX_PATH", str(LFS_DATA_DIR / "bm25_index.pkl"))
 MOVIES_JSON_PATH   = Path(os.getenv("MOVIES_JSON_PATH", str(LFS_DATA_DIR / "processed" / "movies.json")))
 

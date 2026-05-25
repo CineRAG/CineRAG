@@ -115,3 +115,20 @@ def rerank(
 
     reranked.sort(key=lambda m: m["score"], reverse=True)
     return reranked[:top_k]
+
+def crossencoder_rerank(
+      query: str,
+      candidates: list[dict],
+      cross_encoder,
+      top_k: int = 20,
+  ) -> list[dict]:
+      if not candidates:
+          return candidates
+      pairs = [(query, m.get("plot_summary", "")) for m in candidates]
+      scores = cross_encoder.predict(pairs)
+      for m, score in zip(candidates, scores):
+          m = m.copy()
+          m["score"] = float(score)
+      candidates = [dict(m, score=float(s)) for m, s in zip(candidates, scores)]
+      candidates.sort(key=lambda m: m["score"], reverse=True)
+      return candidates[:top_k]
