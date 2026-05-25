@@ -9,12 +9,14 @@ Given the user's message and recent conversation, produce a JSON object with the
     "genre": short genre name like "sci-fi" or null,
     "mood": short mood word like "uplifting" or null,
     "era": time period like "1990s" or null,
-    "exclusions": short exclusion phrase like "no horror" or null
+    "exclusions": short exclusion phrase like "no horror" or null,
+    "min_year": integer year if user says "after 2010" or "from 2000" (e.g. 2010), otherwise null,
+    "max_year": integer year if user says "before 1990" or "up to 2005" (e.g. 1989), otherwise null
   }},
   "refinement": short description of what changed since the previous turn (e.g. "more recent"), or null if not a refinement
 }}
 
-Use "find_similar" when a specific reference movie is mentioned.
+Use "find_similar" when a specific movie title or franchise is mentioned (e.g. "a Thor movie", "something like Inception", "more James Bond films").
 Use "find_by_mood" when the user describes vibes, themes, genres but no specific movie.
 Use "refine_previous" when the message clearly modifies a previous request ("but more recent", "lighter please").
 Use "general_question" when the user asks for information rather than a recommendation.
@@ -22,10 +24,25 @@ Use "general_question" when the user asks for information rather than a recommen
 EXAMPLES
 
 Input: "Movies like Inception but more emotional"
-Output: {{"intent": "find_similar", "reference_movie": "Inception", "attributes": {{"genre": null, "mood": "emotional", "era": null, "exclusions": null}}, "refinement": null}}
+Output: {{"intent": "find_similar", "reference_movie": "Inception", "attributes": {{"genre": null, "mood": "emotional", "era": null, "exclusions": null, "min_year": null, "max_year":
+null}}, "refinement": null}}
 
 Input: "I want a feel-good comedy from the 90s, no horror please"
-Output: {{"intent": "find_by_mood", "reference_movie": null, "attributes": {{"genre": "comedy", "mood": "feel-good", "era": "1990s", "exclusions": "no horror"}}, "refinement": null}}
+Output: {{"intent": "find_by_mood", "reference_movie": null, "attributes": {{"genre": "comedy", "mood": "feel-good", "era": "1990s", "exclusions": "no horror", "min_year": null,
+"max_year": null}}, "refinement": null}}
+
+Input: "Action movies after 2010"
+Output: {{"intent": "find_by_mood", "reference_movie": null, "attributes": {{"genre": "action", "mood": null, "era": null, "exclusions": null, "min_year": 2010, "max_year": null}},
+"refinement": null}}
+
+Input: "Classic sci-fi from before 1985"
+Output: {{"intent": "find_by_mood", "reference_movie": null, "attributes": {{"genre": "sci-fi", "mood": null, "era": null, "exclusions": null, "min_year": null, "max_year": 1985}},
+"refinement": null}}
+
+ Input: "Recommend me a Thor movie"
+  Output: {{"intent": "find_similar", "reference_movie": "Thor", "attributes": {{"genre": "action", "mood": null, "era": null, "exclusions": null, "min_year": null, "max_year": null}},
+  "refinement": null}}
+
 
 CONVERSATION HISTORY (most recent last, may be empty):
 {conversation_history}

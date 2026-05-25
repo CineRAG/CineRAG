@@ -89,13 +89,22 @@ def evaluate(retriever, queries: list[dict], method: str) -> dict:
 # ------------------------------------------------------------------
 
 def main():
-    if not QUERIES_PATH.exists():
-        print(f"ERROR: {QUERIES_PATH} not found.")
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--queries", default=str(QUERIES_PATH), help="Path to queries JSON file")
+    parser.add_argument("--results", default=str(RESULTS_PATH), help="Path to write results JSON")
+    args = parser.parse_args()
+
+    queries_path = Path(args.queries)
+    results_path = Path(args.results)
+
+    if not queries_path.exists():
+        print(f"ERROR: {queries_path} not found.")
         sys.exit(1)
 
-    with open(QUERIES_PATH, encoding="utf-8") as f:
+    with open(queries_path, encoding="utf-8") as f:
         queries = json.load(f)
-    print(f"Loaded {len(queries)} queries.")
+    print(f"Loaded {len(queries)} queries from {queries_path}.")
 
     print("Loading MovieRetriever...")
     from rag.retriever import MovieRetriever
@@ -120,16 +129,16 @@ def main():
         print(f"{r['method']:<10} {r['mrr_at_5']:>8.4f} {r['ndcg_at_5']:>8.4f} {r['num_hits']:>5}/{r['num_queries']}")
     print("=" * 46)
 
-    RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    results_path.parent.mkdir(parents=True, exist_ok=True)
     output = {
         "eval_date":   time.strftime("%Y-%m-%dT%H:%M:%S"),
         "top_k":       TOP_K,
         "num_queries": len(queries),
         "results":     all_results,
     }
-    with open(RESULTS_PATH, "w", encoding="utf-8") as f:
+    with open(results_path, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2)
-    print(f"\nResults → {RESULTS_PATH}")
+    print(f"\nResults → {results_path}")
 
 
 if __name__ == "__main__":

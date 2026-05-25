@@ -1,0 +1,2329 @@
+{
+  "eval_date": "2026-05-25T16:03:39",
+  "top_k": 5,
+  "num_queries": 45,
+  "results": [
+    {
+      "method": "dense",
+      "mrr_at_5": 0.6637,
+      "ndcg_at_5": 0.692,
+      "num_queries": 45,
+      "num_hits": 35,
+      "per_query": [
+        {
+          "query_id": "q001",
+          "query": "I\u2019m trying to find a classic Indian black\u2011white drama set in Varanasi where a young boy\u2019s father dies, leaving his mother to raise him alone while he navigates school, new friendships, and growing up.",
+          "expected_ids": [
+            "1267738"
+          ],
+          "ranked_ids": [
+            "8630196",
+            "1056905",
+            "26511699",
+            "4736692",
+            "10599593"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q002",
+          "query": "I'm trying to find a black\u2011and\u2011white Russian movie about a remote Ural village where farmers band together to seek violent, off\u2011screen revenge after their collective farm is sold, featuring old Soviet music.",
+          "expected_ids": [
+            "2485411"
+          ],
+          "ranked_ids": [
+            "2485411",
+            "615572",
+            "2681823",
+            "1640649",
+            "2439924"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q003",
+          "query": "I'm searching for an indie drama set after 9/11 that follows two buddies who lose their Statue of Liberty concession job, get involved in drug dealing and insurance fraud, and one of them decides to enlist in the army to pay for college.",
+          "expected_ids": [
+            "25730129"
+          ],
+          "ranked_ids": [
+            "5468633",
+            "6565119",
+            "1031573",
+            "30857519",
+            "10916155"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q004",
+          "query": "Which 1970s horror\u2011comedy B\u2011movie has teens skinny\u2011dipping at an abandoned military site and getting attacked by something in the water, while an insurance investigator searches for the missing kids?",
+          "expected_ids": [
+            "3153784"
+          ],
+          "ranked_ids": [
+            "3153784",
+            "24966098",
+            "5073042",
+            "4158045",
+            "715207"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q005",
+          "query": "Looking for a movie about a man raised in a circus who becomes a businessman, hits a mid\u2011life crisis at fifty, disappears at sea, and then encounters an old employee who forces him to confront the things he\u2019s neglected in his life.",
+          "expected_ids": [
+            "24643555"
+          ],
+          "ranked_ids": [
+            "28237392",
+            "5549799",
+            "142780",
+            "4960924",
+            "18794137"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q006",
+          "query": "I'm looking for a Hindi family comedy where a frustrated husband suddenly gains the ability to hear women's thoughts after attending a village festival, and tries to deal with his wife, mother, and boss with the help of a psychologist.",
+          "expected_ids": [
+            "14602109"
+          ],
+          "ranked_ids": [
+            "2350188",
+            "26111450",
+            "18964317",
+            "37478048",
+            "13579288"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q007",
+          "query": "I'm trying to find a classic noir where a crime magazine editor hides behind a huge clock in a New York publishing building after being set up for a murder, and the story unfolds in flashbacks.",
+          "expected_ids": [
+            "2098715"
+          ],
+          "ranked_ids": [
+            "2098715",
+            "3717574",
+            "2292649",
+            "3598416",
+            "1645598"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q008",
+          "query": "I\u2019m looking for a gritty thriller about a teenage drug addict who gets caught after a botched pharmacy robbery, is sentenced to life, and then a secret government agency fakes her death and trains her as an assassin. It has a dark, conspiratorial vibe with intense spy action.",
+          "expected_ids": [
+            "264943"
+          ],
+          "ranked_ids": [
+            "2485659",
+            "31499930",
+            "9610735",
+            "2337370",
+            "24358829"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q009",
+          "query": "What\u2019s the title of that 2008 horror/thriller where a couple in a Colorado town get caught in a sudden zombie outbreak, with military roadblocks, a desperate father trying to get medical aid for his sick child, and soldiers trying to contain the chaos?",
+          "expected_ids": [
+            "3759313"
+          ],
+          "ranked_ids": [
+            "16794053",
+            "3759313",
+            "19463368",
+            "12995615",
+            "22447758"
+          ],
+          "mrr": 0.5,
+          "ndcg": 0.6309,
+          "hit": true
+        },
+        {
+          "query_id": "q010",
+          "query": "Looking for a World War\u202fII movie about an Irish sailor who survives a U\u2011boat attack, is cared for by a pacifist doctor, and then becomes obsessed with revenge by hunting the submarine down with a fighter plane.",
+          "expected_ids": [
+            "882438"
+          ],
+          "ranked_ids": [
+            "882438",
+            "7213804",
+            "905533",
+            "2885062",
+            "8994"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q011",
+          "query": "Looking for a 1980s Chinese action\u2011thriller where a hard\u2011working man juggling two jobs to afford a motorcycle gets betrayed by his drug\u2011dealer friend, who also wants his girlfriend and involves a corrupt police officer in the plot.",
+          "expected_ids": [
+            "5706283"
+          ],
+          "ranked_ids": [
+            "15167247",
+            "2768565",
+            "3365741",
+            "7533919",
+            "1640215"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q012",
+          "query": "I'm looking for a movie about an Alaskan oil\u2011field worker who survives a plane crash in a blizzard and is hunted by wolves while grappling with guilt and thoughts of suicide.",
+          "expected_ids": [
+            "32099336"
+          ],
+          "ranked_ids": [
+            "3377893",
+            "5123642",
+            "4724962",
+            "4966348",
+            "32099336"
+          ],
+          "mrr": 0.2,
+          "ndcg": 0.3869,
+          "hit": true
+        },
+        {
+          "query_id": "q013",
+          "query": "Which classic animated movie features Yogi Bear being sent to a zoo after his endless pic\u2011a\u2011nic food schemes, with Cindy Bear trying to win his heart?",
+          "expected_ids": [
+            "2513047"
+          ],
+          "ranked_ids": [
+            "2513047",
+            "19994247",
+            "864217",
+            "13777365",
+            "11976777"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q014",
+          "query": "Looking for a rom\u2011com where a woman stages her own kidnapping by locking herself in her car\u2019s trunk, only to have a car thief actually steal the vehicle with her inside.",
+          "expected_ids": [
+            "3422774"
+          ],
+          "ranked_ids": [
+            "3422774",
+            "24818077",
+            "8220284",
+            "695249",
+            "25040465"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q015",
+          "query": "I'm looking for a drama/thriller set in a small Australian town about a teenage boy who comes back from boarding school and forms a close, possibly romantic bond with a local girl who uses a leg brace, with a mysterious, emotional undercurrent.",
+          "expected_ids": [
+            "12287985"
+          ],
+          "ranked_ids": [
+            "16725177",
+            "2376432",
+            "249956",
+            "12287985",
+            "30077800"
+          ],
+          "mrr": 0.25,
+          "ndcg": 0.4307,
+          "hit": true
+        },
+        {
+          "query_id": "q016",
+          "query": "Looking for an old sci\u2011fi horror where a rich man's brain is kept alive after his death, turning into a telepathic monster that possesses a medical assistant, and a woman has to battle it.",
+          "expected_ids": [
+            "5844491"
+          ],
+          "ranked_ids": [
+            "5844491",
+            "1771762",
+            "2035109",
+            "4589710",
+            "4287489"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q017",
+          "query": "I\u2019m trying to find that 80s sci\u2011fi horror where a farmer gets taken by a strange light, a half\u2011alien kid grows up on a farm and starts killing the family members, ending with a weird pregnancy and birth.",
+          "expected_ids": [
+            "2831557"
+          ],
+          "ranked_ids": [
+            "2831557",
+            "1721255",
+            "14684782",
+            "26497852",
+            "957818"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q018",
+          "query": "A thriller about a psychiatrist who, after a stormy car crash, gets possessed by a ghostly girl and wakes up as a patient in the mental hospital where she works, trying to prove she\u2019s not actually crazy.",
+          "expected_ids": [
+            "793025"
+          ],
+          "ranked_ids": [
+            "793025",
+            "28996885",
+            "690918",
+            "24131841",
+            "2969963"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q019",
+          "query": "What is the name of that early black\u2011and\u2011white horror film where a young scientist and his hunchback assistant stitch together a human body in a creepy tower lab and end up creating a monster?",
+          "expected_ids": [
+            "73488"
+          ],
+          "ranked_ids": [
+            "73488",
+            "3303226",
+            "3291573",
+            "4287489",
+            "442647"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q020",
+          "query": "I\u2019m looking for a mid\u201190s sci\u2011fi parody where Martians invade Earth, the president gives a televised address, and the chaos spreads from a Vegas hotel to a Kansas family with a bumbling first\u2011contact meeting.",
+          "expected_ids": [
+            "3565461"
+          ],
+          "ranked_ids": [
+            "3565461",
+            "7761830",
+            "55325",
+            "3550987",
+            "11611427"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q021",
+          "query": "I'm looking for a Japanese sci\u2011fi thriller set in a near\u2011future Chinese megacity where three orphaned pickpockets get tangled with a vampire gang leader after an economic collapse.",
+          "expected_ids": [
+            "1607540"
+          ],
+          "ranked_ids": [
+            "1607540",
+            "23195317",
+            "605939",
+            "12790367",
+            "11505804"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q022",
+          "query": "Looking for an old black\u2011and\u2011white animated short where a musical cartoon character hosts a Halloween party with pumpkins and animal friends, only to have a huge gorilla crash the celebration.",
+          "expected_ids": [
+            "7487699"
+          ],
+          "ranked_ids": [
+            "7487699",
+            "22301502",
+            "153007",
+            "4049296",
+            "286891"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q023",
+          "query": "I'm looking for an animated musical about a princess and a fortune\u2011teller who try to use a mysterious dimensional portal to flee a kingdom under attack by a robotic army.",
+          "expected_ids": [
+            "7460481"
+          ],
+          "ranked_ids": [
+            "399435",
+            "13632712",
+            "7460481",
+            "2287636",
+            "550486"
+          ],
+          "mrr": 0.3333,
+          "ndcg": 0.5,
+          "hit": true
+        },
+        {
+          "query_id": "q024",
+          "query": "I'm trying to find an animated short where an elderly widower keeps adding new levels to his house as floodwaters rise, and when he drops his pipe in the submerged lower floors, his search triggers memories of his past.",
+          "expected_ids": [
+            "21663542"
+          ],
+          "ranked_ids": [
+            "21663542",
+            "29916195",
+            "24786448",
+            "5785612",
+            "1618008"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q025",
+          "query": "I'm trying to find a movie about a prison uprising where a reluctant inmate ends up defending a guard against a group of violent prisoners during a chaotic riot.",
+          "expected_ids": [
+            "18970935"
+          ],
+          "ranked_ids": [
+            "18970935",
+            "6143584",
+            "26224240",
+            "17239935",
+            "17455543"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q026",
+          "query": "I\u2019m looking for a made\u2011for\u2011TV thriller where a Des\u202fPlaines police lieutenant investigates a missing teenager, suspects a well\u2011known local businessman of being a serial killer, and battles community denial and flimsy evidence to catch him.",
+          "expected_ids": [
+            "20836034"
+          ],
+          "ranked_ids": [
+            "12555629",
+            "14794631",
+            "22644918",
+            "32789431",
+            "34354688"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q027",
+          "query": "A thriller about a widowed psychiatrist who receives a strange call from her own father about a mysterious wheelchair\u2011bound patient, with supernatural twists and a tense airport backdrop.",
+          "expected_ids": [
+            "18716405"
+          ],
+          "ranked_ids": [
+            "18716405",
+            "15053838",
+            "2008863",
+            "26031039",
+            "23823721"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q028",
+          "query": "Looking for a classic western about a cowboy who drives a herd of cattle to the Klondike gold rush and clashes with a self\u2011appointed judge who confiscates his herd, leading to a chase across the Canadian border.",
+          "expected_ids": [
+            "2165760"
+          ],
+          "ranked_ids": [
+            "2165760",
+            "30366958",
+            "12782082",
+            "15461110",
+            "1364187"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q029",
+          "query": "I'm trying to find a 1980s horror\u2011action movie set in the Louisiana swamps where a scientist is transformed into a plant\u2011based monster after a lab accident, and his sister is killed by a crazed doctor obsessed with immortality.",
+          "expected_ids": [
+            "5929445"
+          ],
+          "ranked_ids": [
+            "5929445",
+            "26724867",
+            "23974943",
+            "6179287",
+            "72317"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q030",
+          "query": "I'm trying to find a family fantasy adventure set in wartime Scotland where a young boy discovers a mysterious creature in Loch\u202fNess and forms a bond with it. It has a magical, heartfelt vibe and includes an old storyteller who shares the legend in a bar.",
+          "expected_ids": [
+            "36956792"
+          ],
+          "ranked_ids": [
+            "36956792",
+            "6559084",
+            "5787130",
+            "7966219",
+            "14977038"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q031",
+          "query": "I'm looking for an old black\u2011and\u2011white adventure thriller where a female pilot crashes in the jungles of French Indochina and is rescued by a mysterious detective posing as an archaeologist.",
+          "expected_ids": [
+            "20904748"
+          ],
+          "ranked_ids": [
+            "61529",
+            "11975716",
+            "32960434",
+            "29163831",
+            "16799338"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q032",
+          "query": "I'm trying to find a 1980s Indian thriller where a senior police officer is sent to a rich family's house to investigate a daughter\u2011in\u2011law's death that appears to be a suicide but turns into a murder mystery.",
+          "expected_ids": [
+            "23227434"
+          ],
+          "ranked_ids": [
+            "12664320",
+            "33226976",
+            "30718169",
+            "28319740",
+            "21176707"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q033",
+          "query": "What is the French indie horror thriller about two college friends who drive to a remote house for the weekend and are relentlessly stalked by a mysterious killer, opening with a disturbing scene of a woman in a hospital gown?",
+          "expected_ids": [
+            "1157922"
+          ],
+          "ranked_ids": [
+            "10059008",
+            "1157922",
+            "22576411",
+            "16035327",
+            "12347447"
+          ],
+          "mrr": 0.5,
+          "ndcg": 0.6309,
+          "hit": true
+        },
+        {
+          "query_id": "q034",
+          "query": "I\u2019m looking for a historical drama about a German monk in the 1500s who breaks with the Catholic Church over its teachings and sparks the Reformation.",
+          "expected_ids": [
+            "10185281"
+          ],
+          "ranked_ids": [
+            "12336807",
+            "12668580",
+            "10185281",
+            "26650366",
+            "31686339"
+          ],
+          "mrr": 0.3333,
+          "ndcg": 0.5,
+          "hit": true
+        },
+        {
+          "query_id": "q035",
+          "query": "I\u2019m looking for an epic biographical drama about a Chinese emperor who grows up in the Forbidden City, loses his throne, and ends up as a political prisoner after the Communist takeover.",
+          "expected_ids": [
+            "129246"
+          ],
+          "ranked_ids": [
+            "129246",
+            "1590940",
+            "781201",
+            "906380",
+            "22826758"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q036",
+          "query": "I'm looking for a movie about a Black high\u2011school football coach hired in the early 1970s at a newly integrated school, where he has to overcome racial tensions and forge a bond with a white assistant while trying to lead the team to a championship.",
+          "expected_ids": [
+            "397574"
+          ],
+          "ranked_ids": [
+            "397574",
+            "1065748",
+            "1377427",
+            "5800283",
+            "4213198"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q037",
+          "query": "Looking for a silent black\u2011and\u2011white fantasy drama where a fairy appears as a poor widow and sends a brother and sister on a magical quest to find the bluebird of happiness, using a special hat that reveals hidden worlds.",
+          "expected_ids": [
+            "4597981"
+          ],
+          "ranked_ids": [
+            "4598057",
+            "4597981",
+            "4598013",
+            "24785258",
+            "4321732"
+          ],
+          "mrr": 0.5,
+          "ndcg": 0.6309,
+          "hit": true
+        },
+        {
+          "query_id": "q038",
+          "query": "What\u2019s the name of that 1980s fantasy comedy where a wealthy 81\u2011year\u2011old man swaps bodies with his 18\u2011year\u2011old grandson and has to go back to high school, sports and teenage romance?",
+          "expected_ids": [
+            "15336744"
+          ],
+          "ranked_ids": [
+            "15336744",
+            "35987457",
+            "675790",
+            "14545761",
+            "8897338"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q039",
+          "query": "I'm looking for an animated fantasy about a solitary white five\u2011tailed fox who ends up at a mountain school for misfit kids, taught by an eccentric teacher, while a stranded alien tries to fix its ship and go home.",
+          "expected_ids": [
+            "10175018"
+          ],
+          "ranked_ids": [
+            "10175018",
+            "18728031",
+            "20868226",
+            "31655197",
+            "22863737"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q040",
+          "query": "A classic wartime drama about a gentle German pastor who stands up to the Nazis in a small village, gets arrested for preaching against Hitler and is sent to Dachau.A classic wartime drama about a gentle German pastor who stands up to the Nazis in a small village, gets arrested for preaching against Hitler and is sent to Dachau.",
+          "expected_ids": [
+            "13840353"
+          ],
+          "ranked_ids": [
+            "13840353",
+            "3555884",
+            "30873849",
+            "1876331",
+            "31322532"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q041",
+          "query": "I'm trying to find a World War\u202fII action movie where a major recruits a dozen hardened prisoners for a suicide raid on a secret Nazi chemical plant to stop a nerve\u2011gas attack on Washington, D.C.",
+          "expected_ids": [
+            "25649956"
+          ],
+          "ranked_ids": [
+            "25649956",
+            "4397117",
+            "31065652",
+            "16327739",
+            "3210303"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q042",
+          "query": "Looking for a Korean period drama set during King Sejong's reign where Joseon is threatened by Ming China over a secret weapons program and forced to send young women as tribute.",
+          "expected_ids": [
+            "20413984"
+          ],
+          "ranked_ids": [
+            "20413984",
+            "20119316",
+            "34468533",
+            "23654302",
+            "22610435"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q043",
+          "query": "Which classic western has a charismatic outlaw who hides with a Mormon wagon train to evade the marshals, befriends a little girl, and ultimately defends the travelers from an Indian attack?",
+          "expected_ids": [
+            "9140037"
+          ],
+          "ranked_ids": [
+            "15974702",
+            "3584576",
+            "14144087",
+            "89272",
+            "5991667"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q044",
+          "query": "Looking for an \u201980s horror\u2011western where a small\u2011town teen is bitten by a mysterious drifter, becomes a vampire, and is forced to join a roaming gang of night\u2011time blood\u2011suckers while trying to survive the deadly sunrise.",
+          "expected_ids": [
+            "1637470"
+          ],
+          "ranked_ids": [
+            "1637470",
+            "975913",
+            "3148833",
+            "27756811",
+            "17308230"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q045",
+          "query": "Looking for a comedic Western where two longtime cowboy buddies reunite in a Texas town, one now a country music star and the other a Hollywood actor, and both end up competing for the same woman they both loved back in the day.",
+          "expected_ids": [
+            "11036915"
+          ],
+          "ranked_ids": [
+            "25974893",
+            "4148842",
+            "8973880",
+            "11036915",
+            "31023204"
+          ],
+          "mrr": 0.25,
+          "ndcg": 0.4307,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "method": "sparse",
+      "mrr_at_5": 0.5963,
+      "ndcg_at_5": 0.6029,
+      "num_queries": 45,
+      "num_hits": 28,
+      "per_query": [
+        {
+          "query_id": "q001",
+          "query": "I\u2019m trying to find a classic Indian black\u2011white drama set in Varanasi where a young boy\u2019s father dies, leaving his mother to raise him alone while he navigates school, new friendships, and growing up.",
+          "expected_ids": [
+            "1267738"
+          ],
+          "ranked_ids": [
+            "27812724",
+            "5311638",
+            "5094131",
+            "31378480",
+            "15943547"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q002",
+          "query": "I'm trying to find a black\u2011and\u2011white Russian movie about a remote Ural village where farmers band together to seek violent, off\u2011screen revenge after their collective farm is sold, featuring old Soviet music.",
+          "expected_ids": [
+            "2485411"
+          ],
+          "ranked_ids": [
+            "2485411",
+            "17182282",
+            "1017172",
+            "15693005",
+            "23400318"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q003",
+          "query": "I'm searching for an indie drama set after 9/11 that follows two buddies who lose their Statue of Liberty concession job, get involved in drug dealing and insurance fraud, and one of them decides to enlist in the army to pay for college.",
+          "expected_ids": [
+            "25730129"
+          ],
+          "ranked_ids": [
+            "25730129",
+            "801722",
+            "13422867",
+            "32989068",
+            "21012631"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q004",
+          "query": "Which 1970s horror\u2011comedy B\u2011movie has teens skinny\u2011dipping at an abandoned military site and getting attacked by something in the water, while an insurance investigator searches for the missing kids?",
+          "expected_ids": [
+            "3153784"
+          ],
+          "ranked_ids": [
+            "32624649",
+            "34882877",
+            "5754330",
+            "6697503",
+            "6589296"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q005",
+          "query": "Looking for a movie about a man raised in a circus who becomes a businessman, hits a mid\u2011life crisis at fifty, disappears at sea, and then encounters an old employee who forces him to confront the things he\u2019s neglected in his life.",
+          "expected_ids": [
+            "24643555"
+          ],
+          "ranked_ids": [
+            "16002873",
+            "864614",
+            "9459686",
+            "6415441",
+            "19399172"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q006",
+          "query": "I'm looking for a Hindi family comedy where a frustrated husband suddenly gains the ability to hear women's thoughts after attending a village festival, and tries to deal with his wife, mother, and boss with the help of a psychologist.",
+          "expected_ids": [
+            "14602109"
+          ],
+          "ranked_ids": [
+            "1658116",
+            "14602109",
+            "163440",
+            "106262",
+            "2015043"
+          ],
+          "mrr": 0.5,
+          "ndcg": 0.6309,
+          "hit": true
+        },
+        {
+          "query_id": "q007",
+          "query": "I'm trying to find a classic noir where a crime magazine editor hides behind a huge clock in a New York publishing building after being set up for a murder, and the story unfolds in flashbacks.",
+          "expected_ids": [
+            "2098715"
+          ],
+          "ranked_ids": [
+            "2098715",
+            "25507665",
+            "4460314",
+            "18793987",
+            "164411"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q008",
+          "query": "I\u2019m looking for a gritty thriller about a teenage drug addict who gets caught after a botched pharmacy robbery, is sentenced to life, and then a secret government agency fakes her death and trains her as an assassin. It has a dark, conspiratorial vibe with intense spy action.",
+          "expected_ids": [
+            "264943"
+          ],
+          "ranked_ids": [
+            "264943",
+            "209549",
+            "68374",
+            "9317122",
+            "1419414"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q009",
+          "query": "What\u2019s the title of that 2008 horror/thriller where a couple in a Colorado town get caught in a sudden zombie outbreak, with military roadblocks, a desperate father trying to get medical aid for his sick child, and soldiers trying to contain the chaos?",
+          "expected_ids": [
+            "3759313"
+          ],
+          "ranked_ids": [
+            "9800451",
+            "3717818",
+            "3242877",
+            "2275790",
+            "2916428"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q010",
+          "query": "Looking for a World War\u202fII movie about an Irish sailor who survives a U\u2011boat attack, is cared for by a pacifist doctor, and then becomes obsessed with revenge by hunting the submarine down with a fighter plane.",
+          "expected_ids": [
+            "882438"
+          ],
+          "ranked_ids": [
+            "3066519",
+            "5403512",
+            "7944229",
+            "905533",
+            "3924766"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q011",
+          "query": "Looking for a 1980s Chinese action\u2011thriller where a hard\u2011working man juggling two jobs to afford a motorcycle gets betrayed by his drug\u2011dealer friend, who also wants his girlfriend and involves a corrupt police officer in the plot.",
+          "expected_ids": [
+            "5706283"
+          ],
+          "ranked_ids": [
+            "15771860",
+            "1968060",
+            "24394835",
+            "5873261",
+            "7999852"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q012",
+          "query": "I'm looking for a movie about an Alaskan oil\u2011field worker who survives a plane crash in a blizzard and is hunted by wolves while grappling with guilt and thoughts of suicide.",
+          "expected_ids": [
+            "32099336"
+          ],
+          "ranked_ids": [
+            "32099336",
+            "101954",
+            "10727249",
+            "3377893",
+            "16639443"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q013",
+          "query": "Which classic animated movie features Yogi Bear being sent to a zoo after his endless pic\u2011a\u2011nic food schemes, with Cindy Bear trying to win his heart?",
+          "expected_ids": [
+            "2513047"
+          ],
+          "ranked_ids": [
+            "2513047",
+            "2580712",
+            "8574921",
+            "31097634",
+            "15003245"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q014",
+          "query": "Looking for a rom\u2011com where a woman stages her own kidnapping by locking herself in her car\u2019s trunk, only to have a car thief actually steal the vehicle with her inside.",
+          "expected_ids": [
+            "3422774"
+          ],
+          "ranked_ids": [
+            "3422774",
+            "19925493",
+            "30710227",
+            "828607",
+            "23487733"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q015",
+          "query": "I'm looking for a drama/thriller set in a small Australian town about a teenage boy who comes back from boarding school and forms a close, possibly romantic bond with a local girl who uses a leg brace, with a mysterious, emotional undercurrent.",
+          "expected_ids": [
+            "12287985"
+          ],
+          "ranked_ids": [
+            "24784399",
+            "20762022",
+            "22325279",
+            "10454813",
+            "944960"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q016",
+          "query": "Looking for an old sci\u2011fi horror where a rich man's brain is kept alive after his death, turning into a telepathic monster that possesses a medical assistant, and a woman has to battle it.",
+          "expected_ids": [
+            "5844491"
+          ],
+          "ranked_ids": [
+            "5844491",
+            "650219",
+            "20097181",
+            "4287489",
+            "442647"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q017",
+          "query": "I\u2019m trying to find that 80s sci\u2011fi horror where a farmer gets taken by a strange light, a half\u2011alien kid grows up on a farm and starts killing the family members, ending with a weird pregnancy and birth.",
+          "expected_ids": [
+            "2831557"
+          ],
+          "ranked_ids": [
+            "17124686",
+            "2331662",
+            "14624892",
+            "558970",
+            "31140821"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q018",
+          "query": "A thriller about a psychiatrist who, after a stormy car crash, gets possessed by a ghostly girl and wakes up as a patient in the mental hospital where she works, trying to prove she\u2019s not actually crazy.",
+          "expected_ids": [
+            "793025"
+          ],
+          "ranked_ids": [
+            "793025",
+            "11612605",
+            "15155743",
+            "28104226",
+            "3861321"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q019",
+          "query": "What is the name of that early black\u2011and\u2011white horror film where a young scientist and his hunchback assistant stitch together a human body in a creepy tower lab and end up creating a monster?",
+          "expected_ids": [
+            "73488"
+          ],
+          "ranked_ids": [
+            "73488",
+            "7218457",
+            "20097181",
+            "2280078",
+            "9618920"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q020",
+          "query": "I\u2019m looking for a mid\u201190s sci\u2011fi parody where Martians invade Earth, the president gives a televised address, and the chaos spreads from a Vegas hotel to a Kansas family with a bumbling first\u2011contact meeting.",
+          "expected_ids": [
+            "3565461"
+          ],
+          "ranked_ids": [
+            "3565461",
+            "3997811",
+            "20644472",
+            "569790",
+            "25734402"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q021",
+          "query": "I'm looking for a Japanese sci\u2011fi thriller set in a near\u2011future Chinese megacity where three orphaned pickpockets get tangled with a vampire gang leader after an economic collapse.",
+          "expected_ids": [
+            "1607540"
+          ],
+          "ranked_ids": [
+            "1607540",
+            "17048091",
+            "6124685",
+            "31304444",
+            "17298868"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q022",
+          "query": "Looking for an old black\u2011and\u2011white animated short where a musical cartoon character hosts a Halloween party with pumpkins and animal friends, only to have a huge gorilla crash the celebration.",
+          "expected_ids": [
+            "7487699"
+          ],
+          "ranked_ids": [
+            "29602277",
+            "4118310",
+            "15753282",
+            "5964231",
+            "4118336"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q023",
+          "query": "I'm looking for an animated musical about a princess and a fortune\u2011teller who try to use a mysterious dimensional portal to flee a kingdom under attack by a robotic army.",
+          "expected_ids": [
+            "7460481"
+          ],
+          "ranked_ids": [
+            "7460481",
+            "32307438",
+            "23725400",
+            "32381897",
+            "34970809"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q024",
+          "query": "I'm trying to find an animated short where an elderly widower keeps adding new levels to his house as floodwaters rise, and when he drops his pipe in the submerged lower floors, his search triggers memories of his past.",
+          "expected_ids": [
+            "21663542"
+          ],
+          "ranked_ids": [
+            "21663542",
+            "407591",
+            "4259508",
+            "12592974",
+            "3099675"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q025",
+          "query": "I'm trying to find a movie about a prison uprising where a reluctant inmate ends up defending a guard against a group of violent prisoners during a chaotic riot.",
+          "expected_ids": [
+            "18970935"
+          ],
+          "ranked_ids": [
+            "1466657",
+            "2055814",
+            "18970935",
+            "35313233",
+            "6613804"
+          ],
+          "mrr": 0.3333,
+          "ndcg": 0.5,
+          "hit": true
+        },
+        {
+          "query_id": "q026",
+          "query": "I\u2019m looking for a made\u2011for\u2011TV thriller where a Des\u202fPlaines police lieutenant investigates a missing teenager, suspects a well\u2011known local businessman of being a serial killer, and battles community denial and flimsy evidence to catch him.",
+          "expected_ids": [
+            "20836034"
+          ],
+          "ranked_ids": [
+            "20836034",
+            "2746792",
+            "7092652",
+            "23472193",
+            "24611218"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q027",
+          "query": "A thriller about a widowed psychiatrist who receives a strange call from her own father about a mysterious wheelchair\u2011bound patient, with supernatural twists and a tense airport backdrop.",
+          "expected_ids": [
+            "18716405"
+          ],
+          "ranked_ids": [
+            "28236143",
+            "28216994",
+            "33797268",
+            "1881878",
+            "30006"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q028",
+          "query": "Looking for a classic western about a cowboy who drives a herd of cattle to the Klondike gold rush and clashes with a self\u2011appointed judge who confiscates his herd, leading to a chase across the Canadian border.",
+          "expected_ids": [
+            "2165760"
+          ],
+          "ranked_ids": [
+            "2165760",
+            "73882",
+            "18676578",
+            "29609480",
+            "17049893"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q029",
+          "query": "I'm trying to find a 1980s horror\u2011action movie set in the Louisiana swamps where a scientist is transformed into a plant\u2011based monster after a lab accident, and his sister is killed by a crazed doctor obsessed with immortality.",
+          "expected_ids": [
+            "5929445"
+          ],
+          "ranked_ids": [
+            "5929445",
+            "7275095",
+            "6179287",
+            "491757",
+            "5985349"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q030",
+          "query": "I'm trying to find a family fantasy adventure set in wartime Scotland where a young boy discovers a mysterious creature in Loch\u202fNess and forms a bond with it. It has a magical, heartfelt vibe and includes an old storyteller who shares the legend in a bar.",
+          "expected_ids": [
+            "36956792"
+          ],
+          "ranked_ids": [
+            "36956792",
+            "6559084",
+            "1714514",
+            "7966219",
+            "32066683"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q031",
+          "query": "I'm looking for an old black\u2011and\u2011white adventure thriller where a female pilot crashes in the jungles of French Indochina and is rescued by a mysterious detective posing as an archaeologist.",
+          "expected_ids": [
+            "20904748"
+          ],
+          "ranked_ids": [
+            "17070479",
+            "26472079",
+            "8260752",
+            "9463843",
+            "4131838"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q032",
+          "query": "I'm trying to find a 1980s Indian thriller where a senior police officer is sent to a rich family's house to investigate a daughter\u2011in\u2011law's death that appears to be a suicide but turns into a murder mystery.",
+          "expected_ids": [
+            "23227434"
+          ],
+          "ranked_ids": [
+            "25008319",
+            "33575471",
+            "21028971",
+            "25747140",
+            "13342147"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q033",
+          "query": "What is the French indie horror thriller about two college friends who drive to a remote house for the weekend and are relentlessly stalked by a mysterious killer, opening with a disturbing scene of a woman in a hospital gown?",
+          "expected_ids": [
+            "1157922"
+          ],
+          "ranked_ids": [
+            "25008319",
+            "21094917",
+            "25934563",
+            "14311655",
+            "5696805"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q034",
+          "query": "I\u2019m looking for a historical drama about a German monk in the 1500s who breaks with the Catholic Church over its teachings and sparks the Reformation.",
+          "expected_ids": [
+            "10185281"
+          ],
+          "ranked_ids": [
+            "19092127",
+            "12336807",
+            "14914760",
+            "35965448",
+            "24632158"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q035",
+          "query": "I\u2019m looking for an epic biographical drama about a Chinese emperor who grows up in the Forbidden City, loses his throne, and ends up as a political prisoner after the Communist takeover.",
+          "expected_ids": [
+            "129246"
+          ],
+          "ranked_ids": [
+            "129246",
+            "2634920",
+            "13212232",
+            "11362250",
+            "45242"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q036",
+          "query": "I'm looking for a movie about a Black high\u2011school football coach hired in the early 1970s at a newly integrated school, where he has to overcome racial tensions and forge a bond with a white assistant while trying to lead the team to a championship.",
+          "expected_ids": [
+            "397574"
+          ],
+          "ranked_ids": [
+            "397574",
+            "2004939",
+            "8859517",
+            "286893",
+            "10286685"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q037",
+          "query": "Looking for a silent black\u2011and\u2011white fantasy drama where a fairy appears as a poor widow and sends a brother and sister on a magical quest to find the bluebird of happiness, using a special hat that reveals hidden worlds.",
+          "expected_ids": [
+            "4597981"
+          ],
+          "ranked_ids": [
+            "4597981",
+            "1853602",
+            "4673186",
+            "1060418",
+            "525314"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q038",
+          "query": "What\u2019s the name of that 1980s fantasy comedy where a wealthy 81\u2011year\u2011old man swaps bodies with his 18\u2011year\u2011old grandson and has to go back to high school, sports and teenage romance?",
+          "expected_ids": [
+            "15336744"
+          ],
+          "ranked_ids": [
+            "14545761",
+            "4195529",
+            "34489023",
+            "179064",
+            "692772"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q039",
+          "query": "I'm looking for an animated fantasy about a solitary white five\u2011tailed fox who ends up at a mountain school for misfit kids, taught by an eccentric teacher, while a stranded alien tries to fix its ship and go home.",
+          "expected_ids": [
+            "10175018"
+          ],
+          "ranked_ids": [
+            "10175018",
+            "11573895",
+            "31655197",
+            "17111814",
+            "2509613"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q040",
+          "query": "A classic wartime drama about a gentle German pastor who stands up to the Nazis in a small village, gets arrested for preaching against Hitler and is sent to Dachau.A classic wartime drama about a gentle German pastor who stands up to the Nazis in a small village, gets arrested for preaching against Hitler and is sent to Dachau.",
+          "expected_ids": [
+            "13840353"
+          ],
+          "ranked_ids": [
+            "13840353",
+            "2615493",
+            "30873849",
+            "5094861",
+            "31958696"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q041",
+          "query": "I'm trying to find a World War\u202fII action movie where a major recruits a dozen hardened prisoners for a suicide raid on a secret Nazi chemical plant to stop a nerve\u2011gas attack on Washington, D.C.",
+          "expected_ids": [
+            "25649956"
+          ],
+          "ranked_ids": [
+            "25649956",
+            "21432813",
+            "1192112",
+            "18463637",
+            "23913058"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q042",
+          "query": "Looking for a Korean period drama set during King Sejong's reign where Joseon is threatened by Ming China over a secret weapons program and forced to send young women as tribute.",
+          "expected_ids": [
+            "20413984"
+          ],
+          "ranked_ids": [
+            "20413984",
+            "3324690",
+            "129246",
+            "10597501",
+            "930561"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q043",
+          "query": "Which classic western has a charismatic outlaw who hides with a Mormon wagon train to evade the marshals, befriends a little girl, and ultimately defends the travelers from an Indian attack?",
+          "expected_ids": [
+            "9140037"
+          ],
+          "ranked_ids": [
+            "9140037",
+            "3762624",
+            "6048468",
+            "11815331",
+            "32120555"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q044",
+          "query": "Looking for an \u201980s horror\u2011western where a small\u2011town teen is bitten by a mysterious drifter, becomes a vampire, and is forced to join a roaming gang of night\u2011time blood\u2011suckers while trying to survive the deadly sunrise.",
+          "expected_ids": [
+            "1637470"
+          ],
+          "ranked_ids": [
+            "3778613",
+            "19936740",
+            "17123071",
+            "6713041",
+            "31920775"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q045",
+          "query": "Looking for a comedic Western where two longtime cowboy buddies reunite in a Texas town, one now a country music star and the other a Hollywood actor, and both end up competing for the same woman they both loved back in the day.",
+          "expected_ids": [
+            "11036915"
+          ],
+          "ranked_ids": [
+            "9425270",
+            "14992861",
+            "2354153",
+            "1474328",
+            "33049275"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        }
+      ]
+    },
+    {
+      "method": "hybrid",
+      "mrr_at_5": 0.6915,
+      "ndcg_at_5": 0.7303,
+      "num_queries": 45,
+      "num_hits": 38,
+      "per_query": [
+        {
+          "query_id": "q001",
+          "query": "I\u2019m trying to find a classic Indian black\u2011white drama set in Varanasi where a young boy\u2019s father dies, leaving his mother to raise him alone while he navigates school, new friendships, and growing up.",
+          "expected_ids": [
+            "1267738"
+          ],
+          "ranked_ids": [
+            "27812724",
+            "8630196",
+            "1056905",
+            "5311638",
+            "26511699"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q002",
+          "query": "I'm trying to find a black\u2011and\u2011white Russian movie about a remote Ural village where farmers band together to seek violent, off\u2011screen revenge after their collective farm is sold, featuring old Soviet music.",
+          "expected_ids": [
+            "2485411"
+          ],
+          "ranked_ids": [
+            "2485411",
+            "17182282",
+            "615572",
+            "2681823",
+            "1017172"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q003",
+          "query": "I'm searching for an indie drama set after 9/11 that follows two buddies who lose their Statue of Liberty concession job, get involved in drug dealing and insurance fraud, and one of them decides to enlist in the army to pay for college.",
+          "expected_ids": [
+            "25730129"
+          ],
+          "ranked_ids": [
+            "5468633",
+            "25730129",
+            "801722",
+            "6565119",
+            "1031573"
+          ],
+          "mrr": 0.5,
+          "ndcg": 0.6309,
+          "hit": true
+        },
+        {
+          "query_id": "q004",
+          "query": "Which 1970s horror\u2011comedy B\u2011movie has teens skinny\u2011dipping at an abandoned military site and getting attacked by something in the water, while an insurance investigator searches for the missing kids?",
+          "expected_ids": [
+            "3153784"
+          ],
+          "ranked_ids": [
+            "3153784",
+            "32624649",
+            "34882877",
+            "24966098",
+            "5754330"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q005",
+          "query": "Looking for a movie about a man raised in a circus who becomes a businessman, hits a mid\u2011life crisis at fifty, disappears at sea, and then encounters an old employee who forces him to confront the things he\u2019s neglected in his life.",
+          "expected_ids": [
+            "24643555"
+          ],
+          "ranked_ids": [
+            "16002873",
+            "28237392",
+            "5549799",
+            "864614",
+            "9459686"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q006",
+          "query": "I'm looking for a Hindi family comedy where a frustrated husband suddenly gains the ability to hear women's thoughts after attending a village festival, and tries to deal with his wife, mother, and boss with the help of a psychologist.",
+          "expected_ids": [
+            "14602109"
+          ],
+          "ranked_ids": [
+            "2350188",
+            "1658116",
+            "14602109",
+            "26111450",
+            "18964317"
+          ],
+          "mrr": 0.3333,
+          "ndcg": 0.5,
+          "hit": true
+        },
+        {
+          "query_id": "q007",
+          "query": "I'm trying to find a classic noir where a crime magazine editor hides behind a huge clock in a New York publishing building after being set up for a murder, and the story unfolds in flashbacks.",
+          "expected_ids": [
+            "2098715"
+          ],
+          "ranked_ids": [
+            "2098715",
+            "3717574",
+            "25507665",
+            "4460314",
+            "2292649"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q008",
+          "query": "I\u2019m looking for a gritty thriller about a teenage drug addict who gets caught after a botched pharmacy robbery, is sentenced to life, and then a secret government agency fakes her death and trains her as an assassin. It has a dark, conspiratorial vibe with intense spy action.",
+          "expected_ids": [
+            "264943"
+          ],
+          "ranked_ids": [
+            "2485659",
+            "264943",
+            "209549",
+            "31499930",
+            "9610735"
+          ],
+          "mrr": 0.5,
+          "ndcg": 0.6309,
+          "hit": true
+        },
+        {
+          "query_id": "q009",
+          "query": "What\u2019s the title of that 2008 horror/thriller where a couple in a Colorado town get caught in a sudden zombie outbreak, with military roadblocks, a desperate father trying to get medical aid for his sick child, and soldiers trying to contain the chaos?",
+          "expected_ids": [
+            "3759313"
+          ],
+          "ranked_ids": [
+            "9800451",
+            "16794053",
+            "3759313",
+            "3717818",
+            "3242877"
+          ],
+          "mrr": 0.3333,
+          "ndcg": 0.5,
+          "hit": true
+        },
+        {
+          "query_id": "q010",
+          "query": "Looking for a World War\u202fII movie about an Irish sailor who survives a U\u2011boat attack, is cared for by a pacifist doctor, and then becomes obsessed with revenge by hunting the submarine down with a fighter plane.",
+          "expected_ids": [
+            "882438"
+          ],
+          "ranked_ids": [
+            "905533",
+            "882438",
+            "3066519",
+            "5403512",
+            "7213804"
+          ],
+          "mrr": 0.5,
+          "ndcg": 0.6309,
+          "hit": true
+        },
+        {
+          "query_id": "q011",
+          "query": "Looking for a 1980s Chinese action\u2011thriller where a hard\u2011working man juggling two jobs to afford a motorcycle gets betrayed by his drug\u2011dealer friend, who also wants his girlfriend and involves a corrupt police officer in the plot.",
+          "expected_ids": [
+            "5706283"
+          ],
+          "ranked_ids": [
+            "15167247",
+            "15771860",
+            "2768565",
+            "1968060",
+            "24394835"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q012",
+          "query": "I'm looking for a movie about an Alaskan oil\u2011field worker who survives a plane crash in a blizzard and is hunted by wolves while grappling with guilt and thoughts of suicide.",
+          "expected_ids": [
+            "32099336"
+          ],
+          "ranked_ids": [
+            "3377893",
+            "32099336",
+            "101954",
+            "5123642",
+            "4724962"
+          ],
+          "mrr": 0.5,
+          "ndcg": 0.6309,
+          "hit": true
+        },
+        {
+          "query_id": "q013",
+          "query": "Which classic animated movie features Yogi Bear being sent to a zoo after his endless pic\u2011a\u2011nic food schemes, with Cindy Bear trying to win his heart?",
+          "expected_ids": [
+            "2513047"
+          ],
+          "ranked_ids": [
+            "2513047",
+            "19994247",
+            "2580712",
+            "8574921",
+            "864217"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q014",
+          "query": "Looking for a rom\u2011com where a woman stages her own kidnapping by locking herself in her car\u2019s trunk, only to have a car thief actually steal the vehicle with her inside.",
+          "expected_ids": [
+            "3422774"
+          ],
+          "ranked_ids": [
+            "3422774",
+            "24818077",
+            "19925493",
+            "8220284",
+            "30710227"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q015",
+          "query": "I'm looking for a drama/thriller set in a small Australian town about a teenage boy who comes back from boarding school and forms a close, possibly romantic bond with a local girl who uses a leg brace, with a mysterious, emotional undercurrent.",
+          "expected_ids": [
+            "12287985"
+          ],
+          "ranked_ids": [
+            "24784399",
+            "16725177",
+            "20762022",
+            "2376432",
+            "22325279"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q016",
+          "query": "Looking for an old sci\u2011fi horror where a rich man's brain is kept alive after his death, turning into a telepathic monster that possesses a medical assistant, and a woman has to battle it.",
+          "expected_ids": [
+            "5844491"
+          ],
+          "ranked_ids": [
+            "5844491",
+            "4287489",
+            "1771762",
+            "650219",
+            "20097181"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q017",
+          "query": "I\u2019m trying to find that 80s sci\u2011fi horror where a farmer gets taken by a strange light, a half\u2011alien kid grows up on a farm and starts killing the family members, ending with a weird pregnancy and birth.",
+          "expected_ids": [
+            "2831557"
+          ],
+          "ranked_ids": [
+            "2831557",
+            "17124686",
+            "2331662",
+            "1721255",
+            "14624892"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q018",
+          "query": "A thriller about a psychiatrist who, after a stormy car crash, gets possessed by a ghostly girl and wakes up as a patient in the mental hospital where she works, trying to prove she\u2019s not actually crazy.",
+          "expected_ids": [
+            "793025"
+          ],
+          "ranked_ids": [
+            "793025",
+            "11612605",
+            "28996885",
+            "690918",
+            "15155743"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q019",
+          "query": "What is the name of that early black\u2011and\u2011white horror film where a young scientist and his hunchback assistant stitch together a human body in a creepy tower lab and end up creating a monster?",
+          "expected_ids": [
+            "73488"
+          ],
+          "ranked_ids": [
+            "73488",
+            "7218457",
+            "3303226",
+            "20097181",
+            "3291573"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q020",
+          "query": "I\u2019m looking for a mid\u201190s sci\u2011fi parody where Martians invade Earth, the president gives a televised address, and the chaos spreads from a Vegas hotel to a Kansas family with a bumbling first\u2011contact meeting.",
+          "expected_ids": [
+            "3565461"
+          ],
+          "ranked_ids": [
+            "3565461",
+            "7761830",
+            "3997811",
+            "55325",
+            "20644472"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q021",
+          "query": "I'm looking for a Japanese sci\u2011fi thriller set in a near\u2011future Chinese megacity where three orphaned pickpockets get tangled with a vampire gang leader after an economic collapse.",
+          "expected_ids": [
+            "1607540"
+          ],
+          "ranked_ids": [
+            "1607540",
+            "17048091",
+            "23195317",
+            "6124685",
+            "605939"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q022",
+          "query": "Looking for an old black\u2011and\u2011white animated short where a musical cartoon character hosts a Halloween party with pumpkins and animal friends, only to have a huge gorilla crash the celebration.",
+          "expected_ids": [
+            "7487699"
+          ],
+          "ranked_ids": [
+            "7487699",
+            "29602277",
+            "22301502",
+            "4118310",
+            "15753282"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q023",
+          "query": "I'm looking for an animated musical about a princess and a fortune\u2011teller who try to use a mysterious dimensional portal to flee a kingdom under attack by a robotic army.",
+          "expected_ids": [
+            "7460481"
+          ],
+          "ranked_ids": [
+            "7460481",
+            "399435",
+            "32307438",
+            "13632712",
+            "23725400"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q024",
+          "query": "I'm trying to find an animated short where an elderly widower keeps adding new levels to his house as floodwaters rise, and when he drops his pipe in the submerged lower floors, his search triggers memories of his past.",
+          "expected_ids": [
+            "21663542"
+          ],
+          "ranked_ids": [
+            "21663542",
+            "407591",
+            "29916195",
+            "24786448",
+            "4259508"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q025",
+          "query": "I'm trying to find a movie about a prison uprising where a reluctant inmate ends up defending a guard against a group of violent prisoners during a chaotic riot.",
+          "expected_ids": [
+            "18970935"
+          ],
+          "ranked_ids": [
+            "18970935",
+            "1466657",
+            "6143584",
+            "2055814",
+            "26224240"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q026",
+          "query": "I\u2019m looking for a made\u2011for\u2011TV thriller where a Des\u202fPlaines police lieutenant investigates a missing teenager, suspects a well\u2011known local businessman of being a serial killer, and battles community denial and flimsy evidence to catch him.",
+          "expected_ids": [
+            "20836034"
+          ],
+          "ranked_ids": [
+            "12555629",
+            "20836034",
+            "2746792",
+            "14794631",
+            "22644918"
+          ],
+          "mrr": 0.5,
+          "ndcg": 0.6309,
+          "hit": true
+        },
+        {
+          "query_id": "q027",
+          "query": "A thriller about a widowed psychiatrist who receives a strange call from her own father about a mysterious wheelchair\u2011bound patient, with supernatural twists and a tense airport backdrop.",
+          "expected_ids": [
+            "18716405"
+          ],
+          "ranked_ids": [
+            "28236143",
+            "18716405",
+            "28216994",
+            "15053838",
+            "2008863"
+          ],
+          "mrr": 0.5,
+          "ndcg": 0.6309,
+          "hit": true
+        },
+        {
+          "query_id": "q028",
+          "query": "Looking for a classic western about a cowboy who drives a herd of cattle to the Klondike gold rush and clashes with a self\u2011appointed judge who confiscates his herd, leading to a chase across the Canadian border.",
+          "expected_ids": [
+            "2165760"
+          ],
+          "ranked_ids": [
+            "2165760",
+            "30366958",
+            "73882",
+            "18676578",
+            "12782082"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q029",
+          "query": "I'm trying to find a 1980s horror\u2011action movie set in the Louisiana swamps where a scientist is transformed into a plant\u2011based monster after a lab accident, and his sister is killed by a crazed doctor obsessed with immortality.",
+          "expected_ids": [
+            "5929445"
+          ],
+          "ranked_ids": [
+            "5929445",
+            "6179287",
+            "7275095",
+            "26724867",
+            "23974943"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q030",
+          "query": "I'm trying to find a family fantasy adventure set in wartime Scotland where a young boy discovers a mysterious creature in Loch\u202fNess and forms a bond with it. It has a magical, heartfelt vibe and includes an old storyteller who shares the legend in a bar.",
+          "expected_ids": [
+            "36956792"
+          ],
+          "ranked_ids": [
+            "36956792",
+            "6559084",
+            "7966219",
+            "5787130",
+            "1714514"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q031",
+          "query": "I'm looking for an old black\u2011and\u2011white adventure thriller where a female pilot crashes in the jungles of French Indochina and is rescued by a mysterious detective posing as an archaeologist.",
+          "expected_ids": [
+            "20904748"
+          ],
+          "ranked_ids": [
+            "17070479",
+            "61529",
+            "11975716",
+            "26472079",
+            "8260752"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q032",
+          "query": "I'm trying to find a 1980s Indian thriller where a senior police officer is sent to a rich family's house to investigate a daughter\u2011in\u2011law's death that appears to be a suicide but turns into a murder mystery.",
+          "expected_ids": [
+            "23227434"
+          ],
+          "ranked_ids": [
+            "12664320",
+            "25008319",
+            "33575471",
+            "33226976",
+            "21028971"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        },
+        {
+          "query_id": "q033",
+          "query": "What is the French indie horror thriller about two college friends who drive to a remote house for the weekend and are relentlessly stalked by a mysterious killer, opening with a disturbing scene of a woman in a hospital gown?",
+          "expected_ids": [
+            "1157922"
+          ],
+          "ranked_ids": [
+            "10059008",
+            "25008319",
+            "21094917",
+            "1157922",
+            "25934563"
+          ],
+          "mrr": 0.25,
+          "ndcg": 0.4307,
+          "hit": true
+        },
+        {
+          "query_id": "q034",
+          "query": "I\u2019m looking for a historical drama about a German monk in the 1500s who breaks with the Catholic Church over its teachings and sparks the Reformation.",
+          "expected_ids": [
+            "10185281"
+          ],
+          "ranked_ids": [
+            "12336807",
+            "19092127",
+            "12668580",
+            "14914760",
+            "10185281"
+          ],
+          "mrr": 0.2,
+          "ndcg": 0.3869,
+          "hit": true
+        },
+        {
+          "query_id": "q035",
+          "query": "I\u2019m looking for an epic biographical drama about a Chinese emperor who grows up in the Forbidden City, loses his throne, and ends up as a political prisoner after the Communist takeover.",
+          "expected_ids": [
+            "129246"
+          ],
+          "ranked_ids": [
+            "129246",
+            "1590940",
+            "2634920",
+            "781201",
+            "13212232"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q036",
+          "query": "I'm looking for a movie about a Black high\u2011school football coach hired in the early 1970s at a newly integrated school, where he has to overcome racial tensions and forge a bond with a white assistant while trying to lead the team to a championship.",
+          "expected_ids": [
+            "397574"
+          ],
+          "ranked_ids": [
+            "397574",
+            "2004939",
+            "1065748",
+            "1377427",
+            "8859517"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q037",
+          "query": "Looking for a silent black\u2011and\u2011white fantasy drama where a fairy appears as a poor widow and sends a brother and sister on a magical quest to find the bluebird of happiness, using a special hat that reveals hidden worlds.",
+          "expected_ids": [
+            "4597981"
+          ],
+          "ranked_ids": [
+            "4597981",
+            "4598057",
+            "1853602",
+            "4673186",
+            "4598013"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q038",
+          "query": "What\u2019s the name of that 1980s fantasy comedy where a wealthy 81\u2011year\u2011old man swaps bodies with his 18\u2011year\u2011old grandson and has to go back to high school, sports and teenage romance?",
+          "expected_ids": [
+            "15336744"
+          ],
+          "ranked_ids": [
+            "14545761",
+            "15336744",
+            "4195529",
+            "35987457",
+            "34489023"
+          ],
+          "mrr": 0.5,
+          "ndcg": 0.6309,
+          "hit": true
+        },
+        {
+          "query_id": "q039",
+          "query": "I'm looking for an animated fantasy about a solitary white five\u2011tailed fox who ends up at a mountain school for misfit kids, taught by an eccentric teacher, while a stranded alien tries to fix its ship and go home.",
+          "expected_ids": [
+            "10175018"
+          ],
+          "ranked_ids": [
+            "10175018",
+            "31655197",
+            "18728031",
+            "11573895",
+            "20868226"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q040",
+          "query": "A classic wartime drama about a gentle German pastor who stands up to the Nazis in a small village, gets arrested for preaching against Hitler and is sent to Dachau.A classic wartime drama about a gentle German pastor who stands up to the Nazis in a small village, gets arrested for preaching against Hitler and is sent to Dachau.",
+          "expected_ids": [
+            "13840353"
+          ],
+          "ranked_ids": [
+            "13840353",
+            "30873849",
+            "3555884",
+            "2615493",
+            "5094861"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q041",
+          "query": "I'm trying to find a World War\u202fII action movie where a major recruits a dozen hardened prisoners for a suicide raid on a secret Nazi chemical plant to stop a nerve\u2011gas attack on Washington, D.C.",
+          "expected_ids": [
+            "25649956"
+          ],
+          "ranked_ids": [
+            "25649956",
+            "21432813",
+            "4397117",
+            "31065652",
+            "1192112"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q042",
+          "query": "Looking for a Korean period drama set during King Sejong's reign where Joseon is threatened by Ming China over a secret weapons program and forced to send young women as tribute.",
+          "expected_ids": [
+            "20413984"
+          ],
+          "ranked_ids": [
+            "20413984",
+            "3324690",
+            "20119316",
+            "34468533",
+            "129246"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q043",
+          "query": "Which classic western has a charismatic outlaw who hides with a Mormon wagon train to evade the marshals, befriends a little girl, and ultimately defends the travelers from an Indian attack?",
+          "expected_ids": [
+            "9140037"
+          ],
+          "ranked_ids": [
+            "9140037",
+            "15974702",
+            "3584576",
+            "3762624",
+            "14144087"
+          ],
+          "mrr": 1.0,
+          "ndcg": 1.0,
+          "hit": true
+        },
+        {
+          "query_id": "q044",
+          "query": "Looking for an \u201980s horror\u2011western where a small\u2011town teen is bitten by a mysterious drifter, becomes a vampire, and is forced to join a roaming gang of night\u2011time blood\u2011suckers while trying to survive the deadly sunrise.",
+          "expected_ids": [
+            "1637470"
+          ],
+          "ranked_ids": [
+            "3778613",
+            "1637470",
+            "19936740",
+            "975913",
+            "17123071"
+          ],
+          "mrr": 0.5,
+          "ndcg": 0.6309,
+          "hit": true
+        },
+        {
+          "query_id": "q045",
+          "query": "Looking for a comedic Western where two longtime cowboy buddies reunite in a Texas town, one now a country music star and the other a Hollywood actor, and both end up competing for the same woman they both loved back in the day.",
+          "expected_ids": [
+            "11036915"
+          ],
+          "ranked_ids": [
+            "25974893",
+            "9425270",
+            "4148842",
+            "14992861",
+            "2354153"
+          ],
+          "mrr": 0.0,
+          "ndcg": 0.0,
+          "hit": false
+        }
+      ]
+    }
+  ]
+}
