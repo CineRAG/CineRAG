@@ -8,8 +8,12 @@ import pytest
 from backend.rag.generator import (
     DETERMINISTIC_FALLBACK_TEXT,
     FALLBACK_TOP_K,
+    PLOT_PREVIEW_LEN,
     ResponseGenerator,
+    _clean_plot_summary,
+    _plot_preview,
     _safe_per_movie_explanation,
+    _smart_truncate,
 )
 from backend.tests.llm.mock_data import MOCK_RETRIEVAL_RESULTS
 
@@ -90,7 +94,7 @@ class TestGenerate:
         assert rec["explanation"] == "Memory and love are central themes."
         assert rec["match_reasons"] == ["shared theme: memory", "emotional core"]
 
-    def test_plot_preview_is_python_sliced_300_chars(self):
+    def test_plot_preview_is_cleaned_and_truncated_at_sentence_boundary(self):
         client = _client_json(_good_picks_payload())
         gen = ResponseGenerator(client)
         out = gen.generate(
@@ -99,7 +103,11 @@ class TestGenerate:
             parsed_intent=PARSED_INTENT_RECOMMEND,
         )
         movie = next(m for m in MOCK_RETRIEVAL_RESULTS if m["movie_id"] == "345678")
-        assert out["recommendations"][0]["plot_preview"] == movie["plot_summary"][:300]
+        # Clean Netflix-style plots pass through _clean_plot_summary unchanged,
+        # so this asserts the contract end-to-end: the rendered preview is
+        # whatever _plot_preview yields on the source text.
+        assert out["recommendations"][0]["plot_preview"] == _plot_preview(movie["plot_summary"])
+        assert len(out["recommendations"][0]["plot_preview"]) <= PLOT_PREVIEW_LEN
 
     def test_empty_candidates_returns_apology_no_llm_call(self):
         client = _client_json({"response_text": "should not be called", "picks": []})
@@ -155,7 +163,7 @@ class TestGenerate:
         # the plot at all, and must not equal the plot_preview rendered below.
         assert rec["explanation"] != copied
         assert rec["explanation"] not in inception_plot
-        assert rec["plot_preview"] == inception_plot[:300]
+        assert rec["plot_preview"] == _plot_preview(inception_plot)
         assert rec["explanation"] != rec["plot_preview"]
 
     def test_llm_explanation_that_paraphrases_passes_through(self):
@@ -409,7 +417,7 @@ class TestRetryAndFallback:
             source = next(
                 m for m in MOCK_RETRIEVAL_RESULTS if m["movie_id"] == rec["movie_id"]
             )
-            assert rec["plot_preview"] == source["plot_summary"][:300]
+            assert rec["plot_preview"] == _plot_preview(source["plot_summary"])
             assert rec["plot_preview"] != rec["explanation"]
 
     def test_response_text_is_consistent_when_recommendations_empty(self):
@@ -469,3 +477,140 @@ class TestSafePerMovieExplanation:
         out = _safe_per_movie_explanation(movie, {"mood": "tense"}, index=0)
         assert "young couple" not in out.lower()
         assert "social backgrounds" not in out.lower()
+
+
+class TestCleanPlotSummary:
+    """Unit tests for the Wikipedia-markup stripper applied to plot_preview."""
+
+    def test_empty_input_returns_empty(self):
+        assert _clean_plot_summary("") == ""
+        assert _clean_plot_summary(None) == ""  # type: ignore[arg-type]
+
+    def test_no_op_on_clean_netflix_style_text(self):
+        s = "A young couple from different social backgrounds fall deeply in love."
+        assert _clean_plot_summary(s) == s
+
+    def test_strips_cite_web_template(self):
+        s = "Melodrama about a university student's experiences with love. Synopsis based on {{cite web}}"
+        out = _clean_plot_summary(s)
+        assert "{{" not in out
+        assert "cite web" not in out
+        # Trailing "Synopsis based on" with nothing after it gets cleaned too.
+        assert not out.lower().endswith("synopsis based on")
+
+    def test_strips_inline_template_mid_text(self):
+        s = "She returned home {{citation needed}} and confronted her past."
+        out = _clean_plot_summary(s)
+        assert "citation needed" not in out
+        assert "She returned home" in out
+        assert "confronted her past" in out
+
+    def test_strips_ref_tags_pair_and_self_closing(self):
+        s = 'A war drama<ref name="Smith 1999">Smith p. 12</ref> set in the trenches.<ref name="Jones"/>'
+        out = _clean_plot_summary(s)
+        assert "<ref" not in out
+        assert "Smith" not in out
+        assert "war drama" in out
+        assert "trenches" in out
+
+    def test_strips_section_headers(self):
+        s = "== Plot ==\nA man wakes up. === Cast === The lead is played by..."
+        out = _clean_plot_summary(s)
+        assert "==" not in out
+        assert "A man wakes up" in out
+
+    def test_strips_file_and_image_links(self):
+        s = "A war movie [[File:Tank.jpg|thumb|A tank]] set in 1944. [[Image:Map.png]]"
+        out = _clean_plot_summary(s)
+        assert "[[" not in out
+        assert "File:" not in out
+        assert "war movie" in out
+
+    def test_extracts_piped_link_display_text(self):
+        s = "She studied at [[Cambridge University|Cambridge]] before the war."
+        out = _clean_plot_summary(s)
+        assert "[[" not in out
+        assert "Cambridge" in out
+        assert "Cambridge University" not in out
+
+    def test_strips_html_comments(self):
+        s = "A spy thriller. <!-- TODO: rewrite this --> The hero defects."
+        out = _clean_plot_summary(s)
+        assert "<!--" not in out
+        assert "TODO" not in out
+        assert "spy thriller" in out
+        assert "hero defects" in out
+
+    def test_collapses_whitespace(self):
+        s = "Line one.\n\n\nLine    two.\t\tLine three."
+        out = _clean_plot_summary(s)
+        assert "\n" not in out
+        assert "  " not in out
+        assert "Line one. Line two. Line three." == out
+
+    def test_real_world_passion_portrait_style(self):
+        # From Ömer's screenshot — exact-ish leakage pattern.
+        s = "Melodrama about a university student's experiences with love and political ideologies.Synopsis based on {{cite web}}"
+        out = _clean_plot_summary(s)
+        assert "{{" not in out
+        assert "cite web" not in out
+        assert "Melodrama" in out
+        assert "political ideologies" in out
+
+
+class TestSmartTruncate:
+    """Unit tests for sentence-boundary-aware truncation."""
+
+    def test_short_text_passes_through_unchanged(self):
+        s = "A short plot."
+        assert _smart_truncate(s, 100) == s
+
+    def test_truncates_at_last_sentence_end_when_feasible(self):
+        s = "First sentence. Second sentence is here. Third sentence runs much longer than the others to push past the limit."
+        out = _smart_truncate(s, 50)
+        # Last sentence end within window is after "is here."
+        assert out.endswith(".")
+        assert out == "First sentence. Second sentence is here."
+
+    def test_falls_back_to_word_boundary_when_no_sentence_end(self):
+        # No periods in the first 50 chars — must trim at last space + ellipsis.
+        s = "This is a long sentence that runs on and on without any punctuation marks at all in sight"
+        out = _smart_truncate(s, 50)
+        assert out.endswith("...")
+        assert not out[:-3].endswith(" ")
+        assert len(out) <= 50
+
+    def test_hard_cuts_when_no_useful_boundary(self):
+        # No spaces at all, no sentence ends.
+        s = "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        out = _smart_truncate(s, 20)
+        assert out.endswith("...")
+        assert len(out) <= 20
+
+    def test_does_not_chase_too_short_a_sentence_cut(self):
+        # Only sentence-end is right at the start; cutting there would drop
+        # most of the content. Should fall back to word/hard cut instead.
+        s = "OK. Then a much much longer second part that has no further punctuation marks anywhere visible at all"
+        out = _smart_truncate(s, 60)
+        # Must not have cut at the early "OK." — that's only 3 chars, below threshold.
+        assert out != "OK."
+        assert len(out) > 30
+
+
+class TestPlotPreviewIntegration:
+    """End-to-end behaviour of _plot_preview = clean + truncate."""
+
+    def test_clean_plot_under_limit_returns_full_text(self):
+        s = "A clean short synopsis under three hundred chars."
+        assert _plot_preview(s) == s
+
+    def test_garbage_template_cleaned_before_truncation(self):
+        s = "A romance about memory and time {{cite web|title=foo}} that unfolds across decades."
+        out = _plot_preview(s)
+        assert "{{" not in out
+        assert "cite web" not in out
+
+    def test_result_never_exceeds_max_length(self):
+        s = "Long sentence. " * 100
+        out = _plot_preview(s)
+        assert len(out) <= PLOT_PREVIEW_LEN

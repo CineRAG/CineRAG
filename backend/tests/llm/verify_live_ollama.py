@@ -33,7 +33,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import requests
 
-from backend.rag.generator import ResponseGenerator
+from backend.rag.generator import ResponseGenerator, _plot_preview
 from backend.rag.llm_client import OllamaClient
 from backend.tests.llm.mock_data import MOCK_RETRIEVAL_RESULTS
 
@@ -126,7 +126,7 @@ def field_checks(rec: dict, idx: int) -> list[tuple[str, bool, str]]:
     checks.append((f"[{idx}] explanation non-empty", isinstance(explanation, str) and len(explanation.strip()) > 0, f"len={len(explanation)}"))
     checks.append((f"[{idx}] explanation != plot_preview", explanation != plot_preview, "ok" if explanation != plot_preview else "EQUAL"))
     checks.append((f"[{idx}] explanation NOT substring of plot", not (explanation and explanation in plot_full), "ok" if explanation not in plot_full else "SUBSTRING"))
-    checks.append((f"[{idx}] plot_preview equals plot_summary[:300]", plot_preview == plot_full[:300], f"len={len(plot_preview)}"))
+    checks.append((f"[{idx}] plot_preview equals _plot_preview(plot_summary)", plot_preview == _plot_preview(plot_full), f"len={len(plot_preview)}"))
     mr = rec.get("match_reasons")
     checks.append((f"[{idx}] match_reasons is list[str]", isinstance(mr, list) and all(isinstance(x, str) for x in mr), f"value={mr!r}"))
     return checks

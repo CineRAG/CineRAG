@@ -26,7 +26,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from backend.rag.generator import ResponseGenerator
+from backend.rag.generator import ResponseGenerator, _plot_preview
 from backend.tests.llm.mock_data import MOCK_RETRIEVAL_RESULTS
 
 
@@ -121,11 +121,12 @@ def check_recommendation_fields(rec: dict, idx: int) -> list[tuple[str, bool, st
         "substring" if explanation in plot_full else "ok",
     ))
 
-    # plot_preview: str of len <= 300, equals plot_summary[:300]
+    # plot_preview is the cleaned + sentence-boundary-truncated form of plot.
+    expected_preview = _plot_preview(plot_full)
     checks.append((
-        f"[{idx}] plot_preview equals plot_summary[:300]",
-        isinstance(plot_preview, str) and plot_preview == plot_full[:300],
-        f"len={len(plot_preview)} expected_len={len(plot_full[:300])}",
+        f"[{idx}] plot_preview equals _plot_preview(plot_summary)",
+        isinstance(plot_preview, str) and plot_preview == expected_preview,
+        f"len={len(plot_preview)} expected_len={len(expected_preview)}",
     ))
 
     # match_reasons: list[str], non-empty (per spec it can be empty for LLM picks

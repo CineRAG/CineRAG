@@ -33,6 +33,84 @@ _FALLBACK_INTROS = (
 )
 
 
+# Regexes for cleaning Wikipedia markup artifacts that leaked into the corpus.
+# All applied in a fixed order in _clean_plot_summary.
+_TEMPLATE_RE = re.compile(r"\{\{.*?\}\}", re.DOTALL)
+_REF_PAIR_RE = re.compile(r"<ref\b[^>]*>.*?</ref>", re.DOTALL | re.IGNORECASE)
+_REF_SELF_RE = re.compile(r"<ref\b[^>]*/\s*>", re.IGNORECASE)
+_HEADER_RE = re.compile(r"={2,}\s*[^=\n]+?\s*={2,}")
+_MEDIA_LINK_RE = re.compile(r"\[\[(?:File|Image)\s*:[^\]]*\]\]", re.IGNORECASE)
+_PIPED_LINK_RE = re.compile(r"\[\[(?:[^\]|]*\|)?([^\]]+)\]\]")
+_HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
+_TRAILING_FRAGMENT_RE = re.compile(
+    r"\s*(?:Synopsis|Summary|Plot summary)\s+(?:based\s+on|adapted\s+from|from)\s*\.?\s*$",
+    re.IGNORECASE,
+)
+_WS_RE = re.compile(r"\s+")
+_SENTENCE_END_RE = re.compile(r"[.!?](?=\s|$)")
+
+
+def _clean_plot_summary(text: str) -> str:
+    """Strip Wikipedia markup leakage from a corpus plot summary.
+
+    Targets observed offenders in the CMU/Wikipedia-derived corpus:
+    - `{{cite web}}` / `{{...}}` citation and infobox templates
+    - `<ref>...</ref>` and self-closing `<ref ... />` citation tags
+    - `== Section Headers ==`
+    - `[[File:...]]` / `[[Image:...]]` media markup
+    - `[[Article|display text]]` piped links (keep display text, drop link)
+    - `<!-- HTML comments -->`
+    - Trailing `Synopsis based on` fragments left after template stripping
+
+    Does NOT attempt to repair scene-by-scene narration or machine-translated
+    ungrammatical text — those are corpus-quality issues, not markup. The
+    cleaner is a no-op on already-clean Netflix-style synopses.
+    """
+    if not text:
+        return ""
+    s = _HTML_COMMENT_RE.sub("", text)
+    s = _TEMPLATE_RE.sub("", s)
+    s = _REF_PAIR_RE.sub("", s)
+    s = _REF_SELF_RE.sub("", s)
+    s = _HEADER_RE.sub("", s)
+    s = _MEDIA_LINK_RE.sub("", s)
+    s = _PIPED_LINK_RE.sub(r"\1", s)
+    s = _TRAILING_FRAGMENT_RE.sub("", s)
+    s = _WS_RE.sub(" ", s).strip()
+    return s
+
+
+def _smart_truncate(text: str, max_len: int) -> str:
+    """Truncate to last sentence-end within max_len when feasible.
+
+    A "feasible" sentence cut is one that keeps at least 60% of the window —
+    otherwise we'd discard too much content chasing a clean ending. When no
+    feasible sentence end exists, fall back to the last word boundary plus
+    an ellipsis. When even that drops too much, hard-cut with ellipsis.
+    """
+    if len(text) <= max_len:
+        return text
+    window = text[:max_len]
+    threshold = max(1, int(max_len * 0.6))
+    matches = list(_SENTENCE_END_RE.finditer(window))
+    if matches:
+        last_end = matches[-1].end()
+        if last_end >= threshold:
+            return window[:last_end].rstrip()
+    # Reserve 3 chars for the ellipsis when hard-cutting so the result never
+    # exceeds max_len.
+    body = text[: max(1, max_len - 3)]
+    last_space = body.rfind(" ")
+    if last_space >= threshold:
+        return body[:last_space].rstrip() + "..."
+    return body.rstrip() + "..."
+
+
+def _plot_preview(plot: str) -> str:
+    """Clean + truncate plot text for the recommendation card citation."""
+    return _smart_truncate(_clean_plot_summary(plot), PLOT_PREVIEW_LEN)
+
+
 def _render_history(history: list[dict] | None) -> str:
     if not history:
         return "(none)"
@@ -174,7 +252,7 @@ def _build_recommendation(
         "year": source_movie.get("year"),
         "genres": list(source_movie.get("genres", [])),
         "explanation": explanation,
-        "plot_preview": plot[:PLOT_PREVIEW_LEN],
+        "plot_preview": _plot_preview(plot),
         "match_reasons": list(pick.get("match_reasons", [])),
     }
 
@@ -331,7 +409,7 @@ class ResponseGenerator:
                     "year": m.get("year"),
                     "genres": list(m.get("genres", [])),
                     "explanation": _safe_per_movie_explanation(m, attrs, index),
-                    "plot_preview": plot[:PLOT_PREVIEW_LEN],
+                    "plot_preview": _plot_preview(plot),
                     "match_reasons": match_reasons,
                 }
             )
