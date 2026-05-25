@@ -36,3 +36,4 @@ data/raw/
 data/processed/
 data/chroma_db/
 *.pkl
+frontend/.env
