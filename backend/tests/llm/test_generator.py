@@ -203,6 +203,53 @@ class TestGenerate:
         # At least one valid pick → no retry needed.
         assert client.generate_json.call_count == 1
 
+    def test_accepts_integer_movie_ids_from_llm(self):
+        """The prompt's wording (digits only, no quotes) makes the LLM emit
+        JSON numbers, so picks arrive as int. Validation must coerce to string
+        before looking them up against the string-keyed candidate dict —
+        otherwise EVERY pick is dropped and the deterministic fallback fires
+        100% of the time, which is what was happening in production."""
+        payload = {
+            "response_text": "Three picks.",
+            "picks": [
+                {"movie_id": 975900, "explanation": "real 1", "match_reasons": []},
+                {"movie_id": 234567, "explanation": "real 2", "match_reasons": []},
+                {"movie_id": 345678, "explanation": "real 3", "match_reasons": []},
+            ],
+        }
+        client = _client_json(payload)
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert client.generate_json.call_count == 1, (
+            "Should not retry — int IDs must resolve on first attempt"
+        )
+        assert [r["movie_id"] for r in out["recommendations"]] == [
+            "975900", "234567", "345678",
+        ], "Integer picks must be coerced to canonical string IDs"
+        # And the LLM's real explanations must survive (no fallback rewrite).
+        assert out["recommendations"][0]["explanation"] == "real 1"
+
+    def test_accepts_mixed_int_and_str_movie_ids(self):
+        payload = {
+            "response_text": "Mixed types.",
+            "picks": [
+                {"movie_id": "975900", "explanation": "str pick", "match_reasons": []},
+                {"movie_id": 234567, "explanation": "int pick", "match_reasons": []},
+            ],
+        }
+        client = _client_json(payload)
+        gen = ResponseGenerator(client)
+        out = gen.generate(
+            user_message="x",
+            reranked_movies=MOCK_RETRIEVAL_RESULTS,
+            parsed_intent=PARSED_INTENT_RECOMMEND,
+        )
+        assert [r["movie_id"] for r in out["recommendations"]] == ["975900", "234567"]
+
 
 class TestRetryAndFallback:
     """Spec §2-§3: retry on all-invalid picks, then deterministic top-K fallback."""
@@ -244,8 +291,11 @@ class TestRetryAndFallback:
         )
         retry_prompt = client.generate_json.call_args_list[1].args[0]
         assert "RETRY NOTICE" in retry_prompt
+        # IDs are rendered quoted so the LLM emits them as JSON strings, not
+        # bare numbers. The validation layer is type-tolerant, but lining up
+        # prompt and validation reduces fallback firing in the first place.
         for movie in MOCK_RETRIEVAL_RESULTS:
-            assert f"- {movie['movie_id']}" in retry_prompt
+            assert f'"{movie["movie_id"]}"' in retry_prompt
 
     def test_deterministic_fallback_fires_when_both_attempts_invalid(self):
         client = _client_json_sequence(_all_invalid_payload(), _all_invalid_payload())

@@ -4,7 +4,7 @@ CRITICAL RULES FOR movie_id:
 - You MUST pick movie_id values exactly from the CANDIDATES block below.
 - Do NOT invent movie IDs.
 - Do NOT use a movie's title as its movie_id.
-- Every pick.movie_id MUST exactly match one of the candidate movie_id values, copied character-for-character (digits only, no quotes around the digits, no extra text).
+- Every pick.movie_id MUST exactly match one of the candidate movie_id values, copied character-for-character, and emitted as a JSON string (in double quotes), even though the value is all digits. Example: "movie_id": "975900".
 - If you cannot find a perfect thematic match, still choose the closest valid candidates from the list rather than inventing IDs.
 
 For each pick, write a short explanation (1-2 sentences) of why it fits the user's request, IN YOUR OWN WORDS. Synthesize concepts and themes — do NOT copy, quote, or lightly paraphrase entire sentences from the plot summary. The explanation must read as original reasoning, not a plot snippet. The plot summary will be shown to the user separately as evidence; your explanation must be visibly distinct from it.

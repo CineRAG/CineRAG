@@ -278,25 +278,34 @@ class ResponseGenerator:
         """
         if "error" in result:
             return []
-        by_id = {m["movie_id"]: m for m in reranked_movies}
+        # Coerce both sides to str. Backend movie_ids are always str (CMU corpus
+        # uses Wikipedia digit strings), but the prompt asks the LLM to emit
+        # them unquoted, so json.loads parses them as int. Without this
+        # normalization every lookup fails and the deterministic fallback
+        # fires on every query.
+        by_id = {str(m["movie_id"]): m for m in reranked_movies}
         recs: list[dict] = []
         for pick in result.get("picks", []):
-            mid = pick.get("movie_id")
+            raw_mid = pick.get("movie_id")
+            if raw_mid is None:
+                logger.warning("ResponseGenerator: pick missing movie_id field")
+                continue
+            mid = str(raw_mid)
             source = by_id.get(mid)
             if not source:
-                logger.warning("ResponseGenerator: pick references unknown movie_id %r", mid)
+                logger.warning("ResponseGenerator: pick references unknown movie_id %r", raw_mid)
                 continue
             recs.append(_build_recommendation(pick, source, len(recs), attrs))
         return recs
 
     def _build_retry_prompt(self, base_prompt: str, reranked_movies: list[dict]) -> str:
-        allowed_block = "\n".join(f"- {m['movie_id']}" for m in reranked_movies)
+        allowed_block = "\n".join(f'- "{m["movie_id"]}"' for m in reranked_movies)
         addendum = (
             "\n\nRETRY NOTICE: your previous response used movie_id values that were not in "
-            "the CANDIDATES list. Allowed movie_id values, exactly:\n"
+            "the CANDIDATES list. Allowed movie_id values (each is a JSON string, in quotes):\n"
             f"{allowed_block}\n"
             "Return JSON again. Every pick.movie_id MUST be one of those exact values, "
-            "copied character-for-character. Do not invent IDs. Do not use titles as IDs."
+            "as a JSON string in double quotes. Do not invent IDs. Do not use titles as IDs."
         )
         return base_prompt + addendum
 
