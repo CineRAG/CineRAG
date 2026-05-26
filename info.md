@@ -48,7 +48,7 @@ If `git pull` reports merge conflicts, stop. Resolve them on a developer machine
 
 ```bash
 cd /files/CineRAG/backend
-conda activate cinerag
+conda activate cinerag_backend
 pip install -r requirements.txt
 ```
 
@@ -139,7 +139,7 @@ Open Terminal 2 in the Backend GPU app.
 
 ```bash
 cd /files/CineRAG/backend
-conda activate cinerag
+conda activate cinerag_backend
 
 export OLLAMA_BASE_URL=http://127.0.0.1:11434
 CHROMA_DB_PATH=/files/CineRAG/data/chroma_db uvicorn main:app --host 0.0.0.0 --port 8000
@@ -176,7 +176,7 @@ Open Terminal 3 in the Backend GPU app.
 
 ```bash
 cd /files/CineRAG/backend
-conda activate cinerag
+conda activate cinerag_backend
 
 BASE_URL=http://127.0.0.1:8000 PROJECT_ROOT=/files/CineRAG bash backend_smoke_test.sh
 ```
