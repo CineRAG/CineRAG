@@ -59,13 +59,10 @@ pip install -r requirements.txt
 The retriever embedding model has changed in the past (e.g. `all-MiniLM-L6-v2` 384-dim → `BAAI/bge-base-en-v1.5` 768-dim). If the on-disk Chroma index was built with a different model than the code expects, queries fail with a dimension mismatch — or, worse, return silently meaningless results.
 
 ```bash
-python - <<'EOF'
-import chromadb
-client = chromadb.PersistentClient(path="/files/CineRAG/data/chroma_db")
-col = client.get_collection("movies")
-print(f"Chroma dim: {len(col.peek(1)['embeddings'][0])}, docs: {col.count():,}")
-EOF
+python -c 'import chromadb; col=chromadb.PersistentClient(path="/files/CineRAG/data/chroma_db").get_collection("movies"); print("Chroma dim:", len(col.peek(1)["embeddings"][0]), " docs:", col.count())'
 ```
+
+(Avoid `<<EOF` heredocs in this runbook — the Nuvolos web terminal can mis-handle them on multi-line paste and leave the shell stuck at the `>` continuation prompt. Always use `python -c '...'` single-line form here.)
 
 Expected, with the current code (`BAAI/bge-base-en-v1.5`): `Chroma dim: 768`.
 
