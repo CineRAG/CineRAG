@@ -27,17 +27,17 @@ QUERY = "Recommend me a mind-bending sci-fi movie like Inception"
 
 
 def main() -> int:
-    u = f"verify_{int(time.time())}"
-    print(f"Signing up: {u}")
+    email = f"verify_{int(time.time())}@test.local"
+    print(f"Signing up: {email}")
     r = requests.post(
         f"{BASE}/api/auth/signup",
-        json={"username": u, "password": "test123"},
+        json={"email": email, "password": "test123"},
         timeout=30,
     )
     if r.status_code != 201:
         print(f"FAIL signup: HTTP {r.status_code}: {r.text[:300]}")
         return 2
-    tok = r.json()["access_token"]
+    tok = r.json()["token"]
     print(f"Token: {tok[:30]}...\n")
 
     print(f"POST /api/chat: {QUERY!r}")
