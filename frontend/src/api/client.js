@@ -1,14 +1,16 @@
 import { toast } from "sonner";
 
-// Hardcoded to relative paths: requests like "/api/..." go to the same
-// origin the page was loaded from (the Vite dev/preview server), which
-// then proxies "/api/..." to the backend via VITE_BACKEND_PROXY_TARGET.
-// Earlier code read VITE_API_BASE_URL, but the value gets baked into
-// the production bundle at build time; stale values from a leftover
-// shell export caused CORS-blocked cross-origin fetches against the
-// Nuvolos backend proxy. Keep this hardcoded for the demo; the proxy
-// target stays configurable on the Vite server side.
-const BASE_URL = "";
+// Detect Nuvolos-style proxy prefix at runtime. The frontend is served
+// at /proxy/<port>/, but fetch("/api/...") with a leading slash resolves
+// to the host root (skipping the prefix), so the request hits the
+// proxy at /api/* which Nuvolos returns 405 for. Reading the prefix
+// from window.location.pathname makes the same bundle work locally
+// (no prefix → "") and under any /proxy/<port>/ proxy automatically.
+const BASE_URL = (() => {
+  if (typeof window === "undefined") return "";
+  const match = window.location.pathname.match(/^(\/proxy\/\d+)/);
+  return match ? match[1] : "";
+})();
 
 function isPublicAuthEndpoint(endpoint, method = "GET") {
   const m = method.toUpperCase();
