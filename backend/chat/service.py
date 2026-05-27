@@ -75,6 +75,7 @@ class ChatService:
             "expanded_query": "",
             "num_candidates_before_filter": 0,
             "num_candidates_after_filter": 0,
+            "num_franchise_excluded": 0,
             "retrieval_method": "hybrid_rrf",
         }
 
@@ -106,6 +107,7 @@ class ChatService:
             # 4. Reference resolution
             reference_movie_data = None
             title_hits: list[dict] = []
+            franchise_ids: set[str] = set()
             if parsed_intent.get("reference_movie"):
                 hits = self.retriever.search_by_title(
                     parsed_intent["reference_movie"], top_k=10
@@ -113,6 +115,14 @@ class ChatService:
                 if hits:
                     reference_movie_data = hits[0]
                     title_hits = hits
+                    # Exclude the reference movie itself and its franchise from
+                    # final candidates. title_hits are still used in the RRF
+                    # fusion (they boost thematically-related films), but the
+                    # franchise titles themselves never reach the LLM —
+                    # otherwise a query like "fantasy like Harry Potter" returns
+                    # only Harry Potter sequels instead of films matching the
+                    # young-hero + mentor + magic theme.
+                    franchise_ids = {h["movie_id"] for h in hits}
 
             # 5. Expand
             expanded_query = self.expander.expand(parsed_intent, reference_movie_data)
@@ -134,6 +144,10 @@ class ChatService:
             filtered = filter_watched(candidates, watched_movie_ids)
             if exclude_movie_ids:
                 filtered = filter_excluded(filtered, exclude_movie_ids)
+            if franchise_ids:
+                before_franchise = len(filtered)
+                filtered = filter_excluded(filtered, franchise_ids)
+                debug["num_franchise_excluded"] = before_franchise - len(filtered)
             debug["num_candidates_after_filter"] = len(filtered)
 
             filtered = crossencoder_rerank(user_message, filtered, self.cross_encoder, top_k=20)
