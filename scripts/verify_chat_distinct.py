@@ -19,11 +19,13 @@ from __future__ import annotations
 
 import sys
 import time
+import uuid
 
 import requests
 
 BASE = "http://127.0.0.1:8000"
 QUERY = "Recommend me a mind-bending sci-fi movie like Inception"
+SESSION_ID = f"verify-{uuid.uuid4().hex[:8]}"
 
 
 def main() -> int:
@@ -43,7 +45,7 @@ def main() -> int:
     print(f"POST /api/chat: {QUERY!r}")
     r = requests.post(
         f"{BASE}/api/chat",
-        json={"message": QUERY, "session_id": "verify-1"},
+        json={"message": QUERY, "session_id": SESSION_ID},
         headers={"Authorization": f"Bearer {tok}"},
         timeout=180,
     )

@@ -25,11 +25,13 @@ from __future__ import annotations
 
 import sys
 import time
+import uuid
 
 import requests
 
 BASE = "http://127.0.0.1:8000"
 DEFAULT_QUERY = "Recommend me a mind-bending sci-fi movie like Inception"
+SESSION_ID = f"verify-q-{uuid.uuid4().hex[:8]}"
 
 # Strings that should never appear in an LLM-generated explanation.
 # If they do, the deterministic-fallback path was triggered = LLM output unusable.
@@ -58,7 +60,7 @@ def run_chat(tok: str, query: str) -> dict:
     print(f"\nPOST /api/chat: {query!r}")
     r = requests.post(
         f"{BASE}/api/chat",
-        json={"message": query, "session_id": "verify-q-1"},
+        json={"message": query, "session_id": SESSION_ID},
         headers={"Authorization": f"Bearer {tok}"},
         timeout=180,
     )
