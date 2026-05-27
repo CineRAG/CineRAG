@@ -1,8 +1,13 @@
 import { toast } from "sonner";
 
-const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ??
-  (import.meta.env.DEV ? "" : "http://localhost:8000");
+// Default to relative paths in both dev and production: requests like
+// "/api/..." go to the same origin the page was loaded from, which is
+// the Vite dev/preview server. That server then proxies "/api/..." to
+// the real backend (VITE_BACKEND_PROXY_TARGET). This keeps the browser
+// on HTTPS via the Nuvolos proxy and avoids mixed-content blocks.
+// Set VITE_API_BASE_URL only if you want to bypass the proxy and call
+// the backend directly (e.g. when frontend and backend share an origin).
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
 function isPublicAuthEndpoint(endpoint, method = "GET") {
   const m = method.toUpperCase();
