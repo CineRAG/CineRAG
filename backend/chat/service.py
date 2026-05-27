@@ -108,7 +108,9 @@ class ChatService:
             reference_movie_data = None
             title_hits: list[dict] = []
             franchise_ids: set[str] = set()
+            ref_title_lower = ""
             if parsed_intent.get("reference_movie"):
+                ref_title_lower = parsed_intent["reference_movie"].strip().lower()
                 hits = self.retriever.search_by_title(
                     parsed_intent["reference_movie"], top_k=10
                 )
@@ -148,6 +150,20 @@ class ChatService:
                 before_franchise = len(filtered)
                 filtered = filter_excluded(filtered, franchise_ids)
                 debug["num_franchise_excluded"] = before_franchise - len(filtered)
+            # Substring catch-all: BM25 search_by_title with top_k=10 misses
+            # the tail of large franchises because BM25 idf collapses when many
+            # titles share the same prefix (8 "Harry Potter and ..." films all
+            # score near-identically, so which 10 land in the top is arbitrary
+            # and "Harry Potter and the Deathly Hallows Part 2" can slip out).
+            # Drop any remaining candidate whose title contains the reference
+            # string — guarantees no franchise film survives to the LLM.
+            if ref_title_lower:
+                before_substring = len(filtered)
+                filtered = [
+                    c for c in filtered
+                    if ref_title_lower not in (c.get("title") or "").lower()
+                ]
+                debug["num_franchise_excluded"] += before_substring - len(filtered)
             debug["num_candidates_after_filter"] = len(filtered)
 
             filtered = crossencoder_rerank(user_message, filtered, self.cross_encoder, top_k=20)
