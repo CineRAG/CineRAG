@@ -34,5 +34,18 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    // `vite preview` serves the production build over a small static
+    // server. On Nuvolos this is far more reliable than `vite dev`
+    // (no HMR WebSocket, no base-path runtime injection of /@vite/client),
+    // and still supports an /api proxy to forward to the backend.
+    preview: {
+      allowedHosts: true,
+      proxy: {
+        '/api': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+      },
+    },
   }
 })
