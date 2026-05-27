@@ -1,13 +1,14 @@
 import { toast } from "sonner";
 
-// Default to relative paths in both dev and production: requests like
-// "/api/..." go to the same origin the page was loaded from, which is
-// the Vite dev/preview server. That server then proxies "/api/..." to
-// the real backend (VITE_BACKEND_PROXY_TARGET). This keeps the browser
-// on HTTPS via the Nuvolos proxy and avoids mixed-content blocks.
-// Set VITE_API_BASE_URL only if you want to bypass the proxy and call
-// the backend directly (e.g. when frontend and backend share an origin).
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
+// Hardcoded to relative paths: requests like "/api/..." go to the same
+// origin the page was loaded from (the Vite dev/preview server), which
+// then proxies "/api/..." to the backend via VITE_BACKEND_PROXY_TARGET.
+// Earlier code read VITE_API_BASE_URL, but the value gets baked into
+// the production bundle at build time; stale values from a leftover
+// shell export caused CORS-blocked cross-origin fetches against the
+// Nuvolos backend proxy. Keep this hardcoded for the demo; the proxy
+// target stays configurable on the Vite server side.
+const BASE_URL = "";
 
 function isPublicAuthEndpoint(endpoint, method = "GET") {
   const m = method.toUpperCase();
